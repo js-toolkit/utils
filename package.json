@@ -1,6 +1,6 @@
 {
   "name": "@vzh/ts-types",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Typescript helper types",
   "main": "./",
   "types": "./index.d.ts",
