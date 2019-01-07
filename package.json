@@ -1,0 +1,50 @@
+{
+  "name": "@vzh/ts-types",
+  "version": "0.0.0",
+  "description": "Typescript helper types",
+  "main": "./",
+  "types": "./index.d.ts",
+  "author": "Vladimir Zhukov",
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Vladimir Zhukov",
+      "url": "http://github.com/vlazh"
+    }
+  ],
+  "homepage": "https://github.com/vlazh/vzh-ts-types",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vlazh/vzh-ts-types"
+  },
+  "bugs": {
+    "url": "https://github.com/vlazh/vzh-ts-types/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist/",
+    "copy": "copyfiles package.json LICENSE README.md ./dist/",
+    "build": "npm run clean && tsc --project ./tsconfig.json && npm run copy",
+    "build-to-tutoron": "npm run clean && tsc --project ./tsconfig.json --outDir '../tutoron/node_modules/@vzh/ts-types/'",
+    "build-to-reflexy": "npm run clean && tsc --project ./tsconfig.json --outDir '../reflexy/node_modules/@vzh/ts-types/'",
+    "build-to-react-components": "npm run clean && tsc --project ./tsconfig.json --outDir '../@vzh-react-components/node_modules/@vzh/ts-types/'",
+    "patch-publish": "npm version patch && npm run build && npm publish ./dist --access public && git push --follow-tags",
+    "minor-publish": "npm version minor && npm run build && npm publish ./dist --access public && git push --follow-tags",
+    "major-publish": "npm version major && npm run build && npm publish ./dist --access public && git push --follow-tags"
+  },
+  "devDependencies": {
+    "@vzh/configs": "^2.21.0",
+    "babel-eslint": "^10.0.1",
+    "copyfiles": "^2.1.0",
+    "eslint": "^5.11.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^3.3.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-typescript": "^0.14.0",
+    "prettier": "^1.15.3",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.2.2",
+    "typescript-eslint-parser": "^21.0.2",
+    "webpack-merge": "^4.2.1"
+  }
+}
