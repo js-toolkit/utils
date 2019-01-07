@@ -19,3 +19,12 @@ export type Overwrite<
   A extends object,
   B extends IntersectionKeys<B, A> extends never ? never : Intersection<B, A>
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
+
+/** Return keys of type `T` */
+export type KeysOfType<A extends object, B> = {
+  [P in keyof A]: A[P] extends B ? P : never
+}[keyof A];
+
+export type ExcludeKeys<A extends object, B> = Pick<A, Exclude<keyof A, KeysOfType<A, B>>>;
+
+export type ExtractKeys<A extends object, B> = Pick<A, KeysOfType<A, B>>;

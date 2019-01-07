@@ -1,4 +1,4 @@
-import { Omit, Overwrite, Diff } from './index';
+import { Omit, Overwrite, KeysOfType } from './index';
 
 type A = { a: number; c: string }; // $ExpectType "F"
 type B = { a?: boolean; b: string };
@@ -15,3 +15,6 @@ type Overwrite1 = Overwrite<A, B>;
 type Overwrite2 = Overwrite<A, D>;
 type Overwrite3 = Overwrite<A, B & D>;
 const c: Overwrite1 = {};
+
+type FilterKeys1 = KeysOfType<A, number>;
+const f: FilterKeys1;
