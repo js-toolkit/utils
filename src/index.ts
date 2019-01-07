@@ -25,7 +25,7 @@ export type Omit<
 > = Pick<A, Exclude<keyof A, K extends keyof A ? K : keyof K>>;
 
 export type Overwrite<
-  A extends object | B,
+  A extends object,
   B extends IntersectionKeys<B, A> extends never ? never : Intersection<B, A>
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
