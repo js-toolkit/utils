@@ -33,19 +33,19 @@
     "major-publish": "npm version major && npm run build && npm publish ./dist --access public && git push --follow-tags"
   },
   "devDependencies": {
-    "@vzh/configs": "^2.21.0",
+    "@typescript-eslint/eslint-plugin": "^1.2.0",
+    "@typescript-eslint/parser": "^1.2.0",
+    "@vzh/configs": "^3.13.0",
     "babel-eslint": "^10.0.1",
     "copyfiles": "^2.1.0",
-    "eslint": "^5.11.1",
+    "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^3.3.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "eslint-plugin-typescript": "^0.14.0",
-    "prettier": "^1.15.3",
+    "prettier": "^1.16.4",
     "rimraf": "^2.6.2",
-    "typescript": "^3.2.2",
-    "typescript-eslint-parser": "^21.0.2",
+    "typescript": "^3.3.1",
     "webpack-merge": "^4.2.1"
   }
 }
