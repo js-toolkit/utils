@@ -1,6 +1,6 @@
 import { NoSuchElementError } from './errors';
 
-/* eslint-disable import/export, no-dupe-class-members */
+/* eslint-disable import/export, no-dupe-class-members, @typescript-eslint/no-non-null-assertion, no-shadow */
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
@@ -238,12 +238,11 @@ export abstract class Option<A> {
 /**
  * The `Some<A>` data constructor for [[Option]] represents existing
  * values of type `A`.
- *
- * Using this function is equivalent with [[Option.some]].
  */
 export function Some<A>(value: NonNullable<A>): Option<A> {
   if (value == null) throw new Error(`Unable create '${Some.name}' value with ${value}`);
-  return new class extends Option<A> {
+
+  return new class Some extends Option<A> {
     constructor() {
       super(value);
     }
@@ -259,10 +258,8 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
 /**
  * The `None` data constructor for [[Option]] represents non-existing
  * values for any type.
- *
- * Using this reference directly is equivalent with [[Option.none]].
  */
-export const None: None = new class extends Option<never> {
+export const None: None = new class None extends Option<never> {
   constructor() {
     super(undefined as never);
   }
