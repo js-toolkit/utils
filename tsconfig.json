@@ -5,10 +5,7 @@
     "baseUrl": "./src",
     "sourceMap": false,
     "declaration": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ]
   },
-  "files": ["./src/index.ts", "./src/fp/index.ts"]
+  "include": ["./tests/*"],
+  "files": ["./src/index.ts", "./src/fp/index.ts", "./src/collections/index.ts"]
 }

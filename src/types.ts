@@ -1,4 +1,4 @@
-import { Omit, Overwrite, KeysOfType } from './index';
+import { Omit, Overwrite, KeysOfType } from '.';
 
 type A = { a: number; c: string }; // $ExpectType "F"
 type B = { a?: boolean; b: string };
