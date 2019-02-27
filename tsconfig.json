@@ -6,6 +6,5 @@
     "sourceMap": false,
     "declaration": true,
   },
-  "include": ["./tests/*"],
   "files": ["./src/index.ts", "./src/fp/index.ts", "./src/collections/index.ts"]
 }
