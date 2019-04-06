@@ -1,18 +1,19 @@
 import { NoSuchElementError } from './errors';
 
-/* eslint-disable import/export, no-dupe-class-members, @typescript-eslint/no-non-null-assertion, no-shadow */
+/* eslint-disable import/export, no-dupe-class-members, @typescript-eslint/no-non-null-assertion0, no-shadow */
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
+type Optional<A> = A | null | undefined;
 
 export abstract class Option<A> {
-  static of<A>(value?: A | null): Option<A> {
+  static of<A>(value: Optional<A>): Option<A> {
     return option(value);
   }
 
-  private readonly value?: A;
+  private readonly value: NonNullable<A> | never;
 
-  protected constructor(ref?: A) {
+  protected constructor(ref: NonNullable<A> | never) {
     this.value = ref;
   }
 
@@ -30,9 +31,9 @@ export abstract class Option<A> {
     return !this.isEmpty();
   }
 
-  get(): A {
-    if (this.nonEmpty()) return this.value!;
-    throw new NoSuchElementError('Option.get');
+  get(): NonNullable<A> {
+    if (this.isEmpty()) throw new NoSuchElementError('Option.get');
+    return this.value;
   }
 
   /**
@@ -42,7 +43,7 @@ export abstract class Option<A> {
    * See [[Option.getOrElseL]] for a lazy alternative.
    */
   getOrElse<AA>(fallback: AA): A | AA {
-    if (this.nonEmpty()) return this.value!;
+    if (this.nonEmpty()) return this.value;
     return fallback;
   }
 
@@ -53,7 +54,7 @@ export abstract class Option<A> {
    * See [[Option.getOrElse]] for a strict alternative.
    */
   getOrElseL<AA>(thunk: () => AA): A | AA {
-    if (this.nonEmpty()) return this.value!;
+    if (this.nonEmpty()) return this.value;
     return thunk();
   }
 
@@ -84,7 +85,7 @@ export abstract class Option<A> {
    * ```
    */
   orNull(): A | null {
-    return this.nonEmpty() ? this.value! : null;
+    return this.nonEmpty() ? this.value : null;
   }
 
   /**
@@ -109,7 +110,7 @@ export abstract class Option<A> {
    *         source mapped by the given function
    */
   map<B>(f: (a: A) => B): Option<B> {
-    return this.isEmpty() ? None : option(f(this.value!));
+    return this.isEmpty() ? None : option(f(this.value));
   }
 
   /**
@@ -141,7 +142,7 @@ export abstract class Option<A> {
    */
   flatMap<B>(f: (a: A) => Option<B>): Option<B> {
     if (this.isEmpty()) return None;
-    const result = f(this.value!);
+    const result = f(this.value);
     const self = this as any;
     return result === self ? self : result;
   }
@@ -162,7 +163,7 @@ export abstract class Option<A> {
   filter(p: (a: A) => boolean): Option<A>;
 
   filter(p: (a: A) => boolean): Option<A> {
-    if (this.isEmpty() || !p(this.value!)) return None;
+    if (this.isEmpty() || !p(this.value)) return None;
     return this;
   }
 
@@ -185,7 +186,7 @@ export abstract class Option<A> {
    */
   fold<B>(fallback: () => B, f: (a: A) => B): B {
     if (this.isEmpty()) return fallback();
-    return f(this.value!);
+    return f(this.value);
   }
 
   /**
@@ -213,7 +214,7 @@ export abstract class Option<A> {
    * @param p is the predicate function to test
    */
   forAll(p: (a: A) => boolean): boolean {
-    return this.isEmpty() || p(this.value!);
+    return this.isEmpty() || p(this.value);
   }
 
   /**
@@ -223,7 +224,7 @@ export abstract class Option<A> {
    * @param cb the procedure to apply
    */
   forEach(cb: (a: A) => void): void {
-    if (this.nonEmpty()) cb(this.value!);
+    if (this.nonEmpty()) cb(this.value);
   }
 
   equals(that: Option<A>): boolean {
@@ -243,6 +244,7 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
   if (value == null) throw new Error(`Unable create '${Some.name}' value with ${value}`);
 
   return new class Some extends Option<A> {
+    // protected readonly value: NonNullable<A> = value;
     constructor() {
       super(value);
     }
@@ -260,6 +262,7 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
  * values for any type.
  */
 export const None: None = new class None extends Option<never> {
+  // protected readonly value: never = undefined as never;
   constructor() {
     super(undefined as never);
   }
@@ -271,6 +274,6 @@ export const None: None = new class None extends Option<never> {
  * If the given value is `null` or `undefined` then the returned
  * option will be empty.
  */
-export function option<A>(value?: A | null): Option<A> {
+export function option<A>(value: Optional<A>): Option<A> {
   return value != null ? Some(value as NonNullable<A>) : None;
 }
