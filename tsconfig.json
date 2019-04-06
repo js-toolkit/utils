@@ -1,10 +1,12 @@
 {
   "extends": "./node_modules/@vzh/configs/ts/dev.tsconfig.json",
   "compilerOptions": {
+    "isolatedModules": false,
     "outDir": "./dist",
     "baseUrl": "./src",
     "sourceMap": false,
     "declaration": true,
+    "incremental": false
   },
   "files": ["./src/index.ts", "./src/fp/index.ts", "./src/collections/index.ts"]
 }
