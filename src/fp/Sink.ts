@@ -1,3 +1,5 @@
+type Finalizator = () => void | Promise<void>;
+
 export default class Sink<A> {
   private readonly promise: Promise<never>;
 
@@ -9,7 +11,7 @@ export default class Sink<A> {
 
   private reject?: (reason?: any) => void;
 
-  private finalizator?: (() => void) | void;
+  private finalizator?: Finalizator;
 
   private pipeHandler?: (value: any) => any;
 
@@ -22,7 +24,7 @@ export default class Sink<A> {
   };
 
   constructor(
-    executor: (pipe: <B>(value: A) => B, cancel: Sink<A>['cancel']) => (() => void) | void
+    executor: (pipe: <B>(value: A) => B, cancel: Sink<A>['cancel']) => Finalizator | void
   ) {
     this.cancel = this.cancel.bind(this);
     this.wait = this.wait.bind(this);
@@ -32,7 +34,8 @@ export default class Sink<A> {
     this.promise = new Promise<never>((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
-      this.finalizator = executor(this.onPipe, this.cancel);
+      const f = executor(this.onPipe, this.cancel);
+      this.finalizator = typeof f === 'function' ? f : undefined;
     }).finally(() => {
       this.pending = false;
       clearTimeout(this.waitTimeoutHandler);
@@ -50,9 +53,9 @@ export default class Sink<A> {
     return this.promise;
   }
 
-  cancel(reason?: any): void {
+  async cancel(reason?: any): Promise<void> {
     if (!this.resolve || !this.reject) throw new Error('Invalid operation.');
-    this.finalizator && this.finalizator();
+    this.finalizator && (await this.finalizator());
     if (reason) {
       this.reject && this.reject(reason);
     } else {
