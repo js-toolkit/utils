@@ -1,7 +1,7 @@
 export default class Sink<A> {
   private readonly promise: Promise<never>;
 
-  private isPending: boolean;
+  private pending: boolean;
 
   private waitTimeoutHandler?: any;
 
@@ -28,15 +28,19 @@ export default class Sink<A> {
     this.wait = this.wait.bind(this);
     this.pipe = this.pipe.bind(this);
 
-    this.isPending = true;
+    this.pending = true;
     this.promise = new Promise<never>((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
       this.finalizator = executor(this.onPipe, this.cancel);
     }).finally(() => {
-      this.isPending = false;
+      this.pending = false;
       clearTimeout(this.waitTimeoutHandler);
     });
+  }
+
+  get isPending(): boolean {
+    return this.pending;
   }
 
   wait(timeout?: number): Promise<never> {
