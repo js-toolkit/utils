@@ -3,7 +3,7 @@ type Finalizator = () => void | Promise<void>;
 export default class Sink<A> {
   private readonly promise: Promise<never>;
 
-  private pending: boolean;
+  private pending: boolean = true;
 
   private waitTimeoutHandler?: any;
 
@@ -30,7 +30,6 @@ export default class Sink<A> {
     this.wait = this.wait.bind(this);
     this.pipe = this.pipe.bind(this);
 
-    this.pending = true;
     this.promise = new Promise<never>((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -54,7 +53,7 @@ export default class Sink<A> {
   }
 
   async cancel(reason?: any): Promise<void> {
-    if (!this.resolve || !this.reject) throw new Error('Invalid operation.');
+    if (!this.isPending) return;
     this.finalizator && (await this.finalizator());
     if (reason) {
       this.reject && this.reject(reason);
