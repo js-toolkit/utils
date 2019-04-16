@@ -13,18 +13,18 @@ export default class Sink<A> {
 
   private finalizator?: Finalizator;
 
-  private pipeHandler?: (value: any) => any;
+  private pipeHandler?: (value: any) => Promise<any>;
 
-  private onPipe = (value: any): any => {
+  private onPipe = async (value: any): Promise<void> => {
     try {
-      this.pipeHandler && this.pipeHandler(value);
+      this.pipeHandler && (await this.pipeHandler(value));
     } catch (ex) {
       this.cancel(ex);
     }
   };
 
   constructor(
-    executor: (pipe: <B>(value: A) => B, cancel: Sink<A>['cancel']) => Finalizator | void
+    executor: (pipe: (value: A) => any, cancel: Sink<A>['cancel']) => Finalizator | void
   ) {
     this.cancel = this.cancel.bind(this);
     this.wait = this.wait.bind(this);
@@ -52,19 +52,30 @@ export default class Sink<A> {
     return this.promise;
   }
 
-  async cancel(reason?: any): Promise<void> {
-    if (!this.isPending) return;
-    this.finalizator && (await this.finalizator());
-    if (reason) {
-      this.reject && this.reject(reason);
-    } else {
-      this.resolve && this.resolve();
-    }
+  cancel(reason?: any): Promise<void> {
+    if (!this.isPending) return Promise.resolve();
+    return Promise.resolve()
+      .then(this.finalizator)
+      .then(() => {
+        if (reason) {
+          this.reject && this.reject(reason);
+        } else {
+          this.resolve && this.resolve();
+        }
+      });
+    // if (!this.isPending) return;
+    // this.finalizator && (await this.finalizator());
+    // if (reason) {
+    //   this.reject && this.reject(reason);
+    // } else {
+    //   this.resolve && this.resolve();
+    // }
   }
 
-  pipe<B>(callback: (value: A) => B): Sink<B> {
+  pipe<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
     const prevHandler = this.pipeHandler;
-    this.pipeHandler = value => callback(prevHandler ? prevHandler(value) : value);
+    this.pipeHandler = value =>
+      (prevHandler ? prevHandler(value) : Promise.resolve(value)).then(action);
     return this as any;
   }
 }
