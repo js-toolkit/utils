@@ -7,7 +7,7 @@ export default class Sink<A> {
 
   private pending: boolean = true;
 
-  private cancelling: boolean = false;
+  private cancelling?: Promise<void>;
 
   private waitTimeoutHandler?: any;
 
@@ -53,14 +53,14 @@ export default class Sink<A> {
   }
 
   cancel(reason?: any): Promise<void> {
+    if (this.cancelling) return this.cancelling;
     if (!this.isPending) return Promise.resolve();
-    if (this.cancelling) return Promise.reject(new Error('Already in cancelling state.'));
+    // if (this.cancelling) return Promise.reject(new Error('Already in cancelling state.'));
 
-    this.cancelling = true;
     // finalizator may works long time so cancel timer because already in cancelling state.
     clearTimeout(this.waitTimeoutHandler);
 
-    return Promise.resolve()
+    this.cancelling = Promise.resolve()
       .then(this.finalizator)
       .catch(ex => {
         if (reason) console.error('Cancel error:', ex);
@@ -72,12 +72,15 @@ export default class Sink<A> {
         } else {
           this.resolve && this.resolve();
         }
-        this.cancelling = false;
+        this.cancelling = undefined;
         this.finalizator = undefined;
         this.reject = undefined;
         this.resolve = undefined;
         this.pipeHandler = undefined;
       });
+
+    return this.cancelling;
+
     // if (!this.isPending) return;
     // this.finalizator && (await this.finalizator());
     // if (reason) {
