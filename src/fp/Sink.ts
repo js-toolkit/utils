@@ -25,6 +25,7 @@ export default class Sink<A> {
   ) {
     this.cancel = this.cancel.bind(this);
     this.wait = this.wait.bind(this);
+    this.catch = this.catch.bind(this);
     this.pipe = this.pipe.bind(this);
     this.onPipe = this.onPipe.bind(this);
 
