@@ -104,6 +104,15 @@ export default class Sink<A> {
     return this as any;
   }
 
+  once<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
+    const prevHandler = this.pipeHandler;
+    this.pipeHandler = value =>
+      (prevHandler ? prevHandler(value) : Promise.resolve(value))
+        .then(action)
+        .then(() => this.cancel());
+    return this as any;
+  }
+
   catch<B = never>(action: (reason: any) => PromiseLike<B> | B): Sink<B> {
     const prevHandler = this.pipeHandler;
     this.pipeHandler = value =>
