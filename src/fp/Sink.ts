@@ -1,4 +1,4 @@
-type Finalizator = () => void | Promise<void>;
+type Finalizator = () => void | Promise<any>;
 
 export default class Sink<A> {
   private readonly promise: Promise<never>;
