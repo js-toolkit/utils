@@ -48,6 +48,7 @@ export default class Sink<A> {
 
   wait(timeout?: number, errorOnTimeout: boolean = true): Promise<never> {
     if (this.isPending && timeout && timeout > 0) {
+      clearTimeout(this.waitTimeoutHandler);
       this.waitTimeoutHandler = setTimeout(() => {
         this.cancel(errorOnTimeout ? new Error(`Timeout of ${timeout}ms exceeded.`) : undefined);
       }, timeout);
