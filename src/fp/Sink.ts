@@ -1,3 +1,5 @@
+import { TimeoutError } from './errors';
+
 type Finalizator = () => void | Promise<any>;
 
 export default class Sink<A> {
@@ -50,7 +52,9 @@ export default class Sink<A> {
     if (this.isPending && timeout && timeout > 0) {
       clearTimeout(this.waitTimeoutHandler);
       this.waitTimeoutHandler = setTimeout(() => {
-        this.cancel(errorOnTimeout ? new Error(`Timeout of ${timeout}ms exceeded.`) : undefined);
+        this.cancel(
+          errorOnTimeout ? new TimeoutError(`Timeout of ${timeout}ms exceeded.`) : undefined
+        );
       }, timeout);
     }
     return this.promise;
