@@ -36,22 +36,21 @@
     "major-publish": "npm version major && npm run build && npm publish ./dist --access public && git push --follow-tags"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.13",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "@typescript-eslint/parser": "^1.9.0",
-    "@vzh/configs": "^3.24.1",
-    "babel-eslint": "^10.0.1",
+    "@types/jest": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
+    "@vzh/configs": "../configs/dist/",
+    "babel-eslint": "^10.0.2",
     "copyfiles": "^2.1.0",
-    "eslint": "^5.16.0",
+    "eslint": "^6.0.1",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^4.3.0",
-    "eslint-plugin-import": "^2.17.2",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
-    "prettier": "^1.17.1",
+    "prettier": "^1.18.2",
     "rimraf": "^2.6.2",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.4.5",
-    "webpack-merge": "^4.2.1"
+    "typescript": "^3.5.2"
   }
 }
