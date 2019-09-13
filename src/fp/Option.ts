@@ -1,6 +1,5 @@
+/* eslint-disable max-classes-per-file, @typescript-eslint/no-use-before-define */
 import { NoSuchElementError } from './errors';
-
-/* eslint-disable import/export, no-dupe-class-members, @typescript-eslint/no-non-null-assertion0, no-shadow */
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
@@ -42,7 +41,7 @@ export abstract class Option<A> {
    *
    * See [[Option.getOrElseL]] for a lazy alternative.
    */
-  getOrElse<AA>(fallback: AA): A | AA {
+  getOrElse<AA>(fallback: AA): NonNullable<A> | AA {
     if (this.nonEmpty()) return this.value;
     return fallback;
   }
@@ -53,7 +52,7 @@ export abstract class Option<A> {
    *
    * See [[Option.getOrElse]] for a strict alternative.
    */
-  getOrElseL<AA>(thunk: () => AA): A | AA {
+  getOrElseL<AA>(thunk: () => AA): NonNullable<A> | AA {
     if (this.nonEmpty()) return this.value;
     return thunk();
   }
@@ -84,7 +83,7 @@ export abstract class Option<A> {
    * return `null`.
    * ```
    */
-  orNull(): A | null {
+  orNull(): NonNullable<A> | null {
     return this.nonEmpty() ? this.value : null;
   }
 
@@ -92,7 +91,7 @@ export abstract class Option<A> {
    * Returns the option's value if the option is nonempty, otherwise
    * return `undefined`.
    */
-  orUndefined(): A | undefined {
+  orUndefined(): NonNullable<A> | undefined {
     return this.nonEmpty() ? this.value : undefined;
   }
 
@@ -109,7 +108,7 @@ export abstract class Option<A> {
    * @return a new option instance containing the value of the
    *         source mapped by the given function
    */
-  map<B>(f: (a: A) => B): Option<B> {
+  map<B>(f: (a: NonNullable<A>) => B): Option<B> {
     return this.isEmpty() ? None : option(f(this.value));
   }
 
@@ -138,13 +137,14 @@ export abstract class Option<A> {
    *          of this option if nonempty.
    *
    * @return a new option instance containing the value of the
-   *         source mapped by the given function
+   *         source mapped by the given function if the value is
+   *         differs from this option value otherwise returns this option
    */
-  flatMap<B>(f: (a: A) => Option<B>): Option<B> {
+  flatMap<B>(f: (a: NonNullable<A>) => Option<B>): Option<B> {
     if (this.isEmpty()) return None;
     const result = f(this.value);
-    const self = this as any;
-    return result === self ? self : result;
+    const self = (this as unknown) as Option<B>;
+    return result.nonEmpty() && result.value === self.value ? self : result;
   }
 
   /**
@@ -160,9 +160,9 @@ export abstract class Option<A> {
    */
   filter<B extends A>(p: (a: A) => a is B): Option<B>;
 
-  filter(p: (a: A) => boolean): Option<A>;
+  filter(p: (a: NonNullable<A>) => boolean): Option<A>;
 
-  filter(p: (a: A) => boolean): Option<A> {
+  filter(p: (a: NonNullable<A>) => boolean): Option<A> {
     if (this.isEmpty() || !p(this.value)) return None;
     return this;
   }
@@ -184,7 +184,7 @@ export abstract class Option<A> {
    * @param f is the mapping function for transforming this option's
    *        value in case it is nonempty
    */
-  fold<B>(fallback: () => B, f: (a: A) => B): B {
+  fold<B>(fallback: () => B, f: (a: NonNullable<A>) => B): B {
     if (this.isEmpty()) return fallback();
     return f(this.value);
   }
@@ -193,7 +193,7 @@ export abstract class Option<A> {
    * Returns true if this option is nonempty and the value it
    * holds is equal to the given `elem`.
    */
-  contains(elem: A): boolean {
+  contains(elem: NonNullable<A>): boolean {
     return this.nonEmpty() && this.value === elem;
   }
 
@@ -203,7 +203,7 @@ export abstract class Option<A> {
    *
    * @param p is the predicate function to test
    */
-  exists(p: (a: A) => boolean): boolean {
+  exists(p: (a: NonNullable<A>) => boolean): boolean {
     return this.filter(p).nonEmpty();
   }
 
@@ -213,7 +213,7 @@ export abstract class Option<A> {
    *
    * @param p is the predicate function to test
    */
-  forAll(p: (a: A) => boolean): boolean {
+  forAll(p: (a: NonNullable<A>) => boolean): boolean {
     return this.isEmpty() || p(this.value);
   }
 
@@ -223,7 +223,7 @@ export abstract class Option<A> {
    *
    * @param cb the procedure to apply
    */
-  forEach(cb: (a: A) => void): void {
+  forEach(cb: (a: NonNullable<A>) => void): void {
     if (this.nonEmpty()) cb(this.value);
   }
 
@@ -243,12 +243,13 @@ export abstract class Option<A> {
 export function Some<A>(value: NonNullable<A>): Option<A> {
   if (value == null) throw new Error(`Unable create '${Some.name}' value with ${value}`);
 
-  return new class Some extends Option<A> {
+  // eslint-disable-next-line no-shadow
+  return new (class Some extends Option<A> {
     // protected readonly value: NonNullable<A> = value;
     constructor() {
       super(value);
     }
-  }();
+  })();
 }
 
 // type A = { a: number };
@@ -261,12 +262,12 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
  * The `None` data constructor for [[Option]] represents non-existing
  * values for any type.
  */
-export const None: None = new class None extends Option<never> {
+export const None: None = new (class None extends Option<never> {
   // protected readonly value: never = undefined as never;
   constructor() {
     super(undefined as never);
   }
-}();
+})();
 
 /**
  * Builds an [[Option]] reference that contains the given value.
