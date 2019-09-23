@@ -218,10 +218,11 @@ export class List<T> implements ListLike<T> {
   }
 
   concat(tail: List<T>): List<T> {
+    if (this === Nil) return tail;
     if (tail === Nil) return this;
 
     const h = new ListInternal(this.head, tail); // to keep head list for return
-    let t = h;
+    let t = h; // last list
     let list = this.tail;
 
     while (list !== Nil) {

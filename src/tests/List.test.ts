@@ -82,6 +82,7 @@ test('prepend', () => {
 });
 
 test('concat', () => {
+  expect(Nil.concat(List.of(0)).toArray()).toEqual([0]);
   expect(list.concat(List.of(0)).toArray()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0]);
 });
 
