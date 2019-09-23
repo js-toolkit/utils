@@ -5,9 +5,8 @@
 export interface ListLike<T> extends Iterable<T> {
   readonly head: T;
   readonly tail: ListLike<T>;
-  readonly size: number;
-  readonly [n: number]: T;
   get(index: number): T;
+  size(): number;
   replace(f: (value: T) => boolean, newValue: T): ListLike<T>;
   find(f: (v: T) => boolean): T | undefined;
   every(f: (value: T) => boolean): boolean;
@@ -33,53 +32,37 @@ export class List<T> implements ListLike<T> {
 
   readonly tail: List<T>;
 
-  readonly size: number;
-
-  readonly [n: number]: T;
-
   protected constructor(head: T, tail: List<T>) {
     this.head = head;
     this.tail = tail;
-    this.size = (tail && tail.size + 1) || 0;
-
-    return new Proxy(this, {
-      // prop always is string type or symbol, not number
-      get(target, prop) {
-        if (typeof prop !== 'symbol' && isFinite(+prop)) {
-          // console.log('***', 'read by index', '***');
-          // read by indexes
-          return target.get(+prop);
-        }
-        return target[prop];
-      },
-      has(target, prop) {
-        if (typeof prop !== 'symbol' && isFinite(+prop)) {
-          // read by indexes
-          return +prop >= 0 && +prop < target.size;
-        }
-        return prop in target;
-      },
-      // set(target, prop) {
-      //   throw new TypeError(`Cannot write '${prop.toString()}' to immutable list ${target}.`);
-      // },
-    });
   }
 
   get(index: number): T {
-    if (index < 0 || index >= this.size) {
-      throw new TypeError(`Index out of bound: ${index}`);
-    }
     if (index === 0) return this.head;
 
     // better performance with while instead of recursion call of this.tail.get(index - 1).
     let list: List<T> = this;
     let j = index;
     while (j > 0) {
+      if (list === Nil) {
+        throw new TypeError(`Index out of bounds: ${index}`);
+      }
       j -= 1;
       list = list.tail;
     }
 
     return list.head;
+  }
+
+  size(): number {
+    if (this === Nil) return 0;
+    let list: List<T> = this;
+    let count = 0;
+    while (list !== Nil) {
+      count += 1;
+      list = list.tail;
+    }
+    return count;
   }
 
   [Symbol.iterator](): Iterator<T, undefined> {
@@ -171,8 +154,6 @@ export class List<T> implements ListLike<T> {
   filter(predicate: (value: T) => boolean): List<T> {
     if (this === Nil) return Nil;
     const [h] = this.copy(predicate);
-    // If all values pass predicate
-    if (h && h.size === this.size) return this;
     return h || Nil;
   }
 
@@ -258,7 +239,7 @@ export class List<T> implements ListLike<T> {
   }
 
   toArray(): T[] {
-    const ar = new Array(this.size);
+    const ar: T[] = [];
     let list: List<T> = this;
     let i = 0;
     while (list !== Nil) {

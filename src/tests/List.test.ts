@@ -90,6 +90,12 @@ test('filter', () => {
   expect(list.filter(_ => _ > 10)).toBe(Nil);
   expect(list.filter(_ => _ > 8).toArray()).toEqual([9, 10]);
   expect(Nil.filter(_ => _ > 8)).toBe(Nil);
+
+  const l = list
+    .filter(_ => _ > 8)
+    .concat(List.of(0))
+    .replace(v => v === 0, 100);
+  expect(l.size()).toEqual(l.toArray().length);
 });
 
 test('replace', () => {
