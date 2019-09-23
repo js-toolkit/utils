@@ -82,13 +82,13 @@ export class List<T> implements ListLike<T> {
     return list.head;
   }
 
-  [Symbol.iterator](): Iterator<T> {
+  [Symbol.iterator](): Iterator<T, undefined> {
     let list: List<T> = this;
 
     return {
-      next(value?: any) {
+      next() {
         if (list === Nil) {
-          return { done: true, value };
+          return { done: true, value: undefined };
         }
 
         try {
@@ -99,17 +99,6 @@ export class List<T> implements ListLike<T> {
         } finally {
           list = list.tail;
         }
-      },
-
-      return(value?: any) {
-        list = Nil;
-        return { done: true, value };
-      },
-
-      throw(e?: any) {
-        list = Nil;
-        if (e) throw e;
-        else return { done: true, value: undefined as any };
       },
     };
   }
@@ -179,9 +168,11 @@ export class List<T> implements ListLike<T> {
     return this.iterate(f, v => v, false);
   }
 
-  filter(f: (value: T) => boolean): List<T> {
+  filter(predicate: (value: T) => boolean): List<T> {
     if (this === Nil) return Nil;
-    const [h] = this.copy(f);
+    const [h] = this.copy(predicate);
+    // If all values pass predicate
+    if (h && h.size === this.size) return this;
     return h || Nil;
   }
 
