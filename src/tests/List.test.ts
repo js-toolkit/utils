@@ -104,6 +104,22 @@ test('join', () => {
   expect(list.join()).toBe('1, 2, 3, 4, 5, 6, 7, 8, 9, 10');
 });
 
+test('iterator', () => {
+  let iterator = list[Symbol.iterator]();
+  let values = [];
+  for (let result = iterator.next(); result.done !== true; result = iterator.next()) {
+    values.push(result.value);
+  }
+  expect(values).toEqual(arr);
+
+  iterator = list[Symbol.iterator]();
+  values = [];
+  for (let result = iterator.next(); result.done !== true; result = iterator.next()) {
+    values.push(result.value);
+  }
+  expect(values).toEqual(arr);
+});
+
 // const list = List.of(1, 2, 3, 4, 5);
 // console.dir(list);
 
