@@ -1,4 +1,4 @@
-import { List, Nil } from '../src/collections/immutable';
+import { List, Nil } from '../collections/immutable';
 
 const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const list = List.of(...arr);
