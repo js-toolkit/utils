@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-this-alias */
+/* eslint-disable max-classes-per-file */
+
 export interface ListLike<T> extends Iterable<T> {
   readonly head: T;
   readonly tail: ListLike<T>;
   readonly size: number;
   readonly [n: number]: T;
   get(index: number): T;
+  replace(f: (value: T) => boolean, newValue: T): ListLike<T>;
   find(f: (v: T) => boolean): T | undefined;
   every(f: (value: T) => boolean): boolean;
   some(f: (value: T) => boolean): boolean;
@@ -41,7 +46,7 @@ export class List<T> implements ListLike<T> {
       // prop always is string type or symbol, not number
       get(target, prop) {
         if (typeof prop !== 'symbol' && isFinite(+prop)) {
-          console.log('***', 'read by index', '***');
+          // console.log('***', 'read by index', '***');
           // read by indexes
           return target.get(+prop);
         }
@@ -119,40 +124,64 @@ export class List<T> implements ListLike<T> {
     return defaultValue;
   }
 
-  find(f: (value: T) => boolean): T | undefined {
-    return this.iterate(_ => _, f, undefined);
-  }
-
-  every(f: (value: T) => boolean): boolean {
-    return this.iterate(f, _ => !_, true);
-  }
-
-  some(f: (value: T) => boolean): boolean {
-    return this.iterate(f, _ => _, false);
-  }
-
-  filter(f: (value: T) => boolean): List<T> {
-    if (this === Nil) return Nil;
-
-    let h: ListInternal<T> | undefined; // in order to keep head list for return
-    let t: ListInternal<T> | undefined = h; // last list
+  /** Returns head list, last list and current iteration list */
+  private copy(
+    predicate: (value: T) => boolean,
+    stop?: (v: T) => boolean
+  ): [ListInternal<T> | undefined, ListInternal<T> | undefined, List<T>] {
+    let h: ListInternal<T> | undefined; // in order to keep the head list for return
+    let t: ListInternal<T> | undefined; // last list
     let list: List<T> = this;
 
     while (list !== Nil) {
-      if (f(list.head)) {
-        // if first iteration
+      if (stop && stop(list.head)) return [h, t, list];
+
+      if (predicate(list.head)) {
+        const nx = new ListInternal(list.head, Nil);
+        // if first element
         if (t === undefined) {
-          h = new ListInternal(list.head, Nil);
-          t = h;
+          h = nx;
+          t = nx;
         } else {
-          const nx = new ListInternal(list.head, Nil);
           t.next = nx;
           t = nx;
         }
       }
+
       list = list.tail;
     }
 
+    return [h, t, list];
+  }
+
+  replace(predicate: (value: T) => boolean, newValue: T): List<T> {
+    if (this === Nil) return Nil;
+    // find predicate
+    const [h, t, last] = this.copy(() => true, predicate);
+    // if first iteration
+    if (h === undefined) return new List(newValue, this.tail);
+    // if not found
+    if (last === Nil) return this;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    t!.next = new List(newValue, last.tail);
+    return h;
+  }
+
+  find(f: (value: T) => boolean): T | undefined {
+    return this.iterate(v => v, f, undefined);
+  }
+
+  every(f: (value: T) => boolean): boolean {
+    return this.iterate(f, v => !v, true);
+  }
+
+  some(f: (value: T) => boolean): boolean {
+    return this.iterate(f, v => v, false);
+  }
+
+  filter(f: (value: T) => boolean): List<T> {
+    if (this === Nil) return Nil;
+    const [h] = this.copy(f);
     return h || Nil;
   }
 
@@ -225,7 +254,7 @@ export class List<T> implements ListLike<T> {
     return items.reduceRight((tail, item) => List.from(item, tail), this as List<T>);
   }
 
-  join(separator: string = ', '): string {
+  join(separator = ', '): string {
     let result = '';
     let list: List<T> = this;
     while (list !== Nil) {
@@ -257,7 +286,7 @@ export class List<T> implements ListLike<T> {
     return items.reduceRight((tail, item) => this.from(item, tail), Nil);
   }
 
-  static empty: Nil = new class Nil extends List<undefined> {
+  static empty: Nil = new (class Nil extends List<undefined> {
     constructor() {
       super(undefined, undefined as never);
 
@@ -282,7 +311,7 @@ export class List<T> implements ListLike<T> {
       // freeze properties to avoid redefining
       return Object.freeze(this) as this;
     }
-  }();
+  })();
 }
 
 class ListInternal<T> extends List<T> {
