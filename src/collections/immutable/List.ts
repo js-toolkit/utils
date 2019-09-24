@@ -158,6 +158,7 @@ export class List<T> implements ListLike<T> {
   }
 
   sort(compare?: (a: T, b: T) => number): List<T> {
+    if (this === Nil) return Nil;
     // todo: slow
     return List.of(...this.toArray().sort(compare));
   }
@@ -182,6 +183,7 @@ export class List<T> implements ListLike<T> {
   }
 
   map<U>(f: (value: T) => U): List<U> {
+    if (this === Nil) return Nil;
     const h = new ListInternal(f(this.head), Nil);
     let t = h; // to keep head list for return
     let list = this.tail;
@@ -195,6 +197,7 @@ export class List<T> implements ListLike<T> {
   }
 
   reverse(): List<T> {
+    if (this === Nil) return Nil;
     return this.reduce((t, h) => List.from(h, t), Nil);
   }
 

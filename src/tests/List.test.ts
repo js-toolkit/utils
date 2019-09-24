@@ -70,6 +70,7 @@ test('reverse', () => {
 
 test('map', () => {
   expect(list.map(_ => _ * 2).toArray()).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
+  expect(Nil.map(_ => _ * 2)).toBe(Nil);
 });
 
 test('append', () => {
