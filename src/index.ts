@@ -23,10 +23,16 @@ export type Overwrite<
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
 /** Return keys of type `T` */
-export type KeysOfType<A extends object, B> = {
-  [P in keyof A]: A[P] extends B ? P : never;
-}[keyof A];
+export type KeysOfType<A extends object, B> = NonNullable<
+  { [P in keyof A]: A[P] extends B ? P : never }[keyof A]
+>;
 
 export type ExcludeKeysOfType<A extends object, B> = Pick<A, Exclude<keyof A, KeysOfType<A, B>>>;
 
 export type ExtractKeysOfType<A extends object, B> = Pick<A, KeysOfType<A, B>>;
+
+export type Writeable<A extends object> = { -readonly [P in keyof A]: A[P] };
+
+export type DeepWriteable<A extends object> = {
+  -readonly [P in keyof A]: A[P] extends object ? DeepWriteable<A[P]> : A[P];
+};
