@@ -9,5 +9,10 @@
     "incremental": false
   },
   "include": ["./src/tests"],
-  "files": ["./src/index.ts", "./src/fp/index.ts", "./src/collections/index.ts"]
+  "files": [
+    "./src/index.ts",
+    "./src/fp/index.ts",
+    "./src/collections/index.ts",
+    "./src/decorators/index.ts"
+  ]
 }
