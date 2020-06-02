@@ -18,7 +18,9 @@ export interface ValueContainer<A extends JSONPrimitives> {
 
 type ExcludeFunctions<A extends object> = ExcludeKeysOfType<A, Function>;
 
-type ValidProps<A extends object, OmitKeys extends keyof any> = ExcludeFunctions<Omit<A, OmitKeys>>;
+type ValidProps<A extends object, OmitKeys extends keyof any> = ExcludeFunctions<
+  Omit<A, OmitKeys | keyof JSONSerializable<any, any>>
+>;
 
 type UnknownType = string;
 
@@ -57,8 +59,10 @@ type ArrayOrObjectToJSON<A, OmitKeys extends keyof any> = A extends ReadonlyArra
   ? ObjectToJSON<A, OmitKeys>
   : UnknownType;
 
-type ValueToJSON<A, OmitKeys extends keyof any> = A extends JSONTypes
+declare type ValueToJSON<A, OmitKeys extends keyof any> = A extends JSONTypes
   ? A
+  : A extends JSONSerializable<infer T, OmitKeys>
+  ? ObjectToJSON<T, OmitKeys>
   : undefined extends A
   ? ArrayOrObjectToJSON<Exclude<A, undefined>, OmitKeys> | undefined
   : ArrayOrObjectToJSON<A, OmitKeys>;
@@ -66,3 +70,17 @@ type ValueToJSON<A, OmitKeys extends keyof any> = A extends JSONTypes
 export type JSONValue<A, OmitKeys extends keyof any = never> = A extends Option<infer T>
   ? ValueToJSON<T, OmitKeys> | undefined
   : ValueToJSON<A, OmitKeys>;
+
+export interface JSONSerializable<A extends object, OmitKeys extends keyof any = never> {
+  /**
+   * Just for correct infering: https://github.com/Microsoft/TypeScript/issues/26688
+   * It's required to define in implementation for correct typing with `JSONModel`.
+   * It might be just equals `this`.
+   */
+  // Must be declared!
+  // Because `Date` type has `toJSON` method and it incorrectly determined as JSONSerializable
+  // because generic type `A` will be erased due to the fact that it is not used.
+  // It needs to remove with TS 3.4.1 but may be present with 3.4.5+
+  readonly _serializable: JSONSerializable<A, OmitKeys>;
+  toJSON(): JSONValue<A, OmitKeys>;
+}
