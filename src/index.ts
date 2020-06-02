@@ -1,4 +1,5 @@
-export type AnyObject = Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type AnyObject = object;
 
 export type Copy<A extends AnyObject> = { [P in keyof A]: A[P] };
 
