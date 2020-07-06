@@ -15,6 +15,7 @@
     "./src/json.ts",
     "./src/fp/index.ts",
     "./src/collections/index.ts",
-    "./src/decorators/index.ts"
+    "./src/decorators/index.ts",
+    "./src/utils/index.ts"
   ]
 }
