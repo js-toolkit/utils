@@ -1,4 +1,4 @@
-import { TimeoutError } from './errors';
+import TimeoutError from './TimeoutError';
 
 type Finalizator = () => void | Promise<any>;
 
@@ -7,7 +7,7 @@ export default class Sink<A> {
 
   private readonly cancelOnError: boolean;
 
-  private pending: boolean = true;
+  private pending = true;
 
   private cancelling?: Promise<void>;
 
@@ -23,7 +23,7 @@ export default class Sink<A> {
 
   constructor(
     executor: (pipe: (value: A) => any, cancel: Sink<A>['cancel']) => Finalizator | void,
-    cancelOnPipeError: boolean = true
+    cancelOnPipeError = true
   ) {
     this.cancel = this.cancel.bind(this);
     this.wait = this.wait.bind(this);
@@ -48,11 +48,11 @@ export default class Sink<A> {
     return this.pending;
   }
 
-  wait(timeout?: number, errorOnTimeout: boolean = true): Promise<never> {
+  wait(timeout?: number, errorOnTimeout = true): Promise<never> {
     if (this.isPending && timeout && timeout > 0) {
       clearTimeout(this.waitTimeoutHandler);
       this.waitTimeoutHandler = setTimeout(() => {
-        this.cancel(
+        void this.cancel(
           errorOnTimeout ? new TimeoutError(`Timeout of ${timeout}ms exceeded.`) : undefined
         );
       }, timeout);
@@ -70,7 +70,7 @@ export default class Sink<A> {
 
     this.cancelling = Promise.resolve()
       .then(this.finalizator)
-      .catch(ex => {
+      .catch((ex) => {
         if (reason) console.error('Cancel error:', ex);
         else throw ex;
       })
@@ -104,14 +104,14 @@ export default class Sink<A> {
 
   pipe<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
     const prevHandler = this.pipeHandler;
-    this.pipeHandler = value =>
+    this.pipeHandler = (value) =>
       (prevHandler ? prevHandler(value) : Promise.resolve(value)).then(action);
     return this as any;
   }
 
   once<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
     const prevHandler = this.pipeHandler;
-    this.pipeHandler = value =>
+    this.pipeHandler = (value) =>
       (prevHandler ? prevHandler(value) : Promise.resolve(value))
         .then(action)
         .then(() => this.cancel());
@@ -120,7 +120,7 @@ export default class Sink<A> {
 
   catch<B = never>(action: (reason: any) => PromiseLike<B> | B): Sink<B> {
     const prevHandler = this.pipeHandler;
-    this.pipeHandler = value =>
+    this.pipeHandler = (value) =>
       (prevHandler ? prevHandler(value) : Promise.resolve(value)).catch(action);
     return this as any;
   }

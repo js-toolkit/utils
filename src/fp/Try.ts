@@ -1,7 +1,7 @@
-import { NoSuchElementError } from './errors';
+/* eslint-disable no-use-before-define */
+/* eslint-disable max-classes-per-file */
+import NoSuchElementError from './NoSuchElementError';
 import { Option, None } from './Option';
-
-/* eslint-disable import/export, no-dupe-class-members */
 
 export type Throwable = Error | object;
 export type Success<A> = Try<A>;
@@ -222,7 +222,7 @@ export abstract class Try<A> {
     if (this.isFailure()) return this;
     try {
       if (p(this.value as A)) return this;
-      return Failure(new NoSuchElementError(`Predicate does not hold for ${this.value as A}`));
+      return Failure(new NoSuchElementError(`Predicate does not hold for ${this.value}`));
     } catch (e) {
       return Failure(e);
     }
@@ -243,7 +243,7 @@ export abstract class Try<A> {
    * ```
    */
   flatMap<B>(f: (a: A) => Try<B>): Try<B> {
-    if (this.isFailure()) return this as any;
+    if (this.isFailure()) return this;
     try {
       return f(this.value as A);
     } catch (e) {
@@ -358,11 +358,11 @@ export abstract class Try<A> {
  * are successful results of computations, as opposed to [[Failure]].
  */
 export function Success<A>(value: A): Try<A> {
-  return new class extends Try<A> {
+  return new (class extends Try<A> {
     constructor() {
       super(value, 'success');
     }
-  }();
+  })();
 }
 
 /**
@@ -370,9 +370,9 @@ export function Success<A>(value: A): Try<A> {
  * represent failures, as opposed to [[Success]].
  */
 export function Failure<A = never>(error: Throwable): Try<A> {
-  return new class extends Try<never> {
+  return new (class extends Try<never> {
     constructor() {
       super(error, 'failure');
     }
-  }();
+  })();
 }

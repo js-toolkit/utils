@@ -1,5 +1,6 @@
-/* eslint-disable max-classes-per-file, @typescript-eslint/no-use-before-define */
-import { NoSuchElementError } from './errors';
+/* eslint-disable no-use-before-define */
+/* eslint-disable max-classes-per-file */
+import NoSuchElementError from './NoSuchElementError';
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
