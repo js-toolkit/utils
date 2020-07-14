@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-types
 type AnyObject = object;
 
+type AnyFunction = (...args: any) => any;
+
 type Copy<A extends AnyObject> = { [P in keyof A]: A[P] };
 
 type DiffKeys<A extends AnyObject, B extends AnyObject> = Exclude<keyof A, keyof B>;
