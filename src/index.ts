@@ -23,19 +23,12 @@ export type Omit<
     | (Extract<keyof A, keyof K> extends never ? never : Pick<K, Extract<keyof A, keyof K>>)
 > = Pick<A, Exclude<keyof A, K extends keyof A ? K : keyof K>>;
 
-export type OmitStrict<
-  A extends AnyObject,
-  K extends
-    | keyof A
-    | (Extract<keyof A, keyof K> extends never ? never : Pick<K, Extract<keyof A, keyof K>>)
-> = Omit<A, K>;
-
 export type Overwrite<
   A extends AnyObject,
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
-/** Return keys of type `T` */
+/** Return keys of export type `T` */
 export type KeysOfType<A extends AnyObject, B> = NonNullable<
   { [P in keyof A]: A[P] extends B ? P : never }[keyof A]
 >;

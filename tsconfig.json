@@ -12,8 +12,8 @@
   "include": ["./src/tests"],
   "files": [
     "./src/index.ts",
-    "./src/json.ts",
     "./src/@types/types/index.ts",
+    "./src/json.ts",
     "./src/fp/index.ts",
     "./src/collections/index.ts",
     "./src/decorators/index.ts",

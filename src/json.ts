@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { ExcludeKeysOfType, ExtractKeysOfType } from './index';
-import { Option } from './fp';
+import { Option } from './fp/Option';
 
 export type JSONPrimitives = string | number | boolean | null | undefined;
 

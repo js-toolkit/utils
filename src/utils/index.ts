@@ -1,4 +1,3 @@
-import { AnyObject } from '../index';
 import NoSuchElementError from '../fp/NoSuchElementError';
 
 export function getEnumName(enumeration: AnyObject, value: string | number): string {
