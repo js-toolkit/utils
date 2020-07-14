@@ -1,6 +1,6 @@
 {
   "name": "@vzh/ts-types",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Typescript helper types",
   "author": "Vladimir Zhukov",
   "license": "MIT",
