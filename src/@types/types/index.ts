@@ -22,6 +22,10 @@ type OmitStrict<
     | (Extract<keyof A, keyof K> extends never ? never : Pick<K, Extract<keyof A, keyof K>>)
 > = Pick<A, Exclude<keyof A, K extends keyof A ? K : keyof K>>;
 
+type ExcludeStrict<T, U extends T> = T extends U ? never : T;
+
+type ExtractStrict<T, U extends T> = T extends U ? T : never;
+
 type Overwrite<
   A extends AnyObject,
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
