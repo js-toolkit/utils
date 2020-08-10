@@ -3,7 +3,7 @@
 import NoSuchElementError from './NoSuchElementError';
 import { Option, None } from './Option';
 
-export type Throwable = Error | object;
+export type Throwable = Error | AnyObject;
 export type Success<A> = Try<A>;
 export type Failure = Try<never>;
 
@@ -222,7 +222,7 @@ export abstract class Try<A> {
     if (this.isFailure()) return this;
     try {
       if (p(this.value as A)) return this;
-      return Failure(new NoSuchElementError(`Predicate does not hold for ${this.value}`));
+      return Failure(new NoSuchElementError(`Predicate does not hold for ${String(this.value)}`));
     } catch (e) {
       return Failure(e);
     }

@@ -1,4 +1,4 @@
-import NoSuchElementError from '../fp/NoSuchElementError';
+import NoSuchElementError from './fp/NoSuchElementError';
 
 export function getEnumName(enumeration: AnyObject, value: string | number): string {
   if (typeof value === 'number') {
@@ -23,6 +23,3 @@ export function getEnumValues<Enum, K extends string>(enumeration: Record<K, Enu
   const names = getEnumNames(enumeration);
   return names.map((prop) => enumeration[prop] as Enum);
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function noop(): void {}
