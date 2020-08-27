@@ -15,11 +15,11 @@ export function getEnumName(enumeration: AnyObject, value: string | number): str
   throw new NoSuchElementError();
 }
 
-export function getEnumNames(enumeration: AnyObject): string[] {
-  return Object.keys(enumeration).filter((prop) => Number.isNaN(+prop));
+export function getEnumNames<Enum, K extends string>(enumeration: Record<K, Enum>): K[] {
+  return Object.keys(enumeration).filter((prop) => Number.isNaN(+prop)) as K[];
 }
 
 export function getEnumValues<Enum, K extends string>(enumeration: Record<K, Enum>): Enum[] {
   const names = getEnumNames(enumeration);
-  return names.map((prop) => enumeration[prop] as Enum);
+  return names.map((prop) => enumeration[prop]);
 }
