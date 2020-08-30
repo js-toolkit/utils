@@ -11,12 +11,12 @@
   },
   "include": ["./src/tests"],
   "files": [
-    "./src/@types/types/index.ts",
-    "./src/json.ts",
-    "./src/enum.ts",
-    "./src/noop.ts",
-    "./src/fp/index.ts",
-    "./src/collections/index.ts",
-    "./src/decorators/index.ts"
+    "src/@types/ts-utils/index.ts",
+    "src/json.ts",
+    "src/enum.ts",
+    "src/noop.ts",
+    "src/fp/index.ts",
+    "src/collections/index.ts",
+    "src/decorators/index.ts"
   ]
 }
