@@ -12,3 +12,5 @@ tmp
 # IDE
 .vscode/
 .history/
+
+!src/node_modules/
