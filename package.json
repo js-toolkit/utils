@@ -8,7 +8,7 @@
   "types": "./index.d.ts",
   "scripts": {
     "clean": "rimraf dist/*",
-    "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/ && copyfiles --up 1 src/@types/package.json ./dist/",
+    "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/",
     "build": "npm run clean && tsc --project ./tsconfig.json",
     "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/@vzh/ts-utils/'",
     "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@vzh/ts-utils/'",
