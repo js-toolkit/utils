@@ -1,6 +1,6 @@
 {
   "name": "@vzh/ts-utils",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "Typescript helper types and utils",
   "author": "Vladimir Zhukov",
   "license": "MIT",
