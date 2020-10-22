@@ -45,3 +45,9 @@ type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 type DeepWriteable<A extends AnyObject> = {
   -readonly [P in keyof A]: A[P] extends AnyObject ? DeepWriteable<A[P]> : A[P];
 };
+
+type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
+  ? U extends Record<keyof U, [any]>
+    ? { [K in keyof U]: U[K][0] }
+    : never
+  : never;
