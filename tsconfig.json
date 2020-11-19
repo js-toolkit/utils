@@ -15,6 +15,7 @@
     "src/json.ts",
     "src/enum.ts",
     "src/noop.ts",
+    "src/getErrorMessage.ts",
     "src/fp/index.ts",
     "src/collections/index.ts",
     "src/decorators/index.ts"
