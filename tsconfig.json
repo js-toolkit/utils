@@ -9,15 +9,6 @@
     "incremental": true,
     "diagnostics": true
   },
-  "include": ["./src/tests"],
-  "files": [
-    "src/@types/ts-utils/index.ts",
-    "src/json.ts",
-    "src/enum.ts",
-    "src/noop.ts",
-    "src/getErrorMessage.ts",
-    "src/fp/index.ts",
-    "src/collections/index.ts",
-    "src/decorators/index.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["src/types.ts"]
 }
