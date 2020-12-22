@@ -7,7 +7,14 @@ export default function beforeCall<F extends AnyFunction>(
     return fn.call(undefined, ...args) as ReturnType<F>;
   };
 
-  Object.defineProperties(wrapper, Object.getOwnPropertyDescriptors(fn));
+  const descs = Object.getOwnPropertyDescriptors(fn);
+  delete descs.arguments;
+  delete descs.caller;
+  delete descs.length;
+  delete descs.name;
+  delete descs.prototype;
+
+  Object.defineProperties(wrapper, descs);
 
   return wrapper as F;
 }
