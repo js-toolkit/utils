@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 type AnyObject = object;
 
@@ -53,3 +55,7 @@ type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   : never;
 
 type PromiseType<T> = T extends Promise<infer R> ? R : T;
+
+type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
