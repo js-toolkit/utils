@@ -59,3 +59,11 @@ type PromiseType<T> = T extends Promise<infer R> ? R : T;
 type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
+
+type InArray<T, Item> = T extends readonly [Item, ...infer _]
+  ? true
+  : T extends readonly [Item]
+  ? true
+  : T extends readonly [infer _, ...infer Rest]
+  ? InArray<Rest, Item>
+  : false;
