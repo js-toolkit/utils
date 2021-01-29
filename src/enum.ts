@@ -28,7 +28,7 @@ export function getEnumValues<Enum, K extends string>(enumeration: Record<K, Enu
   return names.map((prop) => enumeration[prop]);
 }
 
-export function getReverseEnum<Enum extends string | number, K extends string>(
+export function reverseEnum<Enum extends string | number, K extends string>(
   enumeration: Record<K, Enum>
 ): Record<Enum, K> {
   const result: Record<Enum, K> = {} as Record<Enum, K>;
