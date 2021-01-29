@@ -61,6 +61,12 @@ type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
+type ReverseObject<T extends Record<keyof T, any>> = {
+  [P in T[keyof T]]: {
+    [K in keyof T]: T[K] extends P ? K : never;
+  }[keyof T];
+};
+
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 
 type Invalid<T> = Error & { __errorMessage: T };
