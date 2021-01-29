@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type AnyObject = object;
+// type AnyObject = object;
+type AnyObject = Record<string, any>;
 
 type AnyFunction = (...args: any) => any;
 
