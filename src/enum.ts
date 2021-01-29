@@ -7,7 +7,8 @@ export function getEnumName<K extends string>(
   value: string | number
 ): K {
   if (typeof value === 'number') {
-    return enumeration[value] as K;
+    // Check for plain objects
+    if (value in enumeration) return enumeration[value] as K;
   }
 
   for (const prop in enumeration) {
@@ -19,13 +20,34 @@ export function getEnumName<K extends string>(
   throw new NoSuchElementError();
 }
 
-export function getEnumNames<Enum, K extends string>(enumeration: Record<K, Enum>): K[] {
-  return Object.keys(enumeration).filter((prop) => Number.isNaN(+prop)) as K[];
+export function mapEnumNames<Enum extends string | number, K extends string, M = K>(
+  enumeration: Record<K, Enum>,
+  callback: (name: K) => M
+): M[] {
+  const result = [] as M[];
+  for (const prop in enumeration) {
+    const nameOrValue = enumeration[prop as K] as string | number;
+    if (
+      !(nameOrValue in enumeration) ||
+      (Number.isNaN(+prop) && !Number.isNaN(nameOrValue)) ||
+      prop === String(nameOrValue)
+    ) {
+      result.push(callback ? callback(prop) : ((prop as unknown) as M));
+    }
+  }
+  return result;
 }
 
-export function getEnumValues<Enum, K extends string>(enumeration: Record<K, Enum>): Enum[] {
-  const names = getEnumNames(enumeration);
-  return names.map((prop) => enumeration[prop]);
+export function getEnumNames<Enum extends string | number, K extends string>(
+  enumeration: Record<K, Enum>
+): K[] {
+  return mapEnumNames(enumeration, (name) => name);
+}
+
+export function getEnumValues<Enum extends string | number, K extends string>(
+  enumeration: Record<K, Enum>
+): Enum[] {
+  return mapEnumNames(enumeration, (prop) => enumeration[prop]);
 }
 
 export function reverseEnum<Enum extends string | number, K extends string>(
