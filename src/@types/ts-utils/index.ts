@@ -43,6 +43,16 @@ type ExcludeKeysOfType<A extends AnyObject, B> = Pick<A, Exclude<keyof A, KeysOf
 
 type ExtractKeysOfType<A extends AnyObject, B> = Pick<A, KeysOfType<A, B>>;
 
+declare type ExcludeTypes<A extends AnyObject, B> = ExcludeKeysOfType<
+  { [P in keyof A]: Exclude<A[P], B> },
+  never | undefined
+>;
+
+declare type KeepTypes<A extends AnyObject, B> = ExcludeKeysOfType<
+  { [P in keyof A]: Extract<A[P], B> },
+  never | undefined
+>;
+
 type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 
 type DeepWriteable<A extends AnyObject> = {
