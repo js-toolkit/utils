@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-// type AnyObject = object;
-type AnyObject = Record<string, any>;
+type AnyObject<K extends keyof any = string, T = any> = Record<K, T>;
 
 type AnyFunction = (...args: any) => any;
 
@@ -71,10 +69,11 @@ type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
-type ReverseObject<T extends Record<keyof T, any>> = {
-  [P in T[keyof T]]: {
-    [K in keyof T]: T[K] extends P ? K : never;
-  }[keyof T];
+type ReverseObject<T extends AnyObject<keyof T, string | number>> = {
+  [P in keyof T as T[P]]: P;
+  // [P in T[keyof T]]: {
+  //   [K in keyof T]: T[K] extends P ? K : never;
+  // }[keyof T];
 };
 
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
