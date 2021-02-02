@@ -76,6 +76,10 @@ type ReverseObject<T extends AnyObject<keyof T, string | number>> = {
   // }[keyof T];
 };
 
+type LowercaseKeys<T extends AnyObject<string>> = {
+  [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
+};
+
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 
 type Invalid<T> = Error & { __errorMessage: T };
