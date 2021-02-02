@@ -42,13 +42,66 @@ type ExcludeKeysOfType<A extends AnyObject, B> = Pick<A, Exclude<keyof A, KeysOf
 
 type ExtractKeysOfType<A extends AnyObject, B> = Pick<A, KeysOfType<A, B>>;
 
-declare type ExcludeTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
-  { [P in keyof A]: P extends K ? Exclude<A[P], B> : A[P] },
+type BaseTypeOf<T> = T extends string
+  ? string | T
+  : T extends number
+  ? number | T
+  : T extends boolean
+  ? boolean | T
+  : T;
+
+/** Useful for union types because `keyof <union type>` is `never` */
+type Keys<T> = T extends T ? keyof T : never;
+
+type ExcludeTypesOptions<A extends AnyObject> = { omit: keyof A } | { pick: keyof A };
+
+type ExcludeTypes<
+  A extends AnyObject,
+  T extends Extract<BaseTypeOf<A[keyof A]>, T>,
+  K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
+    ? never
+    : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
+    ? ExcludeTypesOptions<A>
+    : never = { pick: keyof A }
+> = ExcludeKeysOfType<
+  {
+    [P in keyof A]: 'omit' extends keyof K
+      ? P extends K['omit']
+        ? A[P]
+        : Exclude<A[P], T>
+      : 'pick' extends keyof K
+      ? P extends K['pick']
+        ? Exclude<A[P], T>
+        : A[P]
+      : Exclude<A[P], T>;
+  },
   never | undefined
 >;
 
-declare type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
-  { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
+// type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
+// { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
+// never | undefined
+// >;
+type KeepTypes<
+  A extends AnyObject,
+  T extends Extract<BaseTypeOf<A[keyof A]>, T>,
+  K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
+    ? never
+    : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
+    ? ExcludeTypesOptions<A>
+    : never = { pick: keyof A }
+> = ExcludeKeysOfType<
+  {
+    [P in keyof A]: 'omit' extends keyof K
+      ? P extends K['omit']
+        ? A[P]
+        : Extract<A[P], T>
+      : 'pick' extends keyof K
+      ? P extends K['pick']
+        ? Extract<A[P], T>
+        : A[P]
+      : Extract<A[P], T>;
+  },
   never | undefined
 >;
 
