@@ -30,7 +30,16 @@ type ExtractStrict<T, U extends T> = T extends U ? T : never;
 type Overwrite<
   A extends AnyObject,
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
-> = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
+> = {
+  [P in keyof A | keyof B]: P extends keyof B
+    ? P extends keyof A
+      ? B[P]
+      : never
+    : P extends keyof A
+    ? A[P]
+    : never;
+};
+// > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
 /** Return keys of type `T` */
 type KeysOfType<A extends AnyObject, B> = NonNullable<
