@@ -41,13 +41,13 @@ type ExcludeKeysOfType<A extends AnyObject, B> = Pick<A, Exclude<keyof A, KeysOf
 
 type ExtractKeysOfType<A extends AnyObject, B> = Pick<A, KeysOfType<A, B>>;
 
-declare type ExcludeTypes<A extends AnyObject, B> = ExcludeKeysOfType<
-  { [P in keyof A]: Exclude<A[P], B> },
+declare type ExcludeTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
+  { [P in keyof A]: P extends K ? Exclude<A[P], B> : A[P] },
   never | undefined
 >;
 
-declare type KeepTypes<A extends AnyObject, B> = ExcludeKeysOfType<
-  { [P in keyof A]: Extract<A[P], B> },
+declare type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
+  { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
   never | undefined
 >;
 
