@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-type AnyObject<K extends keyof any = string, T = any> = Record<K, T>;
+// type AnyObject<K extends keyof any = string> = Record<K, any>;
+type AnyObject = Record<string, any>;
 
 type AnyFunction = (...args: any) => any;
 
@@ -111,6 +112,10 @@ type DeepWriteable<A extends AnyObject> = {
   -readonly [P in keyof A]: A[P] extends AnyObject ? DeepWriteable<A[P]> : A[P];
 };
 
+type DeepPartial<A extends AnyObject> = {
+  [P in keyof A]?: A[P] extends AnyObject ? DeepPartial<A[P]> : A[P];
+};
+
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   ? U extends Record<keyof U, [any]>
     ? { [K in keyof U]: U[K][0] }
@@ -123,14 +128,14 @@ type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
-type ReverseObject<T extends AnyObject<keyof T, string | number>> = {
+type ReverseObject<T extends Record<keyof T, string | number>> = {
   [P in keyof T as T[P]]: P;
   // [P in T[keyof T]]: {
   //   [K in keyof T]: T[K] extends P ? K : never;
   // }[keyof T];
 };
 
-type LowercaseKeys<T extends AnyObject<string>> = {
+type LowercaseKeys<T extends AnyObject> = {
   [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
 };
 
