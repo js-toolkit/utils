@@ -128,6 +128,14 @@ type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
+type RequiredInner<T, K extends keyof T> = {
+  [P in keyof T]: P extends K
+    ? Extract<T[K], AnyObject> extends AnyObject
+      ? Required<T[K]>
+      : T[K]
+    : T[P];
+};
+
 type ReverseObject<T extends Record<keyof T, string | number>> = {
   [P in keyof T as T[P]]: P;
   // [P in T[keyof T]]: {
