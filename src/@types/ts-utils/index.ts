@@ -136,6 +136,14 @@ type RequiredInner<T, K extends keyof T> = {
     : T[P];
 };
 
+type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
+  [P in keyof T]: P extends K
+    ? IK extends keyof Extract<T[K], AnyObject>
+      ? Pick<T[K], IK>
+      : T[P]
+    : T[P];
+};
+
 type ReverseObject<T extends Record<keyof T, string | number>> = {
   [P in keyof T as T[P]]: P;
   // [P in T[keyof T]]: {
