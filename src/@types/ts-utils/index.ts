@@ -40,16 +40,25 @@ type IfExtends<T, Type, Then = T, Else = never> = T extends never
   ? Then
   : Else;
 
-/** Return keys of type `T` */
-type KeysOfType<A extends AnyObject, B> = NonNullable<
+type KeysOfType<A extends AnyObject, B, Strict extends boolean = true> = NonNullable<
   {
-    [P in keyof A]: IfExtends<Extract<A[P], B>, B, P, never>;
+    [P in keyof A]: Strict extends true
+      ? IfExtends<Extract<A[P], B>, B, P, never>
+      : A[P] extends B
+      ? P
+      : never;
   }[keyof A]
 >;
 
-type ExcludeKeysOfType<A extends AnyObject, B> = Pick<A, Exclude<keyof A, KeysOfType<A, B>>>;
+type ExcludeKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<
+  A,
+  Exclude<keyof A, KeysOfType<A, B, Strict>>
+>;
 
-type ExtractKeysOfType<A extends AnyObject, B> = Pick<A, KeysOfType<A, B>>;
+type ExtractKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<
+  A,
+  KeysOfType<A, B, Strict>
+>;
 
 type BaseTypeOf<T> = T extends string
   ? string | T
@@ -61,6 +70,12 @@ type BaseTypeOf<T> = T extends string
 
 /** Useful for union types because `keyof <union type>` is `never` */
 type Keys<T> = T extends T ? keyof T : never;
+
+// type DeepKeys<T> = {
+//   // [P in keyof T]: T[P] extends AnyObject ? AllKeys<T[P]> : P;
+//   // [P in keyof T]: IfType<Extract<T[P], AnyObject>, AnyObject, AllKeys<NonNullable<T[P]>>, P>;
+//   [P in keyof T]: NonNullable<T[P]> extends AnyObject ? DeepKeys<NonNullable<T[P]>> : P;
+// }[Keys<T>];
 
 type ExcludeTypesOptions<A extends AnyObject> = { omit: keyof A } | { pick: keyof A };
 
@@ -84,7 +99,8 @@ type ExcludeTypes<
         : A[P]
       : Exclude<A[P], T>;
   },
-  never | undefined
+  never | undefined,
+  false
 >;
 
 // type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
@@ -111,7 +127,8 @@ type KeepTypes<
         : A[P]
       : Extract<A[P], T>;
   },
-  never | undefined
+  never | undefined,
+  false
 >;
 
 type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
