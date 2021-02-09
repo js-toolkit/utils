@@ -34,9 +34,17 @@ type Overwrite<
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
+type IfExtends<T, Type, Then = T, Else = never> = T extends never
+  ? Else
+  : T extends Type
+  ? Then
+  : Else;
+
 /** Return keys of type `T` */
 type KeysOfType<A extends AnyObject, B> = NonNullable<
-  { [P in keyof A]: A[P] extends B ? P : never }[keyof A]
+  {
+    [P in keyof A]: IfExtends<Extract<A[P], B>, B, P, never>;
+  }[keyof A]
 >;
 
 type ExcludeKeysOfType<A extends AnyObject, B> = Pick<A, Exclude<keyof A, KeysOfType<A, B>>>;
