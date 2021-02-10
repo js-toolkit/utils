@@ -34,9 +34,9 @@ type Overwrite<
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
-type IfExtends<T, Type, Then = T, Else = never> = T extends never
+type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
   ? Else
-  : T extends Type
+  : Extract<T, Type> extends Type
   ? Then
   : Else;
 
@@ -69,13 +69,19 @@ type BaseTypeOf<T> = T extends string
   : T;
 
 /** Useful for union types because `keyof <union type>` is `never` */
-type Keys<T> = T extends T ? keyof T : never;
+// type Keys<T> = T extends T ? keyof T : never;
+type Keys<T, OnlyObject extends boolean = true> = T extends T
+  ? IfExtends<OnlyObject, true, IfExtends<T, AnyObject, keyof T, never>, keyof T>
+  : never;
 
-// type DeepKeys<T> = {
-//   // [P in keyof T]: T[P] extends AnyObject ? AllKeys<T[P]> : P;
-//   // [P in keyof T]: IfType<Extract<T[P], AnyObject>, AnyObject, AllKeys<NonNullable<T[P]>>, P>;
-//   [P in keyof T]: NonNullable<T[P]> extends AnyObject ? DeepKeys<NonNullable<T[P]>> : P;
-// }[Keys<T>];
+type DeepKeys<T, Prop = never> = IfExtends<
+  T,
+  AnyObject,
+  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer ItemType>
+    ? DeepKeys<ItemType, Prop>
+    : Required<Extract<{ [P in keyof T]: DeepKeys<NonNullable<T>[P], P> }, AnyObject>>[Keys<T>],
+  Prop
+>;
 
 type ExcludeTypesOptions<A extends AnyObject> = { omit: keyof A } | { pick: keyof A };
 
