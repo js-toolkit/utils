@@ -17,7 +17,7 @@ export function getEnumName<K extends string>(
     }
   }
 
-  throw new NoSuchElementError();
+  throw new NoSuchElementError(`Value ${value} not found in enumeration.`);
 }
 
 export function mapEnumNames<Enum extends string | number, K extends string, M = K>(
