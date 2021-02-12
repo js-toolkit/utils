@@ -190,6 +190,13 @@ type LowercaseKeys<T extends AnyObject> = {
 
 type Invalid<T> = Error & { __errorMessage: T };
 
+type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
+  A[number],
+  Invalid<any>,
+  Extract<A[number], Invalid<any>>,
+  A
+>;
+
 type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? true
   : T extends readonly [Item]
@@ -198,16 +205,20 @@ type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? InArray<Rest, Item>
   : false;
 
-type UniqueArray<T> = T extends readonly [infer X, ...infer Rest]
+type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
-    ? Invalid<['Encountered value with duplicates:', X]>
-    : readonly [X, ...UniqueArray<Rest>]
+    ? [Invalid<['Encountered value with duplicates:', X]>]
+    : readonly [X, ...ToUniqueArray<Rest>]
   : T;
 
-type AsUniqueArray<A extends ReadonlyArray<any>> = {
-  [I in keyof A]: unknown extends {
-    [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
-  }[number]
-    ? Invalid<['Encountered value with duplicates:', A[I]]>
-    : A[I];
-};
+type UniqueArray<T extends ReadonlyArray<any>> = LiftInvalid<ToUniqueArray<T>>;
+
+type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<
+  {
+    [I in keyof A]: unknown extends {
+      [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
+    }[number]
+      ? Invalid<['Encountered value with duplicates:', A[I]]>
+      : A[I];
+  }
+>;

@@ -4,6 +4,6 @@
 //   return array;
 // }
 
-export default function asUniqueArray<A extends ReadonlyArray<any>>(array: UniqueArray<A>): A {
+export default function asUniqueArray<A extends ReadonlyArray<any>>(array: AsUniqueArray<A>): A {
   return array as A;
 }
