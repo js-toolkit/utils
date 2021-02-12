@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
-import NoSuchElementError from './NoSuchElementError';
+import NoSuchElementError from '../NoSuchElementError';
 import { Option, None } from './Option';
 
 export type Throwable = Error | AnyObject;
@@ -22,7 +22,7 @@ export abstract class Try<A> {
    * e.get() // 1
    * ```
    */
-  static of<A>(thunk: () => A): Try<A> {
+  static of<T>(thunk: () => T): Try<T> {
     try {
       return Success(thunk());
     } catch (e) {
@@ -34,7 +34,7 @@ export abstract class Try<A> {
    * Returns a [[Try]] reference that represents a successful result
    * (i.e. wrapped in [[Success]]).
    */
-  static success<A>(value: A): Try<A> {
+  static success<T>(value: T): Try<T> {
     return Success(value);
   }
 
@@ -42,7 +42,7 @@ export abstract class Try<A> {
    * Returns a [[Try]] reference that represents a failure
    * (i.e. an exception wrapped in [[Failure]]).
    */
-  static failure<A = never>(error: Throwable): Try<A> {
+  static failure<T = never>(error: Throwable): Try<T> {
     return Failure(error);
   }
 

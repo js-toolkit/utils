@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
-import NoSuchElementError from './fp/NoSuchElementError';
+import NoSuchElementError from './NoSuchElementError';
 
 export function getEnumName<K extends string>(
   enumeration: Record<K, string | number>,

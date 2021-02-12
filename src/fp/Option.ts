@@ -1,13 +1,13 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
-import NoSuchElementError from './NoSuchElementError';
+import NoSuchElementError from '../NoSuchElementError';
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
 type Optional<A> = A | null | undefined;
 
 export abstract class Option<A> {
-  static of<A>(value: Optional<A>): Option<A> {
+  static of<T>(value: Optional<T>): Option<T> {
     return option(value);
   }
 
@@ -242,7 +242,7 @@ export abstract class Option<A> {
  * values of type `A`.
  */
 export function Some<A>(value: NonNullable<A>): Option<A> {
-  if (value == null) throw new Error(`Unable create '${Some.name}' value with ${value}`);
+  if (value == null) throw new Error(`Unable create '${Some.name}' value with ${String(value)}`);
 
   // eslint-disable-next-line no-shadow
   return new (class Some extends Option<A> {
@@ -263,6 +263,7 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
  * The `None` data constructor for [[Option]] represents non-existing
  * values for any type.
  */
+// eslint-disable-next-line no-shadow
 export const None: None = new (class None extends Option<never> {
   // protected readonly value: never = undefined as never;
   constructor() {
