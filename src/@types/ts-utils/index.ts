@@ -142,11 +142,13 @@ type KeepTypes<
 type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 
 type DeepWriteable<A extends AnyObject> = {
-  -readonly [P in keyof A]: A[P] extends AnyObject ? DeepWriteable<A[P]> : A[P];
+  -readonly [P in keyof A]: NonNullable<A[P]> extends AnyObject
+    ? DeepWriteable<NonNullable<A[P]>>
+    : A[P];
 };
 
 type DeepPartial<A extends AnyObject> = {
-  [P in keyof A]?: A[P] extends AnyObject ? DeepPartial<A[P]> : A[P];
+  [P in keyof A]?: NonNullable<A[P]> extends AnyObject ? DeepPartial<NonNullable<A[P]>> : A[P];
 };
 
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
