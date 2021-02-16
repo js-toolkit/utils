@@ -141,15 +141,29 @@ type KeepTypes<
 
 type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 
-type DeepWriteable<A extends AnyObject> = {
-  -readonly [P in keyof A]: NonNullable<A[P]> extends AnyObject
-    ? DeepWriteable<NonNullable<A[P]>>
-    : A[P];
-};
+type DeepWriteable<T extends AnyObject> = IfExtends<
+  T,
+  AnyObject,
+  IfExtends<T, ReadonlyArray<any>, T, { -readonly [P in keyof T]: DeepWriteable<T[P]> }>,
+  T
+>;
 
-type DeepPartial<A extends AnyObject> = {
-  [P in keyof A]?: NonNullable<A[P]> extends AnyObject ? DeepPartial<NonNullable<A[P]>> : A[P];
-};
+// type DeepPartial<T extends AnyObject> = IfExtends<
+//   T,
+//   AnyObject,
+//   IfExtends<T, ReadonlyArray<any>, T, { [P in keyof T]?: DeepPartial<T[P]> }>,
+//   T
+// >;
+type DeepPartial<T extends AnyObject> = IfExtends<
+  T,
+  AnyObject,
+  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
+    ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
+      ? Array<DeepPartial<I>>
+      : ReadonlyArray<DeepPartial<RI>>
+    : { [P in keyof T]?: DeepPartial<T[P]> },
+  T
+>;
 
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   ? U extends Record<keyof U, [any]>
