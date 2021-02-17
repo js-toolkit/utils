@@ -76,9 +76,8 @@ export default function getTaskCounter<K extends string = never>({
 
   const resetAll = (): void => {
     if (!isAnyPending()) return;
-    Object.getOwnPropertyNames(tasks).forEach((key) =>
-      resetTask(tasks, key as keyof PendingTasks<K>)
-    );
+    const keys = Object.getOwnPropertyNames(tasks) as (keyof PendingTasks<K>)[];
+    keys.forEach(reset);
   };
 
   const counter: TaskCounter<K> = {
