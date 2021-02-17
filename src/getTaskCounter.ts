@@ -12,7 +12,15 @@ export interface TaskCounter<K extends string> {
 }
 
 export default function getTaskCounter<K extends string = never>(
-  pendingTasks: PendingTasks<K> = { default: 0 }
+  pendingTasks: PendingTasks<K> = { default: 0 },
+  resetTask = (tasks: typeof pendingTasks, key: keyof typeof pendingTasks) => {
+    /* eslint-disable no-param-reassign */
+    if (key === 'default') {
+      tasks.default = 0;
+      return;
+    }
+    delete tasks[key];
+  }
 ): TaskCounter<K> {
   const tasks = pendingTasks;
 
@@ -39,17 +47,14 @@ export default function getTaskCounter<K extends string = never>(
 
   const reset = (key: keyof PendingTasks<K> = 'default'): void => {
     if (!isPending(key)) return;
-    if (key === 'default') {
-      tasks.default = 0;
-      return;
-    }
-    delete tasks[key];
+    resetTask(tasks, key);
   };
 
   const resetAll = (): void => {
     if (!isAnyPending()) return;
-    Object.getOwnPropertyNames(tasks).forEach((key) => delete tasks[key]);
-    tasks.default = 0;
+    Object.getOwnPropertyNames(tasks).forEach((key) =>
+      resetTask(tasks, key as keyof PendingTasks<K>)
+    );
   };
 
   const counter: TaskCounter<K> = {
