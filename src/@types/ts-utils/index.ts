@@ -177,6 +177,8 @@ type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
+type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
+
 type RequiredInner<T, K extends keyof T> = {
   [P in keyof T]: P extends K
     ? Extract<T[K], AnyObject> extends AnyObject
