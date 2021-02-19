@@ -19,6 +19,15 @@ export type ConvertToDataEventMap<
       ];
     };
 
+type ExtractTuple<T extends Record<string, [any] | []>> = {
+  [P in keyof T]: T[P][0];
+};
+
+export type DataEventMap<
+  EventMap extends Record<string, [any] | []>,
+  Target extends DataEventEmitter<EventMap, Target>
+> = ExtractTuple<ConvertToDataEventMap<EventMap, Target>>;
+
 export type DataEventListener<
   EventTypes extends string | symbol | Record<string, [any] | []>,
   K extends EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
