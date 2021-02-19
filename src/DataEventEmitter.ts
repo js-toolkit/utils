@@ -8,15 +8,19 @@ export interface DataEvent<Type, Data, Target> {
   target: Target;
 }
 
+type EventMap = Record<string, [any] | [] | DataEvent<string, any, any>>;
+
 export type ConvertToDataEventMap<
-  EventTypes extends string | symbol | Record<string, [any] | []>,
+  EventTypes extends string | symbol | EventMap,
   Target extends DataEventEmitter<EventTypes, Target>
 > = EventTypes extends string | symbol
   ? Record<EventTypes, [DataEvent<string, unknown, Target>]>
   : {
-      [P in keyof EventTypes]: [
-        DataEvent<P, EventTypes[P] extends [any] | [] ? EventTypes[P][0] : unknown, Target>
-      ];
+      [P in keyof EventTypes]: EventTypes[P] extends [DataEvent<string, any, any>]
+        ? [DataEvent<P, EventTypes[P][0]['data'], Target>]
+        : EventTypes[P] extends DataEvent<string, any, any>
+        ? [DataEvent<P, EventTypes[P]['data'], Target>]
+        : [DataEvent<P, EventTypes[P] extends [any] | [] ? EventTypes[P][0] : unknown, Target>];
     };
 
 type ExtractTuple<T extends Record<string, [any] | []>> = {
@@ -24,18 +28,18 @@ type ExtractTuple<T extends Record<string, [any] | []>> = {
 };
 
 export type DataEventMap<
-  EventMap extends Record<string, [any] | []>,
-  Target extends DataEventEmitter<EventMap, Target>
-> = ExtractTuple<ConvertToDataEventMap<EventMap, Target>>;
+  Map extends EventMap,
+  Target extends DataEventEmitter<Map, Target>
+> = ExtractTuple<ConvertToDataEventMap<Map, Target>>;
 
 export type DataEventListener<
-  EventTypes extends string | symbol | Record<string, [any] | []>,
+  EventTypes extends string | symbol | EventMap,
   K extends EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
   Target extends DataEventEmitter<EventTypes, Target>
 > = EventEmitter.EventListener<ConvertToDataEventMap<EventTypes, Target>, K>;
 
 export default class DataEventEmitter<
-  EventTypes extends string | symbol | Record<string, [any] | []>,
+  EventTypes extends string | symbol | EventMap,
   Target extends DataEventEmitter<EventTypes, Target, Context> = DataEventEmitter<
     EventTypes,
     any,
