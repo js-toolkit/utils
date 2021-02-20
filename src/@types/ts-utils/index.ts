@@ -242,3 +242,15 @@ type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<
       : A[I];
   }
 >;
+
+type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) extends (k: infer I) => void
+  ? I
+  : never;
+
+type LastOfUnion<T> = UnionToIntersection<T extends T ? () => T : never> extends () => infer R
+  ? R
+  : never;
+
+type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
+  ? []
+  : [...UnionToTuple<Exclude<T, L>>, L];
