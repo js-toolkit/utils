@@ -154,14 +154,20 @@ type DeepWriteable<T extends AnyObject> = IfExtends<
 //   IfExtends<T, ReadonlyArray<any>, T, { [P in keyof T]?: DeepPartial<T[P]> }>,
 //   T
 // >;
-type DeepPartial<T extends AnyObject> = IfExtends<
+type DeepPartial<
+  T extends AnyObject,
+  Depth extends number = never,
+  R extends unknown[] = [any]
+> = IfExtends<
   T,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
     ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
-      ? Array<DeepPartial<I>>
-      : ReadonlyArray<DeepPartial<RI>>
-    : { [P in keyof T]?: DeepPartial<T[P]> },
+      ? Array<DeepPartial<I, Depth, R>>
+      : ReadonlyArray<DeepPartial<RI, Depth, R>>
+    : {
+        [P in keyof T]?: R['length'] extends Depth ? T[P] : DeepPartial<T[P], Depth, Push<R, any>>;
+      },
   T
 >;
 
@@ -216,6 +222,10 @@ type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
   Extract<A[number], Invalid<any>>,
   A
 >;
+
+type Last<T extends unknown[]> = T extends [any, ...infer Rest] ? Rest : [];
+
+type Push<A extends unknown[], T> = [...A, T];
 
 type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? true
