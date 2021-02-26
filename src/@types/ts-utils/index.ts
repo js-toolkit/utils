@@ -10,11 +10,11 @@ type AnyFunction = (...args: any) => any;
 type Copy<A extends AnyObject> = { [P in keyof A]: A[P] };
 
 /** Exclude keys of B from keys of A */
-type DiffKeys<A extends AnyObject, B extends AnyObject> = Exclude<keyof A, keyof B>;
+type DiffKeys<A extends AnyObject, B extends AnyObject> = Exclude<Keys<A>, Keys<B>>;
 
 type Diff<A extends AnyObject, B extends AnyObject> = Pick<A, DiffKeys<A, B>>;
 
-type IntersectionKeys<A extends AnyObject, B extends AnyObject> = Extract<keyof A, keyof B>;
+type IntersectionKeys<A extends AnyObject, B extends AnyObject> = Extract<Keys<A>, Keys<B>>;
 
 type Intersection<A extends AnyObject, B extends AnyObject> = Pick<A, IntersectionKeys<A, B>>;
 
@@ -24,8 +24,8 @@ type OmitStrict<
   A extends AnyObject,
   K extends
     | keyof A
-    | (Extract<keyof A, keyof K> extends never ? never : Pick<K, Extract<keyof A, keyof K>>)
-> = Pick<A, Exclude<keyof A, K extends keyof A ? K : keyof K>>;
+    | (Extract<Keys<A>, Keys<K>> extends never ? never : Pick<K, Extract<Keys<A>, Keys<K>>>)
+> = Pick<A, Exclude<Keys<A>, K extends Keys<A> ? K : Keys<K>>>;
 
 type ExcludeStrict<T, U extends T> = T extends U ? never : T;
 
