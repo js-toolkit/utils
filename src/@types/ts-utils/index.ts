@@ -212,6 +212,8 @@ type LowercaseKeys<T extends AnyObject> = {
   [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
 };
 
+type DefineAll<Enum extends string, T extends Record<Enum, unknown>> = T;
+
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 
 type Invalid<T> = Error & { __errorMessage: T };
