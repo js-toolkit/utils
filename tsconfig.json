@@ -10,5 +10,5 @@
     "diagnostics": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/types.ts"]
+  "exclude": ["src/types/types.ts"]
 }
