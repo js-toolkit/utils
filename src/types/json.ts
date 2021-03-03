@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable no-use-before-define */
 import type { Option } from '../fp/Option';
 
 export type JSONPrimitive = string | number | boolean | null | undefined;
@@ -13,7 +15,7 @@ export interface ValueContainer<A extends JSONPrimitive> {
   valueOf: () => A;
 }
 
-type ExcludeFunctions<A extends AnyObject> = ExcludeKeysOfType<A, Function>;
+type ExcludeFunctions<A extends AnyObject> = ExcludeKeysOfType<A, AnyFunction>;
 
 type ValidProps<A extends AnyObject, OmitKeys extends keyof any> = ExcludeFunctions<
   Omit<A, OmitKeys | keyof JSONSerializable<any, any>>
@@ -39,7 +41,7 @@ type ObjectToJSON<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = keyof 
 > extends never
   ? A extends ValueContainer<infer R>
     ? R
-    : {}
+    : {} // eslint-disable-line @typescript-eslint/ban-types
   : Optional<A, OmitKeys> & NonOptional<A, OmitKeys>;
 
 type ExtractKeys<A> = A extends Option<infer T>
