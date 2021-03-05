@@ -7,6 +7,8 @@ type EmptyObject = Record<never, never>;
 
 type AnyFunction = (...args: any) => any;
 
+type AnyConstructor = new (...args: any) => any;
+
 type Copy<A extends AnyObject> = { [P in keyof A]: A[P] };
 
 /** Exclude keys of B from keys of A */

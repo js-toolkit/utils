@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable dot-notation */
 /* eslint-disable no-proto */
-/* eslint-disable @typescript-eslint/ban-types */
 
-export default function es5ErrorCompat<S extends Error, C extends Function>(
+export default function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   this: S,
   Ctor: C
 ): void {
