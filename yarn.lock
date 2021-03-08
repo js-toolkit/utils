@@ -734,10 +734,10 @@
     "@typescript-eslint/types" "4.16.1"
     eslint-visitor-keys "^2.0.0"
 
-"@vzh/configs@^3.73.8":
-  version "3.73.8"
-  resolved "https://registry.yarnpkg.com/@vzh/configs/-/configs-3.73.8.tgz#5b89cce15e3ba3c14c968080b4f6596ee7a00b21"
-  integrity sha512-4wrlbrn8ghyshZC1w7ElgajXV4yOt19rvnaSt3EVNz0O+OW5/eRokvUpLUhf3eF3c5bUdui+96YNURkgveupyA==
+"@vlazh/configs@^3.73.8":
+  version "3.73.10"
+  resolved "https://npm.pkg.github.com/download/@vlazh/configs/3.73.10/02a9d4d03b572fc76583839fbd2d3d5befe82d3624f76a4ef247d4b3f49f74c3#2076acdf80514d69735220a994f521a86fdfde63"
+  integrity sha512-dYj7cg3jRdjzMQz8ax2ovZuxkm2U0A4hvY5XoW9xQNIc3rqC9vXvQ2mL/PqcpNN98pnWcbgnfiblIc+MRygekw==
 
 abab@^2.0.3:
   version "2.0.5"
