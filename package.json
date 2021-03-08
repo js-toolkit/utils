@@ -1,11 +1,16 @@
 {
-  "name": "@vzh/ts-utils",
+  "name": "@vlazh/ts-utils",
   "version": "1.26.0",
   "description": "Typescript helper types and utils",
   "author": "VZH",
   "license": "MIT",
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vlazh/ts-utils"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/",
