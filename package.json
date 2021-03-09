@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vlazh/ts-utils"
+    "url": "https://github.com/js-toolkit/ts-utils"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
