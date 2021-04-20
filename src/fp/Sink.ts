@@ -19,9 +19,9 @@ export default class Sink<A> {
 
   private pending = true;
 
-  private cancelling?: Promise<void>;
-
   private waitTimeoutHandler?: any;
+
+  private cancelling?: Promise<void>;
 
   private resolve?: () => void;
 
@@ -113,25 +113,31 @@ export default class Sink<A> {
   }
 
   pipe<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
-    const prevHandler = this.pipeHandler;
-    this.pipeHandler = (value) =>
-      (prevHandler ? prevHandler(value) : Promise.resolve(value)).then(action);
+    if (this.isPending) {
+      const prevHandler = this.pipeHandler;
+      this.pipeHandler = (value) =>
+        (prevHandler ? prevHandler(value) : Promise.resolve(value)).then(action);
+    }
     return (this as unknown) as Sink<B>;
   }
 
   once<B>(action: (value: A) => PromiseLike<B> | B): Sink<B> {
-    const prevHandler = this.pipeHandler;
-    this.pipeHandler = (value) =>
-      (prevHandler ? prevHandler(value) : Promise.resolve(value))
-        .then(action)
-        .then(() => this.cancel());
+    if (this.isPending) {
+      const prevHandler = this.pipeHandler;
+      this.pipeHandler = (value) =>
+        (prevHandler ? prevHandler(value) : Promise.resolve(value))
+          .then(action)
+          .then(() => this.cancel());
+    }
     return (this as unknown) as Sink<B>;
   }
 
   catch<B = never>(action: (reason: any) => PromiseLike<B> | B): Sink<B> {
-    const prevHandler = this.pipeHandler;
-    this.pipeHandler = (value) =>
-      (prevHandler ? prevHandler(value) : Promise.resolve(value)).catch(action);
+    if (this.isPending) {
+      const prevHandler = this.pipeHandler;
+      this.pipeHandler = (value) =>
+        (prevHandler ? prevHandler(value) : Promise.resolve(value)).catch(action);
+    }
     return (this as unknown) as Sink<B>;
   }
 }
