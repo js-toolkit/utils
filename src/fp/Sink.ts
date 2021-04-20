@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import TimeoutError from './TimeoutError';
 
-type Finalizator = () => void | Promise<any>;
+export type Finalizator = () => void | Promise<any>;
+
+export interface WaitOptions {
+  timeout?: number;
+  errorOnTimeout?: boolean;
+}
+
+export interface SinkOptions {
+  cancelOnPipeError?: boolean;
+}
 
 export default class Sink<A> {
   private readonly promise: Promise<void>;
@@ -15,15 +25,15 @@ export default class Sink<A> {
 
   private resolve?: () => void;
 
-  private reject?: (reason?: any) => void;
+  private reject?: (reason?: unknown) => void;
 
   private finalizator?: Finalizator;
 
-  private pipeHandler?: (value: any) => Promise<any>;
+  private pipeHandler?: (value: A) => Promise<any>;
 
   constructor(
-    executor: (pipe: (value: A) => any, cancel: Sink<A>['cancel']) => Finalizator | void,
-    cancelOnPipeError = true
+    executor: (pipe: (value: A) => void, cancel: Sink<A>['cancel']) => Finalizator | void,
+    { cancelOnPipeError = true }: SinkOptions = {}
   ) {
     this.cancel = this.cancel.bind(this);
     this.wait = this.wait.bind(this);
@@ -36,9 +46,8 @@ export default class Sink<A> {
     this.promise = new Promise<void>((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      const f = executor(this.onPipe, this.cancel);
-      this.finalizator = typeof f === 'function' ? f : undefined;
+      const finalizator = executor(this.onPipe, this.cancel);
+      this.finalizator = typeof finalizator === 'function' ? finalizator : undefined;
     }).finally(() => {
       this.pending = false;
       clearTimeout(this.waitTimeoutHandler);
@@ -49,7 +58,7 @@ export default class Sink<A> {
     return this.pending;
   }
 
-  wait(timeout?: number, errorOnTimeout = true): Promise<void> {
+  wait({ timeout, errorOnTimeout = true }: WaitOptions = {}): Promise<void> {
     if (this.isPending && timeout && timeout > 0) {
       clearTimeout(this.waitTimeoutHandler);
       this.waitTimeoutHandler = setTimeout(() => {
@@ -99,8 +108,7 @@ export default class Sink<A> {
     // }
   }
 
-  private onPipe(value: any): void {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  private onPipe(value: A): void {
     this.pipeHandler && this.pipeHandler(value).catch(this.cancelOnError ? this.cancel : undefined);
   }
 
