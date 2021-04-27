@@ -143,10 +143,26 @@ type KeepTypes<
 
 type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 
-type DeepWriteable<T extends AnyObject> = IfExtends<
+// type DeepWriteable<T extends AnyObject> = IfExtends<
+//   T,
+//   AnyObject,
+//   IfExtends<T, ReadonlyArray<any>, T, { -readonly [P in keyof T]: DeepWriteable<T[P]> }>,
+//   T
+// >;
+type DeepWriteable<
+  T extends AnyObject,
+  Depth extends number = never,
+  R extends unknown[] = [any]
+> = IfExtends<
   T,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, T, { -readonly [P in keyof T]: DeepWriteable<T[P]> }>,
+  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer I>
+    ? Array<DeepWriteable<I, Depth, R>>
+    : {
+        -readonly [P in keyof T]: R['length'] extends Depth
+          ? T[P]
+          : DeepWriteable<T[P], Depth, Push<R, any>>;
+      },
   T
 >;
 
