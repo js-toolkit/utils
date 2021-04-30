@@ -284,3 +284,9 @@ type LastOfUnion<T> = UnionToIntersection<T extends T ? () => T : never> extends
 type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
   ? []
   : [...UnionToTuple<Exclude<T, L>>, L];
+
+type MapToKey<U extends AnyObject, K extends keyof U> = U extends U ? { [P in U[K]]: U } : never;
+
+type MapKeyAsArray<T extends AnyObject, K extends keyof T> = {
+  [P in keyof T]: P extends K ? readonly T[P][] : T[P];
+};
