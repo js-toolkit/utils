@@ -9,7 +9,7 @@ type AnyFunction = (...args: any) => any;
 
 type AnyConstructor = new (...args: any) => any;
 
-type Copy<A extends AnyObject> = { [P in keyof A]: A[P] };
+type AsObject<A extends AnyObject> = { [P in keyof A]: A[P] };
 
 /** Exclude keys of B from keys of A */
 type DiffKeys<A extends AnyObject, B extends AnyObject> = Exclude<Keys<A>, Keys<B>>;
