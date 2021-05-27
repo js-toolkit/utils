@@ -32,7 +32,7 @@ type NonOptional<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = {
   [P in keyof ValidProps<ExcludeKeysOfType<A, Option<any>>, OmitKeys>]: Jsonify<A[P], OmitKeys>;
 };
 
-type ObjectToJSON<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = keyof ValidProps<
+type JSONObjectOf<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = keyof ValidProps<
   A,
   OmitKeys
 > extends never
@@ -60,7 +60,7 @@ export type Jsonify<A, OmitKeys extends ExtractKeys<A> = never> = A extends Opti
   : A extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
   ? Array<number>
   : A extends AnyObject
-  ? ObjectToJSON<A, OmitKeys>
+  ? JSONObjectOf<A, OmitKeys>
   : A extends JSONValue
   ? A
   : string;
