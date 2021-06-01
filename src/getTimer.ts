@@ -7,6 +7,7 @@ export interface Timer {
 interface Options {
   callback: VoidFunction;
   interval: number;
+  /** Default `true` */
   autostart?: boolean;
 }
 
