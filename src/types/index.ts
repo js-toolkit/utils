@@ -7,6 +7,8 @@ type EmptyObject = Record<never, never>;
 
 type AnyFunction = (...args: any) => any;
 
+type AnyAsyncFunction = (...args: any) => Promise<any>;
+
 type AnyConstructor = new (...args: any) => any;
 
 type AsObject<A extends AnyObject> = { [P in keyof A]: A[P] };
