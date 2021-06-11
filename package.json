@@ -23,8 +23,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "patch-publish": "npm run build && npm version patch && npm run copy:configs && npm publish ./dist && git push origin master --follow-tags",
-    "minor-publish": "npm run build && npm version minor && npm run copy:configs && npm publish ./dist && git push origin master --follow-tags",
-    "major-publish": "npm run build && npm version major && npm run copy:configs && npm publish ./dist && git push origin master --follow-tags"
+    "minor-publish": "npm run build && npm version minor && npm run copy:configs && npm publish ./dist && git push origin master --follow-tags"
   },
   "devDependencies": {
     "@js-toolkit/configs": "^3.77.5",
