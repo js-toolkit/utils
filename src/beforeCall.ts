@@ -1,10 +1,18 @@
-export default function beforeCall<F extends AnyFunction>(
+export default function beforeCall<
+  F extends AnyFunction,
+  C extends (...args: Parameters<F>) => void | Promise<void>
+>(
   fn: F,
-  callback: (...args: Parameters<F>) => void,
+  callback: C,
   context: any = undefined
-): F {
+): C extends AnyAsyncFunction
+  ? ((...args: Parameters<F>) => Promise<ReturnType<F>>) & AsObject<F>
+  : F {
   const wrapper: AnyFunction = (...args: Parameters<F>) => {
-    callback(...args);
+    const cbResult = callback(...args);
+    if (cbResult instanceof Promise) {
+      return cbResult.finally(() => fn.call(context, ...args) as ReturnType<F>);
+    }
     return fn.call(context, ...args) as ReturnType<F>;
   };
 
@@ -17,5 +25,6 @@ export default function beforeCall<F extends AnyFunction>(
 
   Object.defineProperties(wrapper, descs);
 
-  return wrapper as F;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return wrapper as any;
 }
