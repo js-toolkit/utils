@@ -11,11 +11,11 @@ export default function beforeCall<
   ? ((...args: Parameters<F>) => Promise<ReturnType<F>>) & AsObject<F>
   : F {
   const wrapper: AnyFunction = (...args: Parameters<F>) => {
-    const cbResult = callback(...args);
+    const cbResult = callback.apply(context, args);
     if (cbResult instanceof Promise) {
-      return cbResult.finally(() => fn.call(context, ...args) as ReturnType<F>);
+      return cbResult.finally(() => fn.apply(context, args) as ReturnType<F>);
     }
-    return fn.call(context, ...args) as ReturnType<F>;
+    return fn.apply(context, args) as ReturnType<F>;
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
