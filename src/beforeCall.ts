@@ -1,3 +1,5 @@
+import copyFnProps from './copyFnProps';
+
 export default function beforeCall<
   F extends AnyFunction,
   C extends (...args: Parameters<F>) => void | Promise<void>
@@ -16,15 +18,6 @@ export default function beforeCall<
     return fn.call(context, ...args) as ReturnType<F>;
   };
 
-  const descs = Object.getOwnPropertyDescriptors(fn);
-  delete descs.arguments;
-  delete descs.caller;
-  delete descs.length;
-  delete descs.name;
-  delete descs.prototype;
-
-  Object.defineProperties(wrapper, descs);
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return wrapper as any;
+  return copyFnProps(fn, wrapper) as any;
 }
