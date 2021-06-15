@@ -1,4 +1,4 @@
-export interface DelayFunc {
+export interface Delay {
   isPending: boolean;
   cancel: VoidFunction;
 }
@@ -7,7 +7,7 @@ export default function delay<T extends AnyFunction>(
   fn: T,
   wait: number,
   ...args: Parameters<T>
-): DelayFunc {
+): Delay {
   let timer: any;
 
   const cancel = (): void => {
