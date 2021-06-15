@@ -1,7 +1,4 @@
-export interface Delay {
-  isPending: boolean;
-  cancel: VoidFunction;
-}
+import type { Delay } from './delayed';
 
 export default function delay<T extends AnyFunction>(
   fn: T,
@@ -18,10 +15,10 @@ export default function delay<T extends AnyFunction>(
   if (wait > 0) {
     timer = setTimeout(() => {
       timer = undefined;
-      fn.call(undefined, args);
+      fn.call(undefined, ...args);
     }, wait);
   } else {
-    fn.call(undefined, args);
+    fn.call(undefined, ...args);
   }
 
   return {
