@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 // eslint-disable-next-line max-classes-per-file
 import es5ErrorCompat from './es5ErrorCompat';
 
@@ -17,7 +18,7 @@ function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): u
   return handler(value);
 }
 
-class CancellablePromise<T> extends Promise<T> {
+class CancellablePromiseClass<T> extends Promise<T> {
   private canceller?: (reason?: any) => void;
 
   constructor(
@@ -94,144 +95,147 @@ class CancellablePromise<T> extends Promise<T> {
   }
 }
 
-type CancellablePromiseStatics = DefineAll<
-  Exclude<keyof typeof Promise, symbol | 'prototype'>,
-  {
-    reject<T = never>(reason?: any): CancellablePromise<T>;
+export interface CancellablePromiseConstructor
+  extends DefineAll<
+    Exclude<keyof typeof Promise, symbol>,
+    {
+      readonly prototype: CancellablePromise<any>;
 
-    resolve(): CancellablePromise<void>;
+      reject<T = never>(reason?: any): CancellablePromise<T>;
 
-    resolve<T>(value: T | PromiseLike<T>): CancellablePromise<T>;
+      resolve(): CancellablePromise<void>;
 
-    all<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>,
-        T6 | PromiseLike<T6>,
-        T7 | PromiseLike<T7>,
-        T8 | PromiseLike<T8>,
-        T9 | PromiseLike<T9>,
-        T10 | PromiseLike<T10>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>;
+      resolve<T>(value: T | PromiseLike<T>): CancellablePromise<T>;
 
-    all<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>,
-        T6 | PromiseLike<T6>,
-        T7 | PromiseLike<T7>,
-        T8 | PromiseLike<T8>,
-        T9 | PromiseLike<T9>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
+      all<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>,
+          T6 | PromiseLike<T6>,
+          T7 | PromiseLike<T7>,
+          T8 | PromiseLike<T8>,
+          T9 | PromiseLike<T9>,
+          T10 | PromiseLike<T10>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>;
 
-    all<T1, T2, T3, T4, T5, T6, T7, T8>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>,
-        T6 | PromiseLike<T6>,
-        T7 | PromiseLike<T7>,
-        T8 | PromiseLike<T8>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8]>;
+      all<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>,
+          T6 | PromiseLike<T6>,
+          T7 | PromiseLike<T7>,
+          T8 | PromiseLike<T8>,
+          T9 | PromiseLike<T9>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
 
-    all<T1, T2, T3, T4, T5, T6, T7>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>,
-        T6 | PromiseLike<T6>,
-        T7 | PromiseLike<T7>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7]>;
+      all<T1, T2, T3, T4, T5, T6, T7, T8>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>,
+          T6 | PromiseLike<T6>,
+          T7 | PromiseLike<T7>,
+          T8 | PromiseLike<T8>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8]>;
 
-    all<T1, T2, T3, T4, T5, T6>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>,
-        T6 | PromiseLike<T6>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5, T6]>;
+      all<T1, T2, T3, T4, T5, T6, T7>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>,
+          T6 | PromiseLike<T6>,
+          T7 | PromiseLike<T7>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7]>;
 
-    all<T1, T2, T3, T4, T5>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>,
-        T5 | PromiseLike<T5>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4, T5]>;
+      all<T1, T2, T3, T4, T5, T6>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>,
+          T6 | PromiseLike<T6>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5, T6]>;
 
-    all<T1, T2, T3, T4>(
-      values: readonly [
-        T1 | PromiseLike<T1>,
-        T2 | PromiseLike<T2>,
-        T3 | PromiseLike<T3>,
-        T4 | PromiseLike<T4>
-      ]
-    ): CancellablePromise<[T1, T2, T3, T4]>;
+      all<T1, T2, T3, T4, T5>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>,
+          T5 | PromiseLike<T5>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4, T5]>;
 
-    all<T1, T2, T3>(
-      values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]
-    ): CancellablePromise<[T1, T2, T3]>;
+      all<T1, T2, T3, T4>(
+        values: readonly [
+          T1 | PromiseLike<T1>,
+          T2 | PromiseLike<T2>,
+          T3 | PromiseLike<T3>,
+          T4 | PromiseLike<T4>
+        ]
+      ): CancellablePromise<[T1, T2, T3, T4]>;
 
-    all<T1, T2>(
-      values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]
-    ): CancellablePromise<[T1, T2]>;
+      all<T1, T2, T3>(
+        values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]
+      ): CancellablePromise<[T1, T2, T3]>;
 
-    all<T>(values: readonly (T | PromiseLike<T>)[]): CancellablePromise<T[]>;
+      all<T1, T2>(
+        values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]
+      ): CancellablePromise<[T1, T2]>;
 
-    all<T>(values: Iterable<T | PromiseLike<T>>): CancellablePromise<T[]>;
+      all<T>(values: readonly (T | PromiseLike<T>)[]): CancellablePromise<T[]>;
 
-    race<T>(values: Iterable<T>): CancellablePromise<T extends PromiseLike<infer U> ? U : T>;
+      all<T>(values: Iterable<T | PromiseLike<T>>): CancellablePromise<T[]>;
 
-    race<T>(values: Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
+      race<T>(values: Iterable<T>): CancellablePromise<T extends PromiseLike<infer U> ? U : T>;
 
-    race<T>(values: readonly T[]): CancellablePromise<T extends PromiseLike<infer U> ? U : T>;
+      race<T>(values: Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
 
-    allSettled<T extends readonly unknown[] | readonly [unknown]>(
-      values: T
-    ): CancellablePromise<
-      {
-        -readonly [P in keyof T]: PromiseSettledResult<
-          T[P] extends PromiseLike<infer U> ? U : T[P]
-        >;
-      }
-    >;
+      race<T>(values: readonly T[]): CancellablePromise<T extends PromiseLike<infer U> ? U : T>;
 
-    allSettled<T>(
-      values: Iterable<T>
-    ): CancellablePromise<PromiseSettledResult<T extends PromiseLike<infer U> ? U : T>[]>;
+      allSettled<T extends readonly unknown[] | readonly [unknown]>(
+        values: T
+      ): CancellablePromise<
+        {
+          -readonly [P in keyof T]: PromiseSettledResult<
+            T[P] extends PromiseLike<infer U> ? U : T[P]
+          >;
+        }
+      >;
 
-    any<T>(values: (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
-  }
->;
+      allSettled<T>(
+        values: Iterable<T>
+      ): CancellablePromise<PromiseSettledResult<T extends PromiseLike<infer U> ? U : T>[]>;
 
-export type CancellablePromiseConstructor = OmitStrict<
-  typeof CancellablePromise,
-  CancellablePromiseStatics
-> &
-  CancellablePromiseStatics & {
-    new <T>(...args: ConstructorParameters<typeof CancellablePromise>): CancellablePromise<T>;
-  };
+      any<T>(values: (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
+    }
+  > {
+  new <T>(...args: ConstructorParameters<typeof CancellablePromiseClass>): CancellablePromise<T>;
+}
 
-export default CancellablePromise as unknown as CancellablePromiseConstructor;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface CancellablePromise<T> extends CancellablePromiseClass<T> {}
+
+const CancellablePromise: CancellablePromiseConstructor =
+  CancellablePromiseClass as unknown as CancellablePromiseConstructor;
+
+export default CancellablePromise;
 
 // const p = new CancellablePromise<void>((resolve, reject, cancel) => {
 //   // setTimeout(() => cancel(), 200);
