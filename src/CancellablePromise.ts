@@ -88,6 +88,10 @@ class CancellablePromise<T> extends Promise<T> {
       T | TResult
     >;
   }
+
+  finally(onfinally?: (() => void) | null): CancellablePromise<T> {
+    return super.finally(onfinally) as CancellablePromise<T>;
+  }
 }
 
 type CancellablePromiseStatics = DefineAll<
