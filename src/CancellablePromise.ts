@@ -39,7 +39,8 @@ class CancellablePromiseClass<T> extends Promise<T> {
     super((resolve, reject) => {
       // console.log('* create', executorOrPromise instanceof Promise);
       ref.val = reject;
-      if (executorOrPromise instanceof Promise) resolve(executorOrPromise);
+      // if (executorOrPromise instanceof Promise) resolve(executorOrPromise);
+      if (executorOrPromise instanceof Promise) executorOrPromise.then(resolve, reject);
       else executorOrPromise(resolve, reject, () => reject(new PromiseCancelledError()));
     });
     ref.set();
