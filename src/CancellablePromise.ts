@@ -19,7 +19,7 @@ function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): u
 }
 
 class CancellablePromiseClass<T> extends Promise<T> {
-  private canceller?: (reason?: any) => void;
+  private canceller?: VoidFunction;
 
   constructor(
     executorOrPromise:
@@ -30,31 +30,40 @@ class CancellablePromiseClass<T> extends Promise<T> {
         ) => void)
       | Promise<T>
   ) {
-    const ref = {
-      val: undefined as AnyFunction | undefined,
-      set: () => {
-        this.canceller = ref.val;
-      },
-    };
+    let canceller: VoidFunction | undefined;
+
     super((resolve, reject) => {
       // console.log('* create', executorOrPromise instanceof Promise);
-      ref.val = reject;
-      // if (executorOrPromise instanceof Promise) resolve(executorOrPromise);
-      if (executorOrPromise instanceof Promise) executorOrPromise.then(resolve, reject);
-      else executorOrPromise(resolve, reject, () => reject(new PromiseCancelledError()));
+      const currentCanceller: VoidFunction = () => reject(new PromiseCancelledError());
+
+      canceller =
+        (executorOrPromise instanceof CancellablePromise && executorOrPromise.canceller) ||
+        currentCanceller;
+
+      if (executorOrPromise instanceof CancellablePromise) {
+        executorOrPromise.cancelled(currentCanceller).then(resolve, reject);
+      } else if (executorOrPromise instanceof Promise) {
+        executorOrPromise.then(resolve, reject);
+      } else {
+        executorOrPromise(resolve, reject, canceller);
+      }
     });
-    ref.set();
+
+    this.canceller = canceller;
   }
 
-  /** Cancel only the current promise, not the prev chain. */
+  /**
+   * Cancel the whole chain of @type {CancellablePromise}.
+   * The regular @type {Promise} will still be executed.
+   */
   cancel(): void {
-    this.canceller && this.canceller(new PromiseCancelledError());
+    this.canceller && this.canceller();
   }
 
   cancelled<TResult = never>(
     oncancelled?: (() => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
-    return super.then(
+    const next = super.then(
       (value) => {
         // console.log('cancelled *', value, oncancelled);
         if (value instanceof PromiseCancelledError) {
@@ -71,28 +80,36 @@ class CancellablePromiseClass<T> extends Promise<T> {
         throw reason;
       }
     ) as CancellablePromise<T | TResult>;
+    next.canceller = this.canceller;
+    return next;
   }
 
   then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
   ): CancellablePromise<TResult1 | TResult2> {
-    return super.then(
+    const next = super.then(
       (value) => catchCancel(onfulfilled, value),
       (reason) => catchCancel(onrejected, reason)
     ) as CancellablePromise<TResult1 | TResult2>;
+    next.canceller = this.canceller;
+    return next;
   }
 
   catch<TResult = never>(
     onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
-    return super.then(undefined, (reason) => catchCancel(onrejected, reason)) as CancellablePromise<
-      T | TResult
-    >;
+    const next = super.then(undefined, (reason) =>
+      catchCancel(onrejected, reason)
+    ) as CancellablePromise<T | TResult>;
+    next.canceller = this.canceller;
+    return next;
   }
 
   finally(onfinally?: (() => void) | null): CancellablePromise<T> {
-    return super.finally(onfinally) as CancellablePromise<T>;
+    const next = super.finally(onfinally) as CancellablePromise<T>;
+    next.canceller = this.canceller;
+    return next;
   }
 }
 
@@ -259,3 +276,19 @@ export default CancellablePromise;
 //   .cancelled(() => console.log('Cancelled 2'));
 
 // setTimeout(() => p.cancel(), 200);
+
+// const p = new CancellablePromise(
+//   new CancellablePromise((resolve, reject) => setTimeout(resolve, 1000))
+//     .then(() => console.log('resolve 1'))
+//     .then(() =>
+//       new Promise((resolve) => setTimeout(resolve, 1000)).then(() => console.log('resolve 2'))
+//     )
+// ); //.then(() => console.log('resolved'));
+
+// p.then(() => console.log('resolved'))
+//   .cancelled(() => console.log('cancelled'))
+//   .catch((ex) => console.log('error', ex));
+
+// setTimeout(() => console.log('end'), 2500);
+
+// setTimeout(() => p.cancel(), 500);
