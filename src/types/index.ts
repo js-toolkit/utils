@@ -40,6 +40,11 @@ type Override<
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
+type Overwrite<
+  A extends AnyObject,
+  B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
+> = Override<A, B>;
+
 type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
   ? Else
   : Extract<T, Type> extends Type
