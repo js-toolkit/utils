@@ -1,4 +1,4 @@
-import { Omit, Overwrite, KeysOfType } from '.';
+import { Omit, Override, KeysOfType } from '.';
 
 type A = { a: number; c: string }; // $ExpectType "F"
 type B = { a?: boolean; b: string };
@@ -18,10 +18,10 @@ type Omit7<I extends object, P extends I> = Omit<P, keyof I>; // OK
 type Omit8<I extends object, P extends I> = Omit<P, I>; // Error
 type Omit9<I extends object, P extends object> = Omit<P, keyof I>; // Error
 
-type Overwrite1 = Overwrite<A, B>;
-type Overwrite2 = Overwrite<A, D>;
-type Overwrite3 = Overwrite<A, B & D>;
-const c: Overwrite1 = {};
+type Override1 = Override<A, B>;
+type Override2 = Override<A, D>;
+type Override3 = Override<A, B & D>;
+const c: Override1 = {};
 
 type FilterKeys1 = KeysOfType<A, number>;
 const f: FilterKeys1;

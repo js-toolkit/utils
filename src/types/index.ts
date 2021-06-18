@@ -35,7 +35,7 @@ type ExcludeStrict<T, U extends T> = T extends U ? never : T;
 
 type ExtractStrict<T, U extends T> = T extends U ? T : never;
 
-type Overwrite<
+type Override<
   A extends AnyObject,
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
