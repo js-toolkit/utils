@@ -206,7 +206,12 @@ type PromiseType<T> = T extends Promise<infer R> ? R : T;
 
 type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
+type RequiredBut<T, K extends keyof T> = T &
+  { [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined> };
+
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
+
+type PartialBut<T, K extends keyof T> = Pick<T, K> & { [P in Exclude<keyof T, K>]?: T[P] };
 
 type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
 
