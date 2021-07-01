@@ -18,7 +18,7 @@ function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): u
   return handler(value);
 }
 
-class CancellablePromiseClass<T> extends Promise<T> {
+class CancellablePromise<T> extends Promise<T> {
   private canceller?: VoidFunction;
 
   constructor(
@@ -43,6 +43,7 @@ class CancellablePromiseClass<T> extends Promise<T> {
       if (executorOrPromise instanceof CancellablePromise) {
         executorOrPromise.cancelled(currentCanceller).then(resolve, reject);
       } else if (executorOrPromise instanceof Promise) {
+        // Use chain to avoid dynamically inserting into the chain a regular Promise which hasn't cancel handler.
         executorOrPromise.then(resolve, reject);
       } else {
         executorOrPromise(resolve, reject, canceller);
@@ -115,9 +116,11 @@ class CancellablePromiseClass<T> extends Promise<T> {
 
 export interface CancellablePromiseConstructor
   extends DefineAll<
-    Exclude<keyof typeof Promise, symbol>,
+    keyof PromiseConstructor,
     {
       readonly prototype: CancellablePromise<any>;
+
+      readonly [Symbol.species]: CancellablePromiseConstructor;
 
       reject<T = never>(reason?: any): CancellablePromise<T>;
 
@@ -244,16 +247,28 @@ export interface CancellablePromiseConstructor
       any<T>(values: (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
     }
   > {
-  new <T>(...args: ConstructorParameters<typeof CancellablePromiseClass>): CancellablePromise<T>;
+  new <T>(
+    executorOrPromise:
+      | ((
+          resolve: (value: T | PromiseLike<T>) => void,
+          reject: (reason?: any) => void,
+          cancel: () => void
+        ) => void)
+      | Promise<T>
+  ): CancellablePromise<T>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface CancellablePromise<T> extends CancellablePromiseClass<T> {}
+// interface CancellablePromise<T> extends CancellablePromiseClass<T> {}
 
-const CancellablePromise: CancellablePromiseConstructor =
-  CancellablePromiseClass as unknown as CancellablePromiseConstructor;
+// const CancellablePromise: CancellablePromiseConstructor =
+//   CancellablePromiseClass as unknown as CancellablePromiseConstructor;
 
-export default CancellablePromise;
+export default CancellablePromise as OmitStrict<
+  typeof CancellablePromise,
+  CancellablePromiseConstructor
+> &
+  CancellablePromiseConstructor;
 
 // const p = new CancellablePromise<void>((resolve, reject, cancel) => {
 //   // setTimeout(() => cancel(), 200);
@@ -283,12 +298,12 @@ export default CancellablePromise;
 //     .then(() =>
 //       new Promise((resolve) => setTimeout(resolve, 1000)).then(() => console.log('resolve 2'))
 //     )
-// ); //.then(() => console.log('resolved'));
+// );
 
 // p.then(() => console.log('resolved'))
 //   .cancelled(() => console.log('cancelled'))
 //   .catch((ex) => console.log('error', ex));
 
-// setTimeout(() => console.log('end'), 2500);
+// setTimeout(() => console.log('end'), 2000);
 
 // setTimeout(() => p.cancel(), 500);
