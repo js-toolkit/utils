@@ -19,6 +19,7 @@
     "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@js-toolkit/ts-utils/'",
     "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/ts-utils/'",
     "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/ts-utils/'",
+    "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/ts-utils/'",
     "build-to-player": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/player/node_modules/@js-toolkit/ts-utils'",
     "test": "jest",
     "test:watch": "jest --watchAll",
