@@ -26,7 +26,6 @@ export default function getListIterator(
   onSwitch: (nextIndex: number) => unknown,
   options?: ListIteratorOptions
 ): ListIterator {
-  let prevIndex = -1;
   let nextIndex = -1;
 
   const selectNextTrack = async (loop?: boolean): Promise<void> => {
@@ -39,10 +38,22 @@ export default function getListIterator(
     }
   };
 
-  const delayedNext = delayed(async () => {
-    prevIndex = await scope.getCurrentIndex();
+  const selectPrevTrack = async (loop?: boolean): Promise<void> => {
+    const size = await scope.getSize();
+    const currentIndex = await scope.getCurrentIndex();
+    // eslint-disable-next-line no-nested-ternary
+    const next = currentIndex === 0 ? (loop ? size - 1 : -1) : Math.min(currentIndex - 1, size - 1);
+    if (next !== currentIndex) {
+      nextIndex = next;
+    }
+  };
+
+  const delayedNext = delayed(() => {
+    // prevIndex = await scope.getCurrentIndex()
     onSwitch(nextIndex);
   }, 0);
+
+  const cancel = (): void => delayedNext.cancel();
 
   const next: ListIterator['next'] = beforeCall(
     ({ delay = options?.delay } = {}) => {
@@ -53,11 +64,15 @@ export default function getListIterator(
     }
   );
 
-  const back = (): void => {
-    prevIndex >= 0 && onSwitch(prevIndex);
-  };
-
-  const cancel = (): void => delayedNext.cancel();
+  const back: ListIterator['back'] = beforeCall(
+    () => {
+      cancel();
+      nextIndex >= 0 && onSwitch(nextIndex);
+    },
+    () => {
+      return selectPrevTrack();
+    }
+  );
 
   return {
     get isPending() {
