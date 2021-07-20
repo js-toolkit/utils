@@ -9,8 +9,10 @@ export interface ListIteratorOptions {
 export type NextOptions = ListIteratorOptions;
 
 export interface ListIterator {
-  readonly next: (options?: NextOptions) => void;
-  readonly back: () => void;
+  readonly next: (options?: NextOptions) => Promise<void>;
+  readonly back: () => Promise<void>;
+  readonly isCanNext: (options?: NextOptions) => Promise<boolean>;
+  readonly isCanBack: () => Promise<boolean>;
   readonly isPending: boolean;
   /** Cancel delayed switch. */
   readonly cancel: VoidFunction;
@@ -28,24 +30,26 @@ export default function getListIterator(
 ): ListIterator {
   let nextIndex = -1;
 
-  const selectNextTrack = async (loop?: boolean): Promise<void> => {
-    const size = await scope.getSize();
-    const currentIndex = await scope.getCurrentIndex();
+  const getNextTrack = async (loop?: boolean): Promise<number> => {
+    const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === size - 1 ? (loop ? 0 : -1) : Math.min(currentIndex + 1, size - 1);
-    if (next !== currentIndex) {
-      nextIndex = next;
-    }
+    return next;
   };
 
-  const selectPrevTrack = async (loop?: boolean): Promise<void> => {
-    const size = await scope.getSize();
-    const currentIndex = await scope.getCurrentIndex();
+  const getPrevTrack = async (loop?: boolean): Promise<number> => {
+    const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === 0 ? (loop ? size - 1 : -1) : Math.min(currentIndex - 1, size - 1);
-    if (next !== currentIndex) {
-      nextIndex = next;
-    }
+    return next;
+  };
+
+  const isCanNext = async (): Promise<boolean> => {
+    return (await getNextTrack()) >= 0;
+  };
+
+  const isCanBack = async (): Promise<boolean> => {
+    return (await getPrevTrack()) >= 0;
   };
 
   const delayedNext = delayed(() => {
@@ -59,18 +63,18 @@ export default function getListIterator(
     ({ delay = options?.delay } = {}) => {
       nextIndex >= 0 && delayedNext.delay(delay ?? 0);
     },
-    ({ loop = options?.loop } = {}) => {
-      return selectNextTrack(loop);
+    async ({ loop = options?.loop } = {}) => {
+      nextIndex = await getNextTrack(loop);
     }
   );
 
   const back: ListIterator['back'] = beforeCall(
     () => {
-      cancel();
       nextIndex >= 0 && onSwitch(nextIndex);
     },
-    () => {
-      return selectPrevTrack();
+    async () => {
+      cancel();
+      nextIndex = await getPrevTrack();
     }
   );
 
@@ -80,6 +84,8 @@ export default function getListIterator(
     },
     next,
     back,
+    isCanNext,
+    isCanBack,
     cancel,
   };
 }
