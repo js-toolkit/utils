@@ -53,11 +53,7 @@ type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
 
 type KeysOfType<A extends AnyObject, B, Strict extends boolean = true> = NonNullable<
   {
-    [P in keyof A]: Strict extends true
-      ? IfExtends<Extract<A[P], B>, B, P, never>
-      : A[P] extends B
-      ? P
-      : never;
+    [P in keyof A]: Strict extends true ? IfExtends<A[P], B, P, never> : A[P] extends B ? P : never;
   }[keyof A]
 >;
 
@@ -204,9 +200,9 @@ type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
 
 type PromiseType<T> = T extends Promise<infer R> ? R : T;
 
-type RequiredSome<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+type RequiredSome<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 
-type RequiredBut<T, K extends keyof T> = T &
+type RequiredBut<T, K extends keyof T> = Pick<T, K> &
   { [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined> };
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
@@ -216,11 +212,7 @@ type PartialBut<T, K extends keyof T> = Pick<T, K> & { [P in Exclude<keyof T, K>
 type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
 
 type RequiredInner<T, K extends keyof T> = {
-  [P in keyof T]: P extends K
-    ? Extract<T[K], AnyObject> extends AnyObject
-      ? Required<T[K]>
-      : T[K]
-    : T[P];
+  [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P];
 };
 
 type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
