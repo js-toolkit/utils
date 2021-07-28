@@ -14,7 +14,8 @@
   "scripts": {
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/",
-    "build": "npm run clean && tsc --project ./tsconfig.json",
+    "minify": "node-utils-minify --replace ./dist",
+    "build": "npm run clean && tsc --build ./tsconfig.json && npm run minify",
     "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/@js-toolkit/ts-utils/'",
     "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@js-toolkit/ts-utils/'",
     "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/ts-utils/'",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@js-toolkit/configs": "^3.77.5",
+    "@js-toolkit/node-utils": "^1.1.3",
     "@types/jest": "^26.0.23",
     "@types/lodash.debounce": "^4.0.6",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
@@ -43,7 +45,9 @@
     "lodash.debounce": "^4.0.8",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
+    "terser": "^5.7.1",
     "ts-jest": "^27.0.3",
-    "typescript": "4.2.4"
+    "typescript": "4.2.4",
+    "yargs": "^17.0.1"
   }
 }
