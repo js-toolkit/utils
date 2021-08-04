@@ -1,1 +1,3 @@
-[![npm package](https://img.shields.io/npm/v/@vzh/ts-types.svg?style=flat-square)](https://www.npmjs.org/package/@vzh/ts-types)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/js-toolkit/ts-utils)
+
+Useful utils, classes, TS types, FP data structures.
