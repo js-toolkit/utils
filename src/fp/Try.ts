@@ -26,7 +26,7 @@ export abstract class Try<A> {
     try {
       return Success(thunk());
     } catch (e) {
-      return Failure(e);
+      return Failure(e as Throwable);
     }
   }
 
@@ -224,7 +224,7 @@ export abstract class Try<A> {
       if (p(this.value as A)) return this;
       return Failure(new NoSuchElementError(`Predicate does not hold for ${String(this.value)}`));
     } catch (e) {
-      return Failure(e);
+      return Failure(e as Throwable);
     }
   }
 
@@ -247,7 +247,7 @@ export abstract class Try<A> {
     try {
       return f(this.value as A);
     } catch (e) {
-      return Failure(e);
+      return Failure(e as Throwable);
     }
   }
 
@@ -325,7 +325,7 @@ export abstract class Try<A> {
     try {
       return this.isSuccess() ? this : f((this as Failure).value);
     } catch (e) {
-      return Failure(e);
+      return Failure(e as Throwable);
     }
   }
 
