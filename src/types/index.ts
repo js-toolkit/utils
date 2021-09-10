@@ -215,10 +215,24 @@ type RequiredInner<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P];
 };
 
+type RequiredInnerKeepUndefined<T, K extends keyof T> = {
+  [P in keyof T]: P extends K
+    ? IfExtends<T[K], AnyObject, RequiredKeepUndefined<T[K]>, T[K]>
+    : T[P];
+};
+
 type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
   [P in keyof T]: P extends K
     ? IK extends keyof Extract<T[K], AnyObject>
       ? Pick<NonNullable<T[K]>, IK>
+      : T[P]
+    : T[P];
+};
+
+type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
+  [P in keyof T]: P extends K
+    ? IK extends keyof Extract<T[K], AnyObject>
+      ? OmitStrict<NonNullable<T[K]>, IK>
       : T[P]
     : T[P];
 };
