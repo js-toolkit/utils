@@ -152,12 +152,8 @@ type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
 //   IfExtends<T, ReadonlyArray<any>, T, { -readonly [P in keyof T]: DeepWriteable<T[P]> }>,
 //   T
 // >;
-type DeepWriteable<
-  T extends AnyObject,
-  Depth extends number = never,
-  R extends unknown[] = [any]
-> = IfExtends<
-  T,
+type DeepWriteable<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+  Exclude<T, AnyFunction>,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer I>
     ? Array<DeepWriteable<I, Depth, R>>
@@ -175,12 +171,8 @@ type DeepWriteable<
 //   IfExtends<T, ReadonlyArray<any>, T, { [P in keyof T]?: DeepPartial<T[P]> }>,
 //   T
 // >;
-type DeepPartial<
-  T extends AnyObject,
-  Depth extends number = never,
-  R extends unknown[] = [any]
-> = IfExtends<
-  T,
+type DeepPartial<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+  Exclude<T, AnyFunction>,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
     ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
@@ -188,6 +180,21 @@ type DeepPartial<
       : ReadonlyArray<DeepPartial<RI, Depth, R>>
     : {
         [P in keyof T]?: R['length'] extends Depth ? T[P] : DeepPartial<T[P], Depth, Push<R, any>>;
+      },
+  T
+>;
+
+type DeepRequired<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+  Exclude<T, AnyFunction>,
+  AnyObject,
+  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
+    ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
+      ? Array<DeepRequired<I, Depth, R>>
+      : ReadonlyArray<DeepRequired<RI, Depth, R>>
+    : {
+        [P in keyof T]-?: R['length'] extends Depth
+          ? T[P]
+          : DeepRequired<T[P], Depth, Push<R, any>>;
       },
   T
 >;
