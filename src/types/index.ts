@@ -230,8 +230,8 @@ type RequiredInnerKeepUndefined<T, K extends keyof T> = {
 
 type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
   [P in keyof T]: P extends K
-    ? IK extends keyof Extract<T[K], AnyObject>
-      ? Pick<NonNullable<T[K]>, IK>
+    ? IK extends keyof Extract<T[P], AnyObject>
+      ? Pick<NonNullable<T[P]>, IK>
       : T[P]
     : T[P];
 };
