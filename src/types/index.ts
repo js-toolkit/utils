@@ -224,7 +224,7 @@ type RequiredInner<T, K extends keyof T> = {
 
 type RequiredInnerKeepUndefined<T, K extends keyof T> = {
   [P in keyof T]: P extends K
-    ? IfExtends<T[K], AnyObject, RequiredKeepUndefined<T[K]>, T[K]>
+    ? IfExtends<T[P], AnyObject, RequiredKeepUndefined<T[P]>, T[P]>
     : T[P];
 };
 
