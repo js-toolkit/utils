@@ -1,12 +1,12 @@
 {
-  "name": "@js-toolkit/ts-utils",
-  "version": "1.37.4",
+  "name": "@js-toolkit/utils",
+  "version": "1.37.5",
   "description": "Typescript helper types and utils",
   "author": "VZH",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/js-toolkit/ts-utils"
+    "url": "https://github.com/js-toolkit/utils"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
@@ -16,11 +16,11 @@
     "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/",
     "minify": "node-utils-minify --replace ./dist",
     "build": "npm run clean && tsc --build ./tsconfig.json && npm run minify",
-    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/@js-toolkit/ts-utils/'",
-    "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@js-toolkit/ts-utils/'",
-    "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/ts-utils/'",
-    "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/ts-utils/'",
-    "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/ts-utils/'",
+    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/@js-toolkit/utils/'",
+    "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@js-toolkit/utils/'",
+    "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/utils/'",
+    "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/utils/'",
+    "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/utils/'",
     "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|fp|tests)/**/*' -u 1 './dist/**/*' '/home/vladimir/dev/sources/player/modules/ts-utils'",
     "test": "jest",
     "test:watch": "jest --watchAll",
