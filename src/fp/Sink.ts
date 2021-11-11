@@ -1,4 +1,4 @@
-import TimeoutError from './TimeoutError';
+import TimeoutError from '../TimeoutError';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Sink {
