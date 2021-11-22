@@ -244,6 +244,7 @@ type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
     : T[P];
 };
 
+/** Swap key and value */
 type ReverseObject<T extends Record<keyof T, string | number>> = {
   [P in keyof T as T[P]]: P;
   // [P in T[keyof T]]: {
@@ -255,6 +256,7 @@ type LowercaseKeys<T extends AnyObject> = {
   [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
 };
 
+/** Requires to define all of the keys. */
 type DefineAll<Enum extends string | symbol, T extends Record<Enum, unknown>> = T;
 
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
@@ -310,8 +312,23 @@ type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false>
   ? []
   : [...UnionToTuple<Exclude<T, L>>, L];
 
-type MapToKey<U extends AnyObject, K extends keyof U> = U extends U ? { [P in U[K]]: U } : never;
+/**
+ * Used with discriminants.
+ * @example
+ * type U = { type: 'type1'; a: number } | { type: 'type2'; b: number };
+ * type Mapped = MapToKey<A, 'type'>; // { type1: { type: 'type1'; a: number } } | { type2: { type: 'type2', b: number } }
+ */
+type MapToKey<U extends AnyObject, K extends keyof U> = U extends U
+  ? U[K] extends string | number
+    ? { [P in U[K]]: U }
+    : never
+  : never;
 
+/**
+ * @example
+ * type A = { a: number; b: number }
+ * type R = MapKeyAsArray<A, 'a'>; // { { a: number[]; b: number } }
+ */
 type MapKeyAsArray<T extends AnyObject, K extends keyof T> = {
   [P in keyof T]: P extends K ? readonly T[P][] : T[P];
 };
