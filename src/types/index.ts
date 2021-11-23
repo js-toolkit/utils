@@ -257,7 +257,7 @@ type LowercaseKeys<T extends AnyObject> = {
 };
 
 /** Requires to define all of the keys. */
-type DefineAll<Enum extends string | symbol, T extends Record<Enum, unknown>> = T;
+type DefineAll<Enum extends string | number | symbol, T extends Record<Enum, unknown>> = T;
 
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 
