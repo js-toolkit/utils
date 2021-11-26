@@ -85,7 +85,7 @@ class CancellablePromise<T> extends Promise<T> {
     return next;
   }
 
-  then<TResult1 = T, TResult2 = never>(
+  override then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
   ): CancellablePromise<TResult1 | TResult2> {
@@ -97,7 +97,7 @@ class CancellablePromise<T> extends Promise<T> {
     return next;
   }
 
-  catch<TResult = never>(
+  override catch<TResult = never>(
     onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
     const next = super.then(undefined, (reason) =>
@@ -107,7 +107,7 @@ class CancellablePromise<T> extends Promise<T> {
     return next;
   }
 
-  finally(onfinally?: (() => void) | null): CancellablePromise<T> {
+  override finally(onfinally?: (() => void) | null): CancellablePromise<T> {
     const next = super.finally(onfinally) as CancellablePromise<T>;
     next.canceller = this.canceller;
     return next;
