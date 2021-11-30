@@ -6,7 +6,7 @@ export interface Timer {
 
 interface Options {
   callback: VoidFunction;
-  interval: number;
+  interval: number | (() => number);
   /** Default `true` */
   autostart?: boolean;
 }
@@ -16,12 +16,27 @@ export default function getTimer({ callback, interval, autostart = true }: Optio
 
   const stop = (): void => {
     clearInterval(timer);
+    clearTimeout(timer);
     timer = undefined;
   };
 
   const start = (): void => {
     stop();
-    timer = setInterval(callback, interval);
+    if (typeof interval === 'function') {
+      const timerCallback = (): void => {
+        try {
+          callback();
+        } finally {
+          loop();
+        }
+      };
+      const loop = (): void => {
+        timer = setTimeout(timerCallback, interval());
+      };
+      loop();
+    } else {
+      timer = setInterval(callback, interval);
+    }
   };
 
   if (autostart) start();
