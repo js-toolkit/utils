@@ -27,7 +27,7 @@ export default function getTimer({ callback, interval, autostart = true }: Optio
         try {
           callback();
         } finally {
-          loop();
+          timer != null && loop();
         }
       };
       const loop = (): void => {
