@@ -22,7 +22,7 @@
     "build-to-styled-components": "tsc --project ./tsconfig.json --outDir '../styled-components/node_modules/@js-toolkit/utils/'",
     "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/utils/'",
     "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/utils/'",
-    "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|tests)/**/*' -u 1 './dist/**/*' '/home/vladimir/dev/sources/player/modules/utils'",
+    "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|tests)/**/*' -e './dist/*(package.json|README.md|LICENSE)' -u 1 './dist/**/*' '/home/vladimir/dev/sources/player/modules/utils'",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "patch-publish": "yarn run build && yarn version --patch && yarn run copy:configs && npm publish ./dist && git push origin master --follow-tags",
