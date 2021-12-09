@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 // eslint-disable-next-line max-classes-per-file
 import es5ErrorCompat from './es5ErrorCompat';
 
@@ -55,7 +54,7 @@ class CancellablePromise<T> extends Promise<T> {
 
   /**
    * Cancel the whole chain of @type {CancellablePromise}.
-   * The regular @type {Promise} will still be executed.
+   * Warn: the regular @type {Promise} will still be executing.
    */
   cancel(): void {
     this.canceller && this.canceller();
@@ -232,13 +231,11 @@ export interface CancellablePromiseConstructor
 
       allSettled<T extends readonly unknown[] | readonly [unknown]>(
         values: T
-      ): CancellablePromise<
-        {
-          -readonly [P in keyof T]: PromiseSettledResult<
-            T[P] extends PromiseLike<infer U> ? U : T[P]
-          >;
-        }
-      >;
+      ): CancellablePromise<{
+        -readonly [P in keyof T]: PromiseSettledResult<
+          T[P] extends PromiseLike<infer U> ? U : T[P]
+        >;
+      }>;
 
       allSettled<T>(
         values: Iterable<T>
@@ -258,7 +255,6 @@ export interface CancellablePromiseConstructor
   ): CancellablePromise<T>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 // interface CancellablePromise<T> extends CancellablePromiseClass<T> {}
 
 // const CancellablePromise: CancellablePromiseConstructor =
@@ -294,16 +290,14 @@ export default CancellablePromise as OmitStrict<
 
 // const p = new CancellablePromise(
 //   new CancellablePromise((resolve, reject) => setTimeout(resolve, 1000))
+//     // new Promise((resolve, reject) => setTimeout(resolve, 1000)) // Regular promise not cancelling
 //     .then(() => console.log('resolve 1'))
 //     .then(() =>
 //       new Promise((resolve) => setTimeout(resolve, 1000)).then(() => console.log('resolve 2'))
 //     )
 // );
-
 // p.then(() => console.log('resolved'))
 //   .cancelled(() => console.log('cancelled'))
 //   .catch((ex) => console.log('error', ex));
-
-// setTimeout(() => console.log('end'), 2000);
-
 // setTimeout(() => p.cancel(), 500);
+// // setTimeout(() => console.log('Done'), 2000);
