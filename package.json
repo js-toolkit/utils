@@ -19,6 +19,7 @@
     "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/@js-toolkit/utils/'",
     "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/reflexy/node_modules/@js-toolkit/utils/'",
     "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/utils/'",
+    "build-to-styled-components": "tsc --project ./tsconfig.json --outDir '../styled-components/node_modules/@js-toolkit/utils/'",
     "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/utils/'",
     "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/utils/'",
     "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|tests)/**/*' -u 1 './dist/**/*' '/home/vladimir/dev/sources/player/modules/utils'",
@@ -28,26 +29,26 @@
     "minor-publish": "yarn run build && yarn version --minor && yarn run copy:configs && npm publish ./dist && git push origin master --follow-tags"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.82.1",
+    "@js-toolkit/configs": "^3.82.2",
     "@js-toolkit/node-utils": "^1.1.4",
     "@types/jest": "^27.0.3",
     "@types/lodash.debounce": "^4.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.3.0",
+    "eslint": "^8.4.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-prettier": "^4.0.0",
     "eventemitter3": "^4.0.7",
-    "jest": "^27.3.1",
+    "jest": "^27.4.3",
     "lodash.debounce": "^4.0.8",
-    "prettier": "^2.5.0",
+    "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
     "terser": "^5.10.0",
-    "ts-jest": "^27.0.7",
+    "ts-jest": "^27.1.1",
     "typescript": "^4.5.2",
-    "yargs": "^17.2.1"
+    "yargs": "^17.3.0"
   }
 }
