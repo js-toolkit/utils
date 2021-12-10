@@ -209,8 +209,9 @@ type PromiseType<T> = T extends Promise<infer R> ? R : T;
 
 type RequiredSome<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 
-type RequiredBut<T, K extends keyof T> = Pick<T, K> &
-  { [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined> };
+type RequiredBut<T, K extends keyof T> = Pick<T, K> & {
+  [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined>;
+};
 
 type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
 
@@ -229,18 +230,12 @@ type RequiredInnerKeepUndefined<T, K extends keyof T> = {
 };
 
 type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
-  [P in keyof T]: P extends K
-    ? IK extends keyof Extract<T[P], AnyObject>
-      ? Pick<NonNullable<T[P]>, IK>
-      : T[P]
-    : T[P];
+  [P in keyof T]: P extends K ? Pick<NonNullable<T[P]>, IK extends Keys<T[P]> ? IK : never> : T[P];
 };
 
 type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
   [P in keyof T]: P extends K
-    ? IK extends keyof Extract<T[K], AnyObject>
-      ? OmitStrict<NonNullable<T[K]>, IK>
-      : T[P]
+    ? OmitStrict<NonNullable<T[K]>, IK extends Keys<T[K]> ? IK : never>
     : T[P];
 };
 
@@ -290,15 +285,13 @@ type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, 
 
 type UniqueArray<T extends ReadonlyArray<any>> = LiftInvalid<ToUniqueArray<T>>;
 
-type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<
-  {
-    [I in keyof A]: unknown extends {
-      [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
-    }[number]
-      ? Invalid<['Encountered value with duplicates:', A[I]]>
-      : A[I];
-  }
->;
+type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<{
+  [I in keyof A]: unknown extends {
+    [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
+  }[number]
+    ? Invalid<['Encountered value with duplicates:', A[I]]>
+    : A[I];
+}>;
 
 type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) extends (k: infer I) => void
   ? I
