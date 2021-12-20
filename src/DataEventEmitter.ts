@@ -45,7 +45,7 @@ export default class DataEventEmitter<
     any,
     any
   >,
-  Context extends any = any
+  Context = any
 > extends EventEmitter<ConvertToDataEventMap<EventTypes, Target>, Context> {
   // @ts-ignore
   emit<T extends EventEmitter.EventNames<EventTypes>>(
@@ -56,7 +56,7 @@ export default class DataEventEmitter<
     const data = args[0] as EventEmitter.EventArgs<EventTypes, T>[0];
     const eventObject: DataEvent<T, typeof data, this> = { type: event, data, target: this };
     return super.emit(
-      (event as unknown) as EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
+      event as unknown as EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
       ...([eventObject as unknown] as Parameters<
         DataEventListener<
           EventTypes,
