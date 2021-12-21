@@ -16,7 +16,7 @@ export function memoizeAsync<T extends AnyAsyncFunction>(
   const memoized = ((...args: unknown[]) => {
     if (callPromise == null) {
       callPromise = func(...args).then(...rest);
-      if (options?.once) {
+      if (!options?.once) {
         callPromise.finally(() => {
           callPromise = undefined;
         });
