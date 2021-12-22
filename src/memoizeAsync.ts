@@ -9,16 +9,19 @@ interface MemoizeAsyncOptions {
 
 export function memoizeAsync<T extends AnyAsyncFunction>(
   func: T,
-  options?: MemoizeAsyncOptions,
+  options: MemoizeAsyncOptions = {},
   ...rest: Parameters<ReturnType<T>['then']>
 ): MemoizedAsync<T> {
   let callPromise: Promise<unknown> | undefined;
 
   const memoized = ((...args: unknown[]) => {
     if (callPromise == null) {
-      callPromise = func(...args).then(...rest);
-      if (!options?.once) {
-        callPromise.finally(() => {
+      callPromise = func(...args);
+      if (rest.length > 0) {
+        callPromise = callPromise.then(...rest);
+      }
+      if (!options.once) {
+        callPromise = callPromise.finally(() => {
           callPromise = undefined;
         });
       }
