@@ -3,7 +3,7 @@
 
 type AnyObject = Record<string, any>;
 
-type EmptyObject = Record<never, never>;
+type EmptyObject = Record<PropertyKey, never>;
 
 type AnyFunction = (...args: any) => any;
 
@@ -309,7 +309,7 @@ type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false>
  * Used with discriminants.
  * @example
  * type U = { type: 'type1'; a: number } | { type: 'type2'; b: number };
- * type Mapped = MapToKey<A, 'type'>; // { type1: { type: 'type1'; a: number } } | { type2: { type: 'type2', b: number } }
+ * type Mapped = MapToKey<U, 'type'>; // => { type1: { type: 'type1'; a: number } } | { type2: { type: 'type2', b: number } }
  */
 type MapToKey<U extends AnyObject, K extends keyof U> = U extends U
   ? U[K] extends string | number
