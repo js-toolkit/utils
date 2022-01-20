@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
 import NoSuchElementError from '../NoSuchElementError';
@@ -144,7 +145,7 @@ export abstract class Option<A> {
   flatMap<B>(f: (a: NonNullable<A>) => Option<B>): Option<B> {
     if (this.isEmpty()) return None;
     const result = f(this.value);
-    const self = (this as unknown) as Option<B>;
+    const self = this as unknown as Option<B>;
     return result.nonEmpty() && result.value === self.value ? self : result;
   }
 
@@ -241,31 +242,39 @@ export abstract class Option<A> {
  * The `Some<A>` data constructor for [[Option]] represents existing
  * values of type `A`.
  */
-export function Some<A>(value: NonNullable<A>): Option<A> {
-  if (value == null) throw new Error(`Unable create '${Some.name}' value with ${String(value)}`);
+export function some<A>(value: NonNullable<A>): Option<A> {
+  if (value == null) throw new Error(`Unable to create '${Some.name}' with value ${String(value)}`);
 
-  // eslint-disable-next-line no-shadow
   return new (class Some extends Option<A> {
-    // protected readonly value: NonNullable<A> = value;
     constructor() {
       super(value);
     }
   })();
 }
 
-// type A = { a: number };
-// export function f1(a?: A | null) {
-//   const s = Some(a);
-//   return s.get().a;
+/**
+ * @alias some
+ */
+export function Some<A>(value: NonNullable<A>): Option<A> {
+  return some(value);
+}
+
+// /**
+//  * Represents existing values of type `A`.
+//  */
+// class Some<A> extends Option<A> {
+//   constructor(value: NonNullable<A>) {
+//     if (value == null)
+//       throw new Error(`Unable to create '${Some.name}' with value ${String(value)}`);
+//     super(value);
+//   }
 // }
 
 /**
  * The `None` data constructor for [[Option]] represents non-existing
  * values for any type.
  */
-// eslint-disable-next-line no-shadow
 export const None: None = new (class None extends Option<never> {
-  // protected readonly value: never = undefined as never;
   constructor() {
     super(undefined as never);
   }
@@ -278,5 +287,16 @@ export const None: None = new (class None extends Option<never> {
  * option will be empty.
  */
 export function option<A>(value: Optional<A>): Option<A> {
-  return value != null ? Some(value as NonNullable<A>) : None;
+  return value != null ? some(value as NonNullable<A>) : None;
 }
+
+// type A = { a: number };
+// export function f1(a?: A | null) {
+//   const s = Some(a);
+//   return s.get().a;
+// }
+
+// const o: Option<number> = Some(0);
+// console.log(o instanceof Option);
+// console.log(o instanceof Some);
+// console.log(o instanceof None);
