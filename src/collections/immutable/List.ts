@@ -1,4 +1,6 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-shadow */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable max-classes-per-file */
 
@@ -24,8 +26,6 @@ export interface ListLike<T> extends Iterable<T> {
   join(separator?: string): string;
   toArray(): T[];
 }
-
-export type Nil = List<any>;
 
 export class List<T> implements ListLike<T> {
   readonly head: T;
@@ -140,15 +140,15 @@ export class List<T> implements ListLike<T> {
   }
 
   find(f: (value: T) => boolean): T | undefined {
-    return this.iterate(v => v, f, undefined);
+    return this.iterate((v) => v, f, undefined);
   }
 
   every(f: (value: T) => boolean): boolean {
-    return this.iterate(f, v => !v, true);
+    return this.iterate(f, (v) => !v, true);
   }
 
   some(f: (value: T) => boolean): boolean {
-    return this.iterate(f, v => v, false);
+    return this.iterate(f, (v) => v, false);
   }
 
   filter(predicate: (value: T) => boolean): List<T> {
@@ -221,7 +221,7 @@ export class List<T> implements ListLike<T> {
 
   append(...items: T[]): List<T> {
     if (!items.length) return this;
-    const next = items.reduceRight((tail, item) => List.from(item, tail), Nil);
+    const next = items.reduceRight((tail, item) => List.from(item, tail), Nil as List<T>);
     return this.concat(next);
   }
 
@@ -285,6 +285,7 @@ export class List<T> implements ListLike<T> {
       });
 
       // freeze properties to avoid redefining
+      // eslint-disable-next-line no-constructor-return
       return Object.freeze(this) as this;
     }
   })();
@@ -298,14 +299,18 @@ class ListInternal<T> extends List<T> {
 
     this.next = next;
 
+    const self = this;
     Object.defineProperty(this, 'tail', {
       get() {
-        return this.next;
+        return self.next;
       },
     });
 
+    // eslint-disable-next-line no-constructor-return
     return Object.seal(this);
   }
 }
+
+export type Nil = List<any>;
 
 export const Nil: Nil = List.empty;
