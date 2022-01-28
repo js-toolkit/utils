@@ -3,7 +3,6 @@
 import NoSuchElementError from '../NoSuchElementError';
 import { Option, None } from './Option';
 
-export type Throwable = Error | AnyObject;
 export type Success<A> = Try<A>;
 export type Failure = Try<never>;
 
@@ -25,8 +24,8 @@ export abstract class Try<A> {
   static of<T>(thunk: () => T): Try<T> {
     try {
       return Success(thunk());
-    } catch (e) {
-      return Failure(e as Throwable);
+    } catch (ex) {
+      return Failure(ex);
     }
   }
 
@@ -42,15 +41,15 @@ export abstract class Try<A> {
    * Returns a [[Try]] reference that represents a failure
    * (i.e. an exception wrapped in [[Failure]]).
    */
-  static failure<T = never>(error: Throwable): Try<T> {
+  static failure<T = never>(error: unknown): Try<T> {
     return Failure(error);
   }
 
   private readonly isSuccessTag: boolean;
 
-  private readonly value: A | Throwable;
+  private readonly value: A | unknown;
 
-  protected constructor(value: A | Throwable, tag: 'failure' | 'success') {
+  protected constructor(value: A | unknown, tag: 'failure' | 'success') {
     this.isSuccessTag = tag === 'success';
     this.value = value;
   }
@@ -204,7 +203,7 @@ export abstract class Try<A> {
    *   )
    * ```
    */
-  fold<R>(failure: (error: Throwable) => R, success: (a: A) => R): R {
+  fold<R>(failure: (error: unknown) => R, success: (a: A) => R): R {
     return this.isSuccess() ? success(this.value as A) : failure((this as Failure).value);
   }
 
@@ -223,8 +222,8 @@ export abstract class Try<A> {
     try {
       if (p(this.value as A)) return this;
       return Failure(new NoSuchElementError(`Predicate does not hold for ${String(this.value)}`));
-    } catch (e) {
-      return Failure(e as Throwable);
+    } catch (ex: unknown) {
+      return Failure(ex);
     }
   }
 
@@ -246,8 +245,8 @@ export abstract class Try<A> {
     if (this.isFailure()) return this;
     try {
       return f(this.value as A);
-    } catch (e) {
-      return Failure(e as Throwable);
+    } catch (ex: unknown) {
+      return Failure(ex);
     }
   }
 
@@ -297,8 +296,8 @@ export abstract class Try<A> {
    * it still returns it as a `Failure(e)`.
    * ```
    */
-  recover<AA>(f: (error: Throwable) => AA): Try<A | AA> {
-    return this.isSuccess() ? this : Try.of(() => f(this.value as Throwable));
+  recover<AA>(f: (error: unknown) => AA): Try<A | AA> {
+    return this.isSuccess() ? this : Try.of(() => f(this.value));
   }
 
   /**
@@ -321,11 +320,11 @@ export abstract class Try<A> {
    * it still returns it as a `Failure(e)`.
    * ```
    */
-  recoverWith<AA>(f: (error: Throwable) => Try<AA>): Try<A | AA> {
+  recoverWith<AA>(f: (error: unknown) => Try<AA>): Try<A | AA> {
     try {
       return this.isSuccess() ? this : f((this as Failure).value);
-    } catch (e) {
-      return Failure(e as Throwable);
+    } catch (ex: unknown) {
+      return Failure(ex);
     }
   }
 
@@ -369,7 +368,7 @@ export function Success<A>(value: A): Try<A> {
  * The `Failure` data constructor is for building [[Try]] values that
  * represent failures, as opposed to [[Success]].
  */
-export function Failure<A = never>(error: Throwable): Try<A> {
+export function Failure<A = never>(error: unknown): Try<A> {
   return new (class extends Try<never> {
     constructor() {
       super(error, 'failure');
