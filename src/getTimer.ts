@@ -6,6 +6,7 @@ export interface Timer {
 
 interface Options {
   callback: VoidFunction;
+  /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick) */
   interval: number | (() => number);
   /** Default `true` */
   autostart?: boolean;
