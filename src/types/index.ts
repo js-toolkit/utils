@@ -327,7 +327,7 @@ type MapKeyAsArray<T extends AnyObject, K extends keyof T> = {
 };
 
 /**
- * Replace getters functions by same props.
+ * Replace getters functions by the same props.
  */
 type GettersToProps<T extends AnyObject> = {
   [P in keyof T as P extends `get${infer S}` ? Uncapitalize<S> : P]: P extends `get${string}`
@@ -338,7 +338,7 @@ type GettersToProps<T extends AnyObject> = {
 };
 
 /**
- * Replace getters functions by same props.
+ * Replace setters functions by the same props.
  */
 type SettersToProps<T extends AnyObject> = {
   [P in keyof T as P extends `set${infer S}` ? Uncapitalize<S> : P]: P extends `set${string}`
