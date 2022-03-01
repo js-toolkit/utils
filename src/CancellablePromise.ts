@@ -4,7 +4,7 @@ import es5ErrorCompat from './es5ErrorCompat';
 export class PromiseCancelledError extends Error {
   constructor(message?: string) {
     super(message);
-    es5ErrorCompat.call(this, PromiseCancelledError);
+    es5ErrorCompat(this, PromiseCancelledError);
   }
 }
 

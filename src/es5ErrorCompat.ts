@@ -1,13 +1,14 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable dot-notation */
 /* eslint-disable no-proto */
 
 export default function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
-  this: S,
-  Ctor: C
+  target: S,
+  TargetCtor: C
 ): void {
-  this.name = Ctor.name;
+  target.name = TargetCtor.name;
   // Workaround to make `instanceof` work in ES5
-  this.constructor = Ctor;
-  this['__proto__'] = Ctor.prototype;
+  target.constructor = TargetCtor;
+  target['__proto__'] = TargetCtor.prototype;
 }

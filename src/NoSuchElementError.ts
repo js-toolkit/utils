@@ -7,6 +7,6 @@ import es5ErrorCompat from './es5ErrorCompat';
 export default class NoSuchElementError extends Error {
   constructor(message?: string) {
     super(message);
-    es5ErrorCompat.call(this, NoSuchElementError);
+    es5ErrorCompat(this, NoSuchElementError);
   }
 }
