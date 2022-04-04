@@ -26,13 +26,13 @@ export function mapEnumNames<Enum extends string | number, K extends string, M =
 ): M[] {
   const result = [] as M[];
   for (const prop in enumeration) {
-    const nameOrValue = enumeration[prop as K] as string | number;
+    const nameOrValue: PropertyKey = enumeration[prop as K];
     if (
       !(nameOrValue in enumeration) ||
       (Number.isNaN(+prop) && !Number.isNaN(nameOrValue)) ||
       prop === String(nameOrValue)
     ) {
-      result.push(callback ? callback(prop) : ((prop as unknown) as M));
+      result.push(callback ? callback(prop) : (prop as unknown as M));
     }
   }
   return result;
