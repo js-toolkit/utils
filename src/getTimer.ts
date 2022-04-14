@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable no-use-before-define */
 export interface TimerStartOptions {
   immediately?: boolean;
 }
@@ -9,14 +12,24 @@ export interface Timer {
 }
 
 interface Options {
-  callback: VoidFunction;
+  callback: VoidFunction | (() => Promise<void>);
   /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick) */
   interval: number | (() => number);
   /** Default `true` */
   autostart?: boolean;
+  /** Used only if `interval` is a function and callback returns `Promise`. */
+  waitCallback?: boolean;
   onStart?: VoidFunction;
   onStop?: VoidFunction;
 }
+
+const ignoreError = (callback: VoidFunction): void => {
+  try {
+    callback();
+  } catch {
+    //
+  }
+};
 
 export default function getTimer({
   callback,
@@ -24,8 +37,10 @@ export default function getTimer({
   onStart,
   onStop,
   autostart = true,
+  waitCallback,
 }: Options): Timer {
   let timer: any;
+  let sessionId = 0;
 
   const stop = (): void => {
     clearInterval(timer);
@@ -38,33 +53,28 @@ export default function getTimer({
     timer != null && stop();
     if (typeof interval === 'function') {
       const timerCallback = (): void => {
+        let loopInvoked = false;
         try {
-          callback();
+          const result = callback();
+          if (waitCallback && result instanceof Promise) {
+            loopInvoked = true;
+            const id = sessionId;
+            result.finally(() => timer != null && id === sessionId && loop());
+          }
         } finally {
-          timer != null && loop();
+          timer != null && !loopInvoked && loop();
         }
       };
       const loop = (): void => {
         timer = setTimeout(timerCallback, interval());
       };
-      if (immediately) {
-        try {
-          timerCallback();
-        } catch {
-          //
-        }
-      }
+      immediately && ignoreError(timerCallback);
       loop();
     } else {
       timer = setInterval(callback, interval);
-      if (immediately) {
-        try {
-          callback();
-        } catch {
-          //
-        }
-      }
+      immediately && ignoreError(callback);
     }
+    sessionId += 1;
     onStart && onStart();
   };
 
