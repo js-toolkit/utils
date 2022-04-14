@@ -1,6 +1,10 @@
+export interface TimerStartOptions {
+  immediately?: boolean;
+}
+
 export interface Timer {
   stop: VoidFunction;
-  start: VoidFunction;
+  start: (options?: TimerStartOptions) => void;
   readonly active: boolean;
 }
 
@@ -10,19 +14,28 @@ interface Options {
   interval: number | (() => number);
   /** Default `true` */
   autostart?: boolean;
+  onStart?: VoidFunction;
+  onStop?: VoidFunction;
 }
 
-export default function getTimer({ callback, interval, autostart = true }: Options): Timer {
+export default function getTimer({
+  callback,
+  interval,
+  onStart,
+  onStop,
+  autostart = true,
+}: Options): Timer {
   let timer: any;
 
   const stop = (): void => {
     clearInterval(timer);
     clearTimeout(timer);
     timer = undefined;
+    onStop && onStop();
   };
 
-  const start = (): void => {
-    stop();
+  const start = ({ immediately }: TimerStartOptions = {}): void => {
+    timer != null && stop();
     if (typeof interval === 'function') {
       const timerCallback = (): void => {
         try {
@@ -34,10 +47,25 @@ export default function getTimer({ callback, interval, autostart = true }: Optio
       const loop = (): void => {
         timer = setTimeout(timerCallback, interval());
       };
+      if (immediately) {
+        try {
+          timerCallback();
+        } catch {
+          //
+        }
+      }
       loop();
     } else {
       timer = setInterval(callback, interval);
+      if (immediately) {
+        try {
+          callback();
+        } catch {
+          //
+        }
+      }
     }
+    onStart && onStart();
   };
 
   if (autostart) start();
