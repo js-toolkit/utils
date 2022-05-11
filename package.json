@@ -1,5 +1,5 @@
 {
-  "name": "@js-toolkit/utils",
+  "name": "@jstoolkit/utils",
   "version": "1.43.0",
   "description": "Typescript helper types and utils",
   "author": "VZH",
@@ -8,48 +8,47 @@
     "type": "git",
     "url": "https://github.com/js-toolkit/utils"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "scripts": {
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json .npmignore LICENSE README.md ./dist/",
     "minify": "node-utils-minify --replace ./dist",
     "build": "npm run clean && tsc --build ./tsconfig.json && npm run minify",
-    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '../../../tutoron/node_modules/@js-toolkit/utils/'",
-    "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '../reflexy/node_modules/@js-toolkit/utils/'",
-    "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@js-toolkit/utils/'",
-    "build-to-styled-components": "tsc --project ./tsconfig.json --outDir '../styled-components/node_modules/@js-toolkit/utils/'",
-    "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@js-toolkit/utils/'",
-    "build-to-valtors": "tsc --project ./tsconfig.json --outDir '../valtors/node_modules/@js-toolkit/utils/'",
-    "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@js-toolkit/utils/'",
+    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '../../../tutoron/node_modules/@jstoolkit/utils/'",
+    "build-to-reflexy": "tsc --project ./tsconfig.json --outDir '../reflexy/node_modules/@jstoolkit/utils/'",
+    "build-to-react-components": "tsc --project ./tsconfig.json --outDir '../react-components/node_modules/@jstoolkit/utils/'",
+    "build-to-styled-components": "tsc --project ./tsconfig.json --outDir '../styled-components/node_modules/@jstoolkit/utils/'",
+    "build-to-mobx-utils": "tsc --project ./tsconfig.json --outDir '../mobx-utils/node_modules/@jstoolkit/utils/'",
+    "build-to-valtors": "tsc --project ./tsconfig.json --outDir '../valtors/node_modules/@jstoolkit/utils/'",
+    "build-to-player-utils": "tsc --project ./tsconfig.json --outDir '../player-utils/node_modules/@jstoolkit/utils/'",
     "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|tests)/**/*' -e './dist/*(package.json|README.md|LICENSE)' -u 1 './dist/**/*' '../../../player/modules/utils'",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "patch-publish": "yarn run build && yarn version --patch && yarn run copy:configs && npm publish ./dist && git push origin master --follow-tags",
-    "minor-publish": "yarn run build && yarn version --minor && yarn run copy:configs && npm publish ./dist && git push origin master --follow-tags"
+    "patch-publish": "yarn run build && yarn version --patch && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags",
+    "minor-publish": "yarn run build && yarn version --minor && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags"
+  },
+  "optionalDependencies": {
+    "@js-toolkit/node-utils": "^1.1.4"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.84.4",
-    "@js-toolkit/node-utils": "^1.1.4",
-    "@types/jest": "^27.4.1",
+    "@jstoolkit/configs": "^3.84.6",
+    "@types/jest": "^27.5.0",
     "@types/lodash.debounce": "^4.0.7",
-    "@typescript-eslint/eslint-plugin": "^5.20.0",
-    "@typescript-eslint/parser": "^5.20.0",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.13.0",
+    "eslint": "^8.15.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eventemitter3": "^4.0.7",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "lodash.debounce": "^4.0.8",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
-    "terser": "^5.12.1",
-    "ts-jest": "^27.1.4",
-    "typescript": "^4.6.3",
+    "terser": "^5.13.1",
+    "ts-jest": "^28.0.2",
+    "typescript": "^4.6.4",
     "yargs": "^17.4.1"
   }
 }
