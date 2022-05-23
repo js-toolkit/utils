@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import TimeoutError from '../TimeoutError';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -14,6 +15,15 @@ export namespace Sink {
   }
 }
 
+function createTimer(callback: VoidFunction, timeout: number): unknown {
+  return setTimeout(callback, timeout);
+}
+
+function stopTimer(timer: unknown): void {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  clearTimeout(timer as any);
+}
+
 export class Sink<A> {
   private readonly promise: Promise<void>;
 
@@ -21,7 +31,7 @@ export class Sink<A> {
 
   private pending;
 
-  private waitTimeoutHandler?: any;
+  private waitTimeoutHandler?: unknown;
 
   private cancelling?: Promise<void>;
 
@@ -53,7 +63,7 @@ export class Sink<A> {
       this.finalizator = typeof finalizator === 'function' ? finalizator : undefined;
     }).finally(() => {
       this.pending = false;
-      clearTimeout(this.waitTimeoutHandler);
+      stopTimer(this.waitTimeoutHandler);
     });
   }
 
@@ -64,8 +74,8 @@ export class Sink<A> {
   /** Wait until Sink is finished/cancelled. */
   wait({ timeout, errorOnTimeout = true }: Sink.WaitOptions = {}): Promise<void> {
     if (this.isPending && timeout && timeout > 0) {
-      clearTimeout(this.waitTimeoutHandler);
-      this.waitTimeoutHandler = setTimeout(() => {
+      stopTimer(this.waitTimeoutHandler);
+      this.waitTimeoutHandler = createTimer(() => {
         void this.cancel(
           errorOnTimeout ? new TimeoutError(`Timeout of ${timeout}ms exceeded.`) : undefined
         );
@@ -81,7 +91,7 @@ export class Sink<A> {
     // if (this.cancelling) return Promise.reject(new Error('Already in cancelling state.'));
 
     // finalizator may works long time so cancel timer because already in cancelling state.
-    clearTimeout(this.waitTimeoutHandler);
+    stopTimer(this.waitTimeoutHandler);
 
     this.cancelling = Promise.resolve()
       .then(this.finalizator)
