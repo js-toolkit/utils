@@ -1,6 +1,8 @@
+import TimeoutError from './TimeoutError';
+
 export interface Awaiter<T> {
   readonly pending: boolean;
-  wait: () => Promise<T>;
+  wait: (timeout?: number) => Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: any) => void;
 }
@@ -24,7 +26,18 @@ export default function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awa
 
   let promise: Promise<T>;
 
-  const wait = (): Promise<T> => {
+  let waitTimeoutHandler: any;
+
+  const rejectHandler = (error: unknown): void => {
+    if (!pending && !settled) {
+      rejected = true;
+      rejectValue = error;
+      resolved = false;
+    }
+    rejectRef && rejectRef(error);
+  };
+
+  const wait = (timeout?: number): Promise<T> => {
     if (promise == null) {
       promise = new Promise<T>((resolve, reject) => {
         pending = true;
@@ -36,8 +49,19 @@ export default function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awa
         // Changed only after all chain will resolved.
         pending = false;
         settled = true;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        clearTimeout(waitTimeoutHandler);
       });
     }
+    if (timeout && timeout > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      clearTimeout(waitTimeoutHandler);
+      waitTimeoutHandler = setTimeout(
+        () => rejectHandler(new TimeoutError(`Timeout of ${timeout}ms exceeded.`)),
+        timeout
+      );
+    }
+
     return promise;
   };
 
@@ -59,14 +83,7 @@ export default function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awa
       }
       resolveRef && resolveRef(value);
     },
-    reject: (error) => {
-      if (!pending && !settled) {
-        rejected = true;
-        rejectValue = error;
-        resolved = false;
-      }
-      rejectRef && rejectRef(error);
-    },
+    reject: rejectHandler,
   };
 }
 
