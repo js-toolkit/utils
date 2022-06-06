@@ -13,8 +13,9 @@ export interface ListIterator {
   readonly back: () => Promise<void>;
   readonly isCanNext: (options?: NextOptions) => Promise<boolean>;
   readonly isCanBack: () => Promise<boolean>;
+  /** Pending for next */
   readonly isPending: boolean;
-  /** Cancel delayed switch. */
+  /** Cancel the delayed switch. */
   readonly cancel: VoidFunction;
 }
 
@@ -30,14 +31,14 @@ export default function getListIterator(
 ): ListIterator {
   let nextIndex = -1;
 
-  const getNextTrack = async (loop?: boolean): Promise<number> => {
+  const getNextItem = async (loop?: boolean): Promise<number> => {
     const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === size - 1 ? (loop ? 0 : -1) : Math.min(currentIndex + 1, size - 1);
     return next;
   };
 
-  const getPrevTrack = async (loop?: boolean): Promise<number> => {
+  const getPrevItem = async (loop?: boolean): Promise<number> => {
     const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === 0 ? (loop ? size - 1 : -1) : Math.min(currentIndex - 1, size - 1);
@@ -45,11 +46,11 @@ export default function getListIterator(
   };
 
   const isCanNext = async (): Promise<boolean> => {
-    return (await getNextTrack()) >= 0;
+    return (await getNextItem()) >= 0;
   };
 
   const isCanBack = async (): Promise<boolean> => {
-    return (await getPrevTrack()) >= 0;
+    return (await getPrevItem()) >= 0;
   };
 
   const delayedNext = delayed(() => {
@@ -64,7 +65,7 @@ export default function getListIterator(
       nextIndex >= 0 && delayedNext.delay(delay ?? 0);
     },
     async ({ loop = options?.loop } = {}) => {
-      nextIndex = await getNextTrack(loop);
+      nextIndex = await getNextItem(loop);
     }
   );
 
@@ -74,7 +75,7 @@ export default function getListIterator(
     },
     async () => {
       cancel();
-      nextIndex = await getPrevTrack();
+      nextIndex = await getPrevItem();
     }
   );
 
