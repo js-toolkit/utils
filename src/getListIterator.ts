@@ -7,12 +7,13 @@ export interface ListIteratorOptions {
 }
 
 export type NextOptions = ListIteratorOptions;
+type GetNextOptions = Pick<NextOptions, 'loop'>;
 
 export interface ListIterator {
   readonly next: (options?: NextOptions) => Promise<void>;
   readonly back: () => Promise<void>;
-  readonly isCanNext: (options?: NextOptions) => Promise<boolean>;
-  readonly isCanBack: () => Promise<boolean>;
+  readonly isCanNext: (options?: GetNextOptions) => Promise<boolean>;
+  readonly isCanBack: (options?: GetNextOptions) => Promise<boolean>;
   /** Pending for next */
   readonly isPending: boolean;
   /** Cancel the delayed switch. */
@@ -45,12 +46,12 @@ export default function getListIterator(
     return next;
   };
 
-  const isCanNext = async (): Promise<boolean> => {
-    return (await getNextItem()) >= 0;
+  const isCanNext = async (opts?: GetNextOptions): Promise<boolean> => {
+    return (await getNextItem(opts?.loop)) >= 0;
   };
 
-  const isCanBack = async (): Promise<boolean> => {
-    return (await getPrevItem()) >= 0;
+  const isCanBack = async (opts?: GetNextOptions): Promise<boolean> => {
+    return (await getPrevItem(opts?.loop)) >= 0;
   };
 
   const delayedNext = delayed(() => {
