@@ -203,6 +203,19 @@ type DeepRequired<T, Depth extends number = never, R extends unknown[] = [any]> 
   T
 >;
 
+type DeepReadonly<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+  Exclude<T, AnyFunction>,
+  AnyObject,
+  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
+    ? ReadonlyArray<DeepReadonly<RI, Depth, R>>
+    : {
+        readonly [P in keyof T]?: R['length'] extends Depth
+          ? T[P]
+          : DeepReadonly<T[P], Depth, Push<R, any>>;
+      },
+  T
+>;
+
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   ? U extends Record<keyof U, [any]>
     ? { [K in keyof U]: U[K][0] }
