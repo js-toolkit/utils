@@ -284,7 +284,19 @@ type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
 
 type Last<T extends unknown[]> = T extends [any, ...infer Rest] ? Rest : [];
 
-type Push<A extends unknown[], T> = [...A, T];
+type Push<A extends readonly unknown[], T> = [...A, T];
+
+type Tail<
+  T extends readonly unknown[],
+  Length extends number = never,
+  R extends readonly unknown[] = []
+> = T['length'] extends 0
+  ? R
+  : R['length'] extends Length
+  ? R
+  : T extends readonly [...infer I, (infer L)?]
+  ? Tail<I, Length, [L, ...R]>
+  : R;
 
 type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? true
