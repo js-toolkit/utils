@@ -298,6 +298,18 @@ type Tail<
   ? Tail<I, Length, [L, ...R]>
   : R;
 
+type Skip<
+  T extends readonly unknown[],
+  Length extends number = never,
+  R extends readonly unknown[] = []
+> = T['length'] extends 0
+  ? T
+  : R['length'] extends Length
+  ? T
+  : T extends readonly [unknown?, ...infer Rest]
+  ? Skip<Rest, Length, [...R, unknown]>
+  : T;
+
 type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? true
   : T extends readonly [Item]
