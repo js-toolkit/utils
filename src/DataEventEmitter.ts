@@ -8,7 +8,9 @@ export interface DataEvent<Type, Data, Target> {
   target: Target;
 }
 
-type EventMap = Record<string, [any] | [] | DataEvent<string, any, any>>;
+type EventArgs = [any] | [any?] | [];
+
+type EventMap = Record<string, EventArgs | DataEvent<string, any, any>>;
 
 export type ConvertToDataEventMap<
   EventTypes extends string | symbol | EventMap,
@@ -20,10 +22,10 @@ export type ConvertToDataEventMap<
         ? [DataEvent<P, EventTypes[P][0]['data'], Target>]
         : EventTypes[P] extends DataEvent<string, any, any>
         ? [DataEvent<P, EventTypes[P]['data'], Target>]
-        : [DataEvent<P, EventTypes[P] extends [any] | [] ? EventTypes[P][0] : unknown, Target>];
+        : [DataEvent<P, EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown, Target>];
     };
 
-type ExtractTuple<T extends Record<string, [any] | []>> = {
+type ExtractTuple<T extends Record<string, EventArgs>> = {
   [P in keyof T]: T[P][0];
 };
 
