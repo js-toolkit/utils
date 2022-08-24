@@ -19,10 +19,12 @@ export type ConvertToDataEventMap<
   ? Record<EventTypes, [DataEvent<string, unknown, Target>]>
   : {
       [P in keyof EventTypes]: EventTypes[P] extends [DataEvent<string, any, any>]
-        ? [DataEvent<P, EventTypes[P][0]['data'], Target>]
+        ? [data: DataEvent<P, EventTypes[P][0]['data'], Target>]
         : EventTypes[P] extends DataEvent<string, any, any>
-        ? [DataEvent<P, EventTypes[P]['data'], Target>]
-        : [DataEvent<P, EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown, Target>];
+        ? [data: DataEvent<P, EventTypes[P]['data'], Target>]
+        : [
+            data: DataEvent<P, EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown, Target>
+          ];
     };
 
 type ExtractTuple<T extends Record<string, EventArgs>> = {
@@ -40,6 +42,22 @@ export type DataEventListener<
   Target extends DataEventEmitter<EventTypes, Target>
 > = EventEmitter.EventListener<ConvertToDataEventMap<EventTypes, Target>, K>;
 
+type NormalizeEventTypes<EventTypes extends string | symbol | EventMap> =
+  EventTypes extends EventMap
+    ? EventTypes extends Record<string, DataEvent<string, any, any>>
+      ? {
+          [P in keyof EventTypes]: Exclude<EventTypes[P]['data'], undefined> extends never
+            ? []
+            : IfExtends<
+                EventTypes[P]['data'],
+                undefined,
+                [data?: EventTypes[P]['data']],
+                [data: EventTypes[P]['data']]
+              >;
+        }
+      : EventTypes
+    : EventTypes;
+
 export default class DataEventEmitter<
   EventTypes extends string | symbol | EventMap,
   Target extends DataEventEmitter<EventTypes, Target, Context> = DataEventEmitter<
@@ -50,12 +68,12 @@ export default class DataEventEmitter<
   Context = any
 > extends EventEmitter<ConvertToDataEventMap<EventTypes, Target>, Context> {
   // @ts-ignore
-  emit<T extends EventEmitter.EventNames<EventTypes>>(
+  emit<T extends EventEmitter.EventNames<NormalizeEventTypes<EventTypes>>>(
     event: T,
-    ...args: EventEmitter.EventArgs<EventTypes, T>
+    ...args: EventEmitter.EventArgs<NormalizeEventTypes<EventTypes>, T>
   ): boolean {
     // Replace event data with type and data
-    const data = args[0] as EventEmitter.EventArgs<EventTypes, T>[0];
+    const data = args[0] as EventEmitter.EventArgs<NormalizeEventTypes<EventTypes>, T>[0];
     const eventObject: DataEvent<T, typeof data, this> = { type: event, data, target: this };
     return super.emit(
       event as unknown as EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
