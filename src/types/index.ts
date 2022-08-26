@@ -1,6 +1,9 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type NonNullValue = {};
+
 type AnyObject = Record<string, any>;
 
 type EmptyObject = Record<PropertyKey, never>;
