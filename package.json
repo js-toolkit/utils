@@ -24,7 +24,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "patch-publish": "yarn run build && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags",
-    "minor-publish": "yarn run build && npm version minor -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags"
+    "minor-publish": "yarn run build && npm version minor --no-workspaces-update -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags"
   },
   "optionalDependencies": {
     "@js-toolkit/node-utils": "^1.1.4"
