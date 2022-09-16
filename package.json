@@ -1,6 +1,6 @@
 {
   "name": "@jstoolkit/utils",
-  "version": "1.45.0",
+  "version": "1.45.1",
   "description": "Typescript helper types and utils",
   "author": "VZH",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "build-to-player": "tsc --build ./tsconfig.json && npm run minify && copyfiles -e './dist/*(collections|decorators|tests)/**/*' -e './dist/*(package.json|README.md|LICENSE)' -u 1 './dist/**/*' '../../../player/modules/utils'",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "patch-publish": "yarn run build && npm version patch -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags",
+    "patch-publish": "yarn run build && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags",
     "minor-publish": "yarn run build && npm version minor -m 'v%s' && yarn run copy:configs && npm publish ./dist --access public && git push origin master --follow-tags"
   },
   "optionalDependencies": {
