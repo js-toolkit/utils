@@ -212,7 +212,7 @@ type DeepReadonly<T, Depth extends number = never, R extends unknown[] = [any]> 
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
     ? ReadonlyArray<DeepReadonly<RI, Depth, R>>
     : {
-        readonly [P in keyof T]?: R['length'] extends Depth
+        readonly [P in keyof T]: R['length'] extends Depth
           ? T[P]
           : DeepReadonly<T[P], Depth, Push<R, any>>;
       },
