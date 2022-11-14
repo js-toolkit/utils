@@ -5,13 +5,13 @@ export default function beforeCall<
   C extends (...args: Parameters<F>) => void | Promise<void>
 >(
   fn: F,
-  callback: C,
+  beforeCallback: C,
   context: any = undefined
 ): C extends AnyAsyncFunction
   ? ((...args: Parameters<F>) => Promise<ReturnType<F>>) & AsObject<F>
   : F {
   const wrapper: AnyFunction = (...args: Parameters<F>) => {
-    const cbResult = callback.apply(context, args);
+    const cbResult = beforeCallback.apply(context, args);
     if (cbResult instanceof Promise) {
       return cbResult.finally(() => fn.apply(context, args) as ReturnType<F>);
     }
