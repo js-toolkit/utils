@@ -4,11 +4,12 @@
     "isolatedModules": false,
     "outDir": "./dist",
     "baseUrl": "./src",
+    "exactOptionalPropertyTypes": true,
     "sourceMap": false,
     "declaration": true,
     "incremental": true,
     "diagnostics": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/types/types.ts", "src/types/json_repro.ts"]
+  "exclude": ["src/types/types.ts"]
 }

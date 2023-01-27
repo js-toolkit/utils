@@ -6,12 +6,12 @@ export namespace Sink {
   export type Finalizator = () => void | Promise<any>;
 
   export interface Options {
-    cancelOnPipeError?: boolean;
+    readonly cancelOnPipeError?: boolean | undefined;
   }
 
   export interface WaitOptions {
-    timeout?: number;
-    errorOnTimeout?: boolean;
+    readonly timeout?: number | undefined;
+    readonly errorOnTimeout?: boolean | undefined;
   }
 }
 
@@ -26,22 +26,14 @@ function stopTimer(timer: unknown): void {
 
 export class Sink<A> {
   private readonly promise: Promise<void>;
-
   private readonly cancelOnError: boolean;
-
   private pending;
-
-  private waitTimeoutHandler?: unknown;
-
-  private cancelling?: Promise<void>;
-
-  private resolve?: () => void;
-
-  private reject?: (reason?: unknown) => void;
-
-  private finalizator?: Sink.Finalizator;
-
-  private pipeHandler?: (value: A) => Promise<any>;
+  private waitTimeoutHandler: unknown | undefined;
+  private cancelling: Promise<void> | undefined;
+  private resolve: VoidFunction | undefined;
+  private reject: ((reason?: unknown | undefined) => void) | undefined;
+  private finalizator: Sink.Finalizator | undefined;
+  private pipeHandler: ((value: A) => Promise<any>) | undefined;
 
   constructor(
     executor: (pipe: (value: A) => void, cancel: Sink<A>['cancel']) => Sink.Finalizator | void,
@@ -85,7 +77,7 @@ export class Sink<A> {
   }
 
   /** Stop pipes and free resources. */
-  cancel(reason?: unknown): Promise<void> {
+  cancel(reason?: unknown | undefined): Promise<void> {
     if (this.cancelling) return this.cancelling;
     if (!this.isPending) return Promise.resolve();
     // if (this.cancelling) return Promise.reject(new Error('Already in cancelling state.'));

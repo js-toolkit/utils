@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import es5ErrorCompat from './es5ErrorCompat';
+import { es5ErrorCompat } from './es5ErrorCompat';
 
 export class PromiseCancelledError extends Error {
   constructor(message?: string) {
@@ -18,7 +18,7 @@ function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): u
 }
 
 export class CancellablePromise<T> extends Promise<T> {
-  private canceller?: VoidFunction;
+  private canceller: VoidFunction | undefined;
 
   constructor(
     executorOrPromise:
