@@ -31,7 +31,7 @@ const ignoreError = (callback: VoidFunction): void => {
   }
 };
 
-export default function getTimer({
+export function getTimer({
   callback,
   interval,
   onStart,
@@ -88,3 +88,5 @@ export default function getTimer({
     },
   };
 }
+
+export default getTimer;

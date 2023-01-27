@@ -15,7 +15,7 @@ function objectToString(error: AnyObject): string {
   return errStr;
 }
 
-export default function getErrorMessage(error: unknown): string {
+export function getErrorMessage(error: unknown): string {
   // If error is not object
   if (typeof error !== 'object' || error == null) return String(error);
   // If error has own implementation of `toString()`.
@@ -25,3 +25,5 @@ export default function getErrorMessage(error: unknown): string {
   // If error is instance of some class
   return `${error.constructor.name}: ${objectToString(error)}`;
 }
+
+export default getErrorMessage;

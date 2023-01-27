@@ -6,7 +6,7 @@
  * Converts a numeric to a rational.
  * @returns [numerator, denominator], [1,0] is infinity.
  */
-export default function farey(
+export function farey(
   value: number,
   /** Max denominator */
   limit: number
@@ -31,6 +31,8 @@ export default function farey(
     }
   }
 }
+
+export default farey;
 
 // console.log(farey(Math.PI, 50));
 // console.log(farey(1035 / 582, 50));

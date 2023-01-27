@@ -1,4 +1,4 @@
-import TimeoutError from './TimeoutError';
+import { TimeoutError } from './TimeoutError';
 
 export interface Awaiter<T> {
   readonly pending: boolean;
@@ -11,7 +11,7 @@ export interface AwaiterOptions {
   readonly lazy?: boolean;
 }
 
-export default function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> {
+export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> {
   // https://stackoverflow.com/a/42118995
 
   let pending = false;
@@ -86,6 +86,8 @@ export default function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awa
     reject: rejectHandler,
   };
 }
+
+export default getAwaiter;
 
 // const w = getAwaiter<number>();
 

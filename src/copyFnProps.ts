@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-export default function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
+export function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
   // Do not use `Object.getOwnPropertyDescriptors` for ES5 capability
   const descs = Object.getOwnPropertyNames(source).reduce((acc, prop) => {
     const desc = Object.getOwnPropertyDescriptor(source, prop);
@@ -22,3 +22,5 @@ export default function copyFnProps<T extends AnyFunction>(source: T, dest: T): 
 
   return dest;
 }
+
+export default copyFnProps;

@@ -1,4 +1,4 @@
-export default class CacheMap<K, V> extends Map<K, V> {
+export class CacheMap<K, V> extends Map<K, V> {
   private readonly queue = new Map<K, Promise<unknown>>();
 
   getOrQueue<F extends () => V | Promise<V>>(
@@ -28,3 +28,5 @@ export default class CacheMap<K, V> extends Map<K, V> {
     return this.get(key) as Awaited<ReturnType<F>>;
   }
 }
+
+export default CacheMap;

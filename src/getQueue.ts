@@ -1,4 +1,4 @@
-import clear from './clear';
+import { clear } from './clear';
 
 export interface Queue<T> {
   add: (item: T) => void;

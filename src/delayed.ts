@@ -1,4 +1,4 @@
-import copyFnProps from './copyFnProps';
+import { copyFnProps } from './copyFnProps';
 
 interface Delay<T extends AnyFunction> {
   isPending: boolean;
@@ -10,7 +10,7 @@ export type DelayedFunc<T extends AnyFunction> = ((...args: Parameters<T>) => vo
   AsObject<T> &
   Delay<T>;
 
-function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc<T> {
+export function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc<T> {
   let timer: any;
 
   const wrapper = ((...args) => {
@@ -42,7 +42,7 @@ function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc<T> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-namespace delayed {
+export namespace delayed {
   export type Func<T extends AnyFunction> = DelayedFunc<T>;
 }
 

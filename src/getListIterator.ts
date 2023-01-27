@@ -1,5 +1,5 @@
-import beforeCall from './beforeCall';
-import delayed from './delayed';
+import { beforeCall } from './beforeCall';
+import { delayed } from './delayed';
 
 export interface ListIteratorOptions {
   readonly delay?: number;
@@ -25,7 +25,7 @@ export interface ListScope {
   readonly getSize: () => number | Promise<number>;
 }
 
-export default function getListIterator(
+export function getListIterator(
   scope: ListScope,
   onSwitch: (nextIndex: number) => unknown,
   options?: ListIteratorOptions
@@ -91,3 +91,5 @@ export default function getListIterator(
     cancel,
   };
 }
+
+export default getListIterator;

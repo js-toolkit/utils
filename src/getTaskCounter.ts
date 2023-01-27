@@ -23,7 +23,7 @@ export interface TaskCounterOptions<K extends string> {
   onEndTask?: (task: keyof NonNullable<this['pendingTasks']>) => void;
 }
 
-export default function getTaskCounter<K extends string = never>({
+export function getTaskCounter<K extends string = never>({
   pendingTasks = { default: 0 },
   resetTask = (tasks, key) => {
     /* eslint-disable no-param-reassign */
@@ -91,3 +91,5 @@ export default function getTaskCounter<K extends string = never>({
 
   return counter;
 }
+
+export default getTaskCounter;

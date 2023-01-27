@@ -1,12 +1,12 @@
 import type { DebounceSettings, DebouncedFunc as DebouncedFuncOrigin } from 'lodash';
 import origin from 'lodash.debounce';
-import beforeCall from './beforeCall';
+import { beforeCall } from './beforeCall';
 
 export interface DebouncedFunc<T extends AnyFunction> extends DebouncedFuncOrigin<T> {
   isPending: boolean;
 }
 
-export default function debounce<T extends AnyFunction>(
+export function debounce<T extends AnyFunction>(
   fn: T,
   wait?: number,
   options?: DebounceSettings
@@ -24,3 +24,5 @@ export default function debounce<T extends AnyFunction>(
   debounced.cancel = beforeCall(debounced.cancel.bind(debounced), unpending);
   return debounced;
 }
+
+export default debounce;

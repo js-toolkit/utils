@@ -6,7 +6,7 @@
 export type DefaultOrBabelDescriptor<T> = TypedPropertyDescriptor<T> & { initializer?: () => any };
 
 /** Bind method to instance. */
-export default function bind<T extends (...args: any[]) => any>(
+export function bind<T extends (...args: any[]) => any>(
   target: object,
   propertyKey: string | symbol,
   descriptor: DefaultOrBabelDescriptor<T>
@@ -37,3 +37,5 @@ export default function bind<T extends (...args: any[]) => any>(
     },
   };
 }
+
+export default bind;

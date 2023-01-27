@@ -1,8 +1,10 @@
-import es5ErrorCompat from './es5ErrorCompat';
+import { es5ErrorCompat } from './es5ErrorCompat';
 
-export default class UnreachableCaseError extends Error {
+export class UnreachableCaseError extends Error {
   constructor(value: never) {
     super(`Unreachable case: ${String(value)}`);
     es5ErrorCompat(this, UnreachableCaseError);
   }
 }
+
+export default UnreachableCaseError;

@@ -1,3 +1,5 @@
-export default function toInt(value: number): number {
+export function toInt(value: number): number {
   return Math.floor(value);
 }
+
+export default toInt;

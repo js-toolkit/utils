@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
-import NoSuchElementError from '../NoSuchElementError';
+import { NoSuchElementError } from '../NoSuchElementError';
 
 export type Some<A> = Option<A>;
 export type None = Option<never>;
@@ -287,7 +287,7 @@ export const None: None = new (class None extends Option<never> {
  * option will be empty.
  */
 export function option<A>(value: Optional<A>): Option<A> {
-  return value != null ? some(value as NonNullable<A>) : None;
+  return value != null ? some(value) : None;
 }
 
 // type A = { a: number };

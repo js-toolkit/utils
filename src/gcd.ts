@@ -1,5 +1,5 @@
 /** Greatest common divisor */
-export default function gcd(x: number, y: number): number {
+export function gcd(x: number, y: number): number {
   let a = Math.abs(x);
   let b = Math.abs(y);
 
@@ -9,3 +9,5 @@ export default function gcd(x: number, y: number): number {
 
   return a;
 }
+
+export default gcd;

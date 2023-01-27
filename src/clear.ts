@@ -1,6 +1,6 @@
 type ClearResult<T extends AnyObject> = T extends ReadonlyArray<unknown> ? T : Partial<T>;
 
-export default function clear<T extends AnyObject>(obj: T): ClearResult<T> {
+export function clear<T extends AnyObject>(obj: T): ClearResult<T> {
   if (Array.isArray(obj)) {
     obj.splice(0, obj.length);
   } else {
@@ -11,3 +11,5 @@ export default function clear<T extends AnyObject>(obj: T): ClearResult<T> {
   }
   return obj as ClearResult<T>;
 }
+
+export default clear;

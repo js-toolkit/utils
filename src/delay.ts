@@ -1,6 +1,10 @@
-import type delayed from './delayed';
+import type { delayed } from './delayed';
 
-function delay<T extends AnyFunction>(fn: T, wait: number, ...args: Parameters<T>): delay.Delay {
+export function delay<T extends AnyFunction>(
+  fn: T,
+  wait: number,
+  ...args: Parameters<T>
+): delay.Delay {
   let timer: any;
 
   const cancel = (): void => {
@@ -22,7 +26,7 @@ function delay<T extends AnyFunction>(fn: T, wait: number, ...args: Parameters<T
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-namespace delay {
+export namespace delay {
   export type Delay = Pick<delayed.Func<any>, 'isPending' | 'cancel'>;
 }
 

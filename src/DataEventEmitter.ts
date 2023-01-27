@@ -58,7 +58,7 @@ type NormalizeEventTypes<EventTypes extends string | symbol | EventMap> =
       : EventTypes
     : EventTypes;
 
-export default class DataEventEmitter<
+export class DataEventEmitter<
   EventTypes extends string | symbol | EventMap,
   Target extends DataEventEmitter<EventTypes, Target, Context> = DataEventEmitter<
     EventTypes,
@@ -87,3 +87,5 @@ export default class DataEventEmitter<
     );
   }
 }
+
+export default DataEventEmitter;

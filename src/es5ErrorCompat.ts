@@ -3,7 +3,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-proto */
 
-export default function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
+export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target: S,
   TargetCtor: C
 ): void {
@@ -12,3 +12,5 @@ export default function es5ErrorCompat<S extends Error, C extends AnyConstructor
   target.constructor = TargetCtor;
   target['__proto__'] = TargetCtor.prototype;
 }
+
+export default es5ErrorCompat;

@@ -1,6 +1,6 @@
 import copyFnProps from './copyFnProps';
 
-export default function beforeCall<
+export function beforeCall<
   F extends AnyFunction,
   C extends (...args: Parameters<F>) => void | Promise<void>
 >(
@@ -21,3 +21,5 @@ export default function beforeCall<
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return copyFnProps(fn, wrapper) as any;
 }
+
+export default beforeCall;

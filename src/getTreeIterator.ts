@@ -1,5 +1,5 @@
-import beforeCall from './beforeCall';
-import delayed from './delayed';
+import { beforeCall } from './beforeCall';
+import { delayed } from './delayed';
 
 export interface TreeIteratorOptions {
   readonly delay?: number;
@@ -28,7 +28,7 @@ export interface TreeScope<N extends AnyObject, SN extends N> {
   readonly stop: ((node: N) => node is SN) | ((node: N) => boolean);
 }
 
-export default function getTreeIterator<N extends AnyObject, SN extends N = N>(
+export function getTreeIterator<N extends AnyObject, SN extends N = N>(
   scope: TreeScope<N, SN>,
   onSwitch: (nextNode: SN) => unknown,
   options?: TreeIteratorOptions
@@ -155,3 +155,5 @@ export default function getTreeIterator<N extends AnyObject, SN extends N = N>(
     cancel,
   };
 }
+
+export default getTreeIterator;

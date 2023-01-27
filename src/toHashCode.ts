@@ -4,7 +4,7 @@
  * Javascript implementation of java's string hashcode method.
  * @see https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
  */
-export default function toHashCode(str: string): number {
+export function toHashCode(str: string): number {
   let hash = 0;
   if (str.length === 0) return hash;
 
@@ -16,3 +16,5 @@ export default function toHashCode(str: string): number {
 
   return hash;
 }
+
+export default toHashCode;

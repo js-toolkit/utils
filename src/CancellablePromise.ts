@@ -17,7 +17,7 @@ function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): u
   return handler(value);
 }
 
-class CancellablePromise<T> extends Promise<T> {
+export class CancellablePromise<T> extends Promise<T> {
   private canceller?: VoidFunction;
 
   constructor(

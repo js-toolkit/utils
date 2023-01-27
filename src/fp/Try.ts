@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
-import NoSuchElementError from '../NoSuchElementError';
+import { NoSuchElementError } from '../NoSuchElementError';
 import { Option, None } from './Option';
 
 export type Success<A> = Try<A>;
