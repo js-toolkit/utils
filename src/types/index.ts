@@ -239,6 +239,20 @@ type PartialBut<T, K extends keyof T> = Pick<T, K> & { [P in Exclude<keyof T, K>
 
 type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
 
+/** Useful with `exactOptionalPropertyTypes` option. */
+type OptionalToUndefined<T> = { [K in keyof T]: undefined extends T[K] ? T[K] | undefined : T[K] };
+// type OptionalToUndefined<T> = { [K in keyof T]: [T[K]] } extends infer U
+//   ? U extends PartialRecord<keyof U, [any]>
+//     ? {
+//         [K in keyof U]: U[K] extends [any]
+//           ? U[K][0]
+//           : U[K] extends [any] | undefined
+//           ? Exclude<U[K], undefined>[0] | undefined
+//           : never;
+//       }
+//     : never
+//   : never;
+
 type RequiredInner<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P];
 };
