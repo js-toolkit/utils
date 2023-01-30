@@ -8,8 +8,8 @@ export interface DebouncedFunc<T extends AnyFunction> extends DebouncedFuncOrigi
 
 export function debounce<T extends AnyFunction>(
   fn: T,
-  wait?: number,
-  options?: DebounceSettings
+  wait?: number | undefined,
+  options?: DebounceSettings | undefined
 ): DebouncedFunc<T> {
   const unpending = (): void => {
     // eslint-disable-next-line no-use-before-define

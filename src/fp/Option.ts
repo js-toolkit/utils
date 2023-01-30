@@ -291,7 +291,7 @@ export function option<A>(value: Optional<A>): Option<A> {
 }
 
 // type A = { a: number };
-// export function f1(a?: A | null) {
+// export function f1(a?: A | null | undefined) {
 //   const s = Some(a);
 //   return s.get().a;
 // }

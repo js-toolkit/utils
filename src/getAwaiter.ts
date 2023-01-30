@@ -2,13 +2,13 @@ import { TimeoutError } from './TimeoutError';
 
 export interface Awaiter<T> {
   readonly pending: boolean;
-  wait: (timeout?: number) => Promise<T>;
+  wait: (timeout?: number | undefined) => Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any) => void;
+  reject: (reason?: any | undefined) => void;
 }
 
 export interface AwaiterOptions {
-  readonly lazy?: boolean;
+  readonly lazy?: boolean | undefined;
 }
 
 export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> {
@@ -37,7 +37,7 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
     rejectRef && rejectRef(error);
   };
 
-  const wait = (timeout?: number): Promise<T> => {
+  const wait = (timeout?: number | undefined): Promise<T> => {
     if (promise == null) {
       promise = new Promise<T>((resolve, reject) => {
         pending = true;

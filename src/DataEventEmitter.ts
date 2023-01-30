@@ -51,7 +51,7 @@ type NormalizeEventTypes<EventTypes extends string | symbol | EventMap> =
             : IfExtends<
                 EventTypes[P]['data'],
                 undefined,
-                [data?: EventTypes[P]['data']],
+                [data?: EventTypes[P]['data'] | undefined],
                 [data: EventTypes[P]['data']]
               >;
         }

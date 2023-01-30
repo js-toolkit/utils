@@ -2,25 +2,27 @@ export type PendingTasks<K extends string> = { default: number } & PartialRecord
 
 export interface TaskCounter<K extends string> {
   /** true - while has at least 1 running task by key. */
-  isPending: (key?: keyof PendingTasks<K>) => boolean;
+  isPending: (key?: keyof PendingTasks<K> | undefined) => boolean;
   /** true - while has at least 1 running task. */
   isAnyPending: () => boolean;
-  push: (key?: keyof PendingTasks<K>) => void;
-  pop: (key?: keyof PendingTasks<K>) => void;
-  reset: (key?: keyof PendingTasks<K>) => void;
-  resetAll: () => void;
+  push: (key?: keyof PendingTasks<K> | undefined) => void;
+  pop: (key?: keyof PendingTasks<K> | undefined) => void;
+  reset: (key?: keyof PendingTasks<K> | undefined) => void;
+  resetAll: VoidFunction;
 }
 
 export interface TaskCounterOptions<K extends string> {
-  pendingTasks?: PendingTasks<K>;
-  resetTask?: (
-    tasks: NonNullable<this['pendingTasks']>,
-    key: keyof NonNullable<this['pendingTasks']>
-  ) => void;
-  onPending?: () => void;
-  onIdle?: () => void;
-  onStartTask?: (task: keyof NonNullable<this['pendingTasks']>) => void;
-  onEndTask?: (task: keyof NonNullable<this['pendingTasks']>) => void;
+  pendingTasks?: PendingTasks<K> | undefined;
+  resetTask?:
+    | ((
+        tasks: NonNullable<this['pendingTasks']>,
+        key: keyof NonNullable<this['pendingTasks']>
+      ) => void)
+    | undefined;
+  onPending?: VoidFunction | undefined;
+  onIdle?: VoidFunction | undefined;
+  onStartTask?: ((task: keyof NonNullable<this['pendingTasks']>) => void) | undefined;
+  onEndTask?: ((task: keyof NonNullable<this['pendingTasks']>) => void) | undefined;
 }
 
 export function getTaskCounter<K extends string = never>({

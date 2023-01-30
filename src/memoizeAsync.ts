@@ -4,7 +4,7 @@ type MemoizedAsync<T extends AnyAsyncFunction> = T & {
 
 interface MemoizeAsyncOptions {
   /** Allow call once only. Always returns a memoized result. */
-  readonly once?: boolean;
+  readonly once?: boolean|undefined;
 }
 
 export function memoizeAsync<T extends AnyAsyncFunction>(
