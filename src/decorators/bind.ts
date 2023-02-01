@@ -3,7 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-export type DefaultOrBabelDescriptor<T> = TypedPropertyDescriptor<T> & { initializer?: () => any };
+export type DefaultOrBabelDescriptor<T> = TypedPropertyDescriptor<T> & {
+  initializer?: (() => any) | undefined;
+};
 
 /** Bind method to instance. */
 export function bind<T extends (...args: any[]) => any>(

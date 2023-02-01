@@ -1,6 +1,6 @@
 {
   "name": "@jstoolkit/utils",
-  "version": "1.46.0",
+  "version": "1.46.1",
   "description": "Typescript helper types and utils",
   "author": "VZH",
   "license": "MIT",
@@ -30,13 +30,13 @@
     "@js-toolkit/node-utils": "^1.1.4"
   },
   "devDependencies": {
-    "@jstoolkit/configs": "^3.84.7",
+    "@jstoolkit/configs": "^3.85.0",
     "@types/jest": "^29.4.0",
     "@types/lodash.debounce": "^4.0.7",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.32.0",
+    "eslint": "^8.33.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",

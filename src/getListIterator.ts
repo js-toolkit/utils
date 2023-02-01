@@ -2,18 +2,18 @@ import { beforeCall } from './beforeCall';
 import { delayed } from './delayed';
 
 export interface ListIteratorOptions {
-  readonly delay?: number;
-  readonly loop?: boolean;
+  readonly delay?: number | undefined;
+  readonly loop?: boolean | undefined;
 }
 
 export type NextOptions = ListIteratorOptions;
 type GetNextOptions = Pick<NextOptions, 'loop'>;
 
 export interface ListIterator {
-  readonly next: (options?: NextOptions) => Promise<void>;
+  readonly next: (options?: NextOptions | undefined) => Promise<void>;
   readonly back: () => Promise<void>;
-  readonly isCanNext: (options?: GetNextOptions) => Promise<boolean>;
-  readonly isCanBack: (options?: GetNextOptions) => Promise<boolean>;
+  readonly isCanNext: (options?: GetNextOptions | undefined) => Promise<boolean>;
+  readonly isCanBack: (options?: GetNextOptions | undefined) => Promise<boolean>;
   /** Pending for next */
   readonly isPending: boolean;
   /** Cancel the delayed switch. */
@@ -28,29 +28,29 @@ export interface ListScope {
 export function getListIterator(
   scope: ListScope,
   onSwitch: (nextIndex: number) => unknown,
-  options?: ListIteratorOptions
+  options?: ListIteratorOptions | undefined
 ): ListIterator {
   let nextIndex = -1;
 
-  const getNextItem = async (loop?: boolean): Promise<number> => {
+  const getNextItem = async (loop?: boolean | undefined): Promise<number> => {
     const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === size - 1 ? (loop ? 0 : -1) : Math.min(currentIndex + 1, size - 1);
     return next;
   };
 
-  const getPrevItem = async (loop?: boolean): Promise<number> => {
+  const getPrevItem = async (loop?: boolean | undefined): Promise<number> => {
     const [size, currentIndex] = await Promise.all([scope.getSize(), scope.getCurrentIndex()]);
     // eslint-disable-next-line no-nested-ternary
     const next = currentIndex === 0 ? (loop ? size - 1 : -1) : Math.min(currentIndex - 1, size - 1);
     return next;
   };
 
-  const isCanNext = async (opts?: GetNextOptions): Promise<boolean> => {
+  const isCanNext = async (opts?: GetNextOptions | undefined): Promise<boolean> => {
     return (await getNextItem(opts?.loop)) >= 0;
   };
 
-  const isCanBack = async (opts?: GetNextOptions): Promise<boolean> => {
+  const isCanBack = async (opts?: GetNextOptions | undefined): Promise<boolean> => {
     return (await getPrevItem(opts?.loop)) >= 0;
   };
 

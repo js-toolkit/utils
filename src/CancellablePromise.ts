@@ -2,14 +2,17 @@
 import { es5ErrorCompat } from './es5ErrorCompat';
 
 export class PromiseCancelledError extends Error {
-  constructor(message?: string) {
+  constructor(message?: string | undefined) {
     super(message);
     es5ErrorCompat(this, PromiseCancelledError);
   }
 }
 
-// eslint-disable-next-line no-shadow
-function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): unknown {
+function catchCancel(
+  // eslint-disable-next-line no-shadow
+  handler?: ((value: any) => unknown) | null | undefined,
+  value?: any | undefined
+): unknown {
   // console.log('catchCancel', value, onrejected);
   if (value instanceof PromiseCancelledError || !handler) {
     throw value;
@@ -24,7 +27,7 @@ export class CancellablePromise<T> extends Promise<T> {
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any) => void,
+          reject: (reason?: any | undefined) => void,
           cancel: () => void
         ) => void)
       | Promise<T>
@@ -61,7 +64,7 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   cancelled<TResult = never>(
-    oncancelled?: (() => TResult | PromiseLike<TResult>) | null
+    oncancelled?: (() => TResult | PromiseLike<TResult>) | null | undefined
   ): CancellablePromise<T | TResult> {
     const next = super.then(
       (value) => {
@@ -85,8 +88,8 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   override then<TResult1 = T, TResult2 = never>(
-    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
   ): CancellablePromise<TResult1 | TResult2> {
     const next = super.then(
       (value) => catchCancel(onfulfilled, value),
@@ -97,7 +100,7 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   override catch<TResult = never>(
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
+    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined
   ): CancellablePromise<T | TResult> {
     const next = super.then(undefined, (reason) =>
       catchCancel(onrejected, reason)
@@ -106,7 +109,7 @@ export class CancellablePromise<T> extends Promise<T> {
     return next;
   }
 
-  override finally(onfinally?: (() => void) | null): CancellablePromise<T> {
+  override finally(onfinally?: VoidFunction | null | undefined): CancellablePromise<T> {
     const next = super.finally(onfinally) as CancellablePromise<T>;
     next.canceller = this.canceller;
     return next;
@@ -121,7 +124,7 @@ export interface CancellablePromiseConstructor
 
       readonly [Symbol.species]: CancellablePromiseConstructor;
 
-      reject<T = never>(reason?: any): CancellablePromise<T>;
+      reject<T = never>(reason?: any | undefined): CancellablePromise<T>;
 
       resolve(): CancellablePromise<void>;
 
@@ -248,7 +251,7 @@ export interface CancellablePromiseConstructor
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any) => void,
+          reject: (reason?: any | undefined) => void,
           cancel: () => void
         ) => void)
       | Promise<T>

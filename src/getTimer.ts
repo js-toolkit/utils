@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable no-use-before-define */
 export interface TimerStartOptions {
-  immediately?: boolean;
+  immediately?: boolean | undefined;
 }
 
 export interface Timer {
   stop: VoidFunction;
-  start: (options?: TimerStartOptions) => void;
+  start: (options?: TimerStartOptions | undefined) => void;
   readonly active: boolean;
 }
 
@@ -16,11 +16,11 @@ interface Options {
   /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick) */
   interval: number | (() => number);
   /** Default `true` */
-  autostart?: boolean;
+  autostart?: boolean | undefined;
   /** Used only if `interval` is a function and callback returns `Promise`. */
-  waitCallback?: boolean;
-  onStart?: VoidFunction;
-  onStop?: VoidFunction;
+  waitCallback?: boolean | undefined;
+  onStart?: VoidFunction | undefined;
+  onStop?: VoidFunction | undefined;
 }
 
 const ignoreError = (callback: VoidFunction): void => {
