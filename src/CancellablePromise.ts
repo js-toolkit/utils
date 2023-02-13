@@ -28,7 +28,7 @@ export class CancellablePromise<T> extends Promise<T> {
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
           reject: (reason?: any | undefined) => void,
-          cancel: () => void
+          cancel: VoidFunction
         ) => void)
       | Promise<T>
   ) {
@@ -252,7 +252,7 @@ export interface CancellablePromiseConstructor
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
           reject: (reason?: any | undefined) => void,
-          cancel: () => void
+          cancel: VoidFunction
         ) => void)
       | Promise<T>
   ): CancellablePromise<T>;
