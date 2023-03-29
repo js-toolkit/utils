@@ -123,6 +123,8 @@ type OmitIndex<T extends AnyObject> = {
   [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P];
 };
 
+type WithIndex<T extends AnyObject> = T & Record<string, any>;
+
 // type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
 // { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
 // never | undefined
