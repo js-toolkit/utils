@@ -12,7 +12,7 @@ export function omitBy<O extends AnyObject, T extends O[keyof O]>(
   predicate: OmitByPredicate<O, T>
 ): O[keyof O] extends T ? Partial<O> : PartialSome<O, KeysOfType<O, T>> {
   // ): O[keyof O] extends T ? Partial<O> : ExcludeKeysOfType<O, T> {
-  const result = {};
+  const result: AnyObject = {};
   Object.getOwnPropertyNames(obj).forEach((key) => {
     const equals = predicate(obj[key], key);
     if (!equals) {

@@ -35,7 +35,7 @@ export function bind<T extends (...args: any[]) => any>(
         ...rest,
         value: value?.bind(this),
       });
-      return this[propertyKey];
+      return (this as AnyObject)[propertyKey as string];
     },
   };
 }

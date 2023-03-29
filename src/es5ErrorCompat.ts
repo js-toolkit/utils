@@ -10,7 +10,7 @@ export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target.name = TargetCtor.name;
   // Workaround to make `instanceof` work in ES5
   target.constructor = TargetCtor;
-  target['__proto__'] = TargetCtor.prototype;
+  (target as AnyObject)['__proto__'] = TargetCtor.prototype;
 }
 
 export default es5ErrorCompat;
