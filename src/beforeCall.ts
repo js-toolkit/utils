@@ -1,4 +1,4 @@
-import copyFnProps from './copyFnProps';
+import { copyFnProps } from './copyFnProps';
 
 export function beforeCall<
   F extends AnyFunction,
