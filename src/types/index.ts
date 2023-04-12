@@ -369,6 +369,9 @@ type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false>
   ? []
   : [...UnionToTuple<Exclude<T, L>>, L];
 
+/** Returns `never` if T is union type. */
+type NoUnion<T> = [T] extends [UnionToIntersection<T>] ? T : never;
+
 /**
  * Used with discriminants.
  * @example
