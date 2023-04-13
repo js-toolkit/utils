@@ -1,8 +1,8 @@
-type MemoizedAsync<T extends AnyAsyncFunction> = T & {
+export type MemoizedAsync<T extends AnyAsyncFunction> = T & {
   readonly promise: ReturnType<T> | undefined;
 };
 
-interface MemoizeAsyncOptions {
+export interface MemoizeAsyncOptions {
   /** Allow call once only. Always returns a memoized result. */
   readonly once?: boolean | undefined;
 }
