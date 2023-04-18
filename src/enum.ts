@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
-import NoSuchElementError from './NoSuchElementError';
+import { NoSuchElementError } from './NoSuchElementError';
 
 export function getEnumName<K extends string>(
   enumeration: Record<K, string | number>,
@@ -8,7 +8,7 @@ export function getEnumName<K extends string>(
 ): K {
   if (typeof value === 'number') {
     // Check for plain objects
-    if (value in enumeration) return enumeration[value] as K;
+    if (value in enumeration) return enumeration[value as unknown as K] as K;
   }
 
   for (const prop in enumeration) {

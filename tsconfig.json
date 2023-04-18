@@ -1,7 +1,6 @@
 {
   "extends": "@jstoolkit/configs/ts/common.tsconfig.json",
   "compilerOptions": {
-    "isolatedModules": false,
     "outDir": "./dist",
     "baseUrl": "./src",
     "exactOptionalPropertyTypes": true,
@@ -10,6 +9,5 @@
     "incremental": true,
     "diagnostics": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/types/types.ts"]
+  "include": ["src/**/*"]
 }
