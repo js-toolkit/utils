@@ -372,6 +372,20 @@ type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false>
 /** Returns `never` if T is union type. */
 type NonUnion<T> = [T] extends [UnionToIntersection<T>] ? T : never;
 
+type IfTuple<T, Then = T, Else = never> = T extends ArrayLike<any>
+  ? number extends T['length']
+    ? Then
+    : Else
+  : Else;
+
+/** Returns union of tuple indices. */
+type TupleIndices<T extends readonly any[]> = Extract<
+  keyof T,
+  `${number}`
+> extends `${infer N extends number}`
+  ? N
+  : never;
+
 /**
  * Used with discriminants.
  * @example
