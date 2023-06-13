@@ -51,7 +51,7 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
         const nextIdx = step + (step > 0 ? -1 : children.length);
         if (nextIdx >= 0 && nextIdx <= children.length - 1) {
           const nextNode = children[nextIdx];
-          if (scope.stop(nextNode)) return nextNode;
+          if (scope.stop(nextNode)) return nextNode as SN;
           return selectNext(nextNode, step, loop, visited);
         }
       }
@@ -73,13 +73,13 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
       const nextIdx = idx + step;
       if (nextIdx >= 0 && nextIdx <= siblings.length - 1) {
         const nextNode = siblings[nextIdx];
-        if (scope.stop(nextNode)) return nextNode;
+        if (scope.stop(nextNode)) return nextNode as SN;
         return selectNext(nextNode, step, loop, visited);
       }
     }
 
     // Up to parent
-    if (scope.stop(parent)) return parent;
+    if (scope.stop(parent)) return parent as SN;
     visited.add(parent);
     return selectNext(parent, step, loop, visited);
   };
