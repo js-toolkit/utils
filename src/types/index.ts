@@ -31,7 +31,7 @@ type OmitStrict<
   A extends AnyObject,
   K extends
     | keyof A
-    | (Extract<Keys<A>, Keys<K>> extends never ? never : Pick<K, Extract<Keys<A>, Keys<K>>>)
+    | (Extract<Keys<A>, Keys<K>> extends never ? never : Pick<K, Extract<Keys<A>, Keys<K>>>),
 > = Pick<A, Exclude<Keys<A>, K extends Keys<A> ? K : Keys<K>>>;
 
 type ExcludeStrict<T, U extends T> = T extends U ? never : T;
@@ -40,12 +40,12 @@ type ExtractStrict<T, U extends T> = T extends U ? T : never;
 
 type Override<
   A extends AnyObject,
-  B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
+  B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never,
 > = { [P in keyof Merge<A, B>]: Merge<A, B>[P] };
 
 type Overwrite<
   A extends AnyObject,
-  B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never
+  B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never,
 > = Override<A, B>;
 
 type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
@@ -102,7 +102,7 @@ type ExcludeTypes<
     ? never
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
     ? ExcludeTypesOptions<A>
-    : never = { pick: keyof A }
+    : never = { pick: keyof A },
 > = ExcludeKeysOfType<
   {
     [P in keyof A]: 'omit' extends keyof K
@@ -136,7 +136,7 @@ type KeepTypes<
     ? never
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
     ? ExcludeTypesOptions<A>
-    : never = { pick: keyof A }
+    : never = { pick: keyof A },
 > = ExcludeKeysOfType<
   {
     [P in keyof A]: 'omit' extends keyof K
@@ -312,7 +312,7 @@ type Push<A extends readonly unknown[], T> = [...A, T];
 type Tail<
   T extends readonly unknown[],
   Length extends number = never,
-  R extends readonly unknown[] = []
+  R extends readonly unknown[] = [],
 > = T['length'] extends 0
   ? R
   : R['length'] extends Length
@@ -324,7 +324,7 @@ type Tail<
 type Skip<
   T extends readonly unknown[],
   Length extends number = never,
-  R extends readonly unknown[] = []
+  R extends readonly unknown[] = [],
 > = T['length'] extends 0
   ? T
   : R['length'] extends Length
@@ -384,6 +384,14 @@ type TupleIndices<T extends readonly any[]> = Extract<
   `${number}`
 > extends `${infer N extends number}`
   ? N
+  : never;
+
+/** Returns union of tuple values. */
+type TupleToUnion<T extends readonly any[]> = Extract<
+  keyof T,
+  `${number}`
+> extends `${infer N extends number}`
+  ? T[N]
   : never;
 
 /**
