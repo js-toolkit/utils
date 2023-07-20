@@ -14,7 +14,7 @@ type EventMap = Record<string, EventArgs | DataEvent<string, any, any>>;
 
 export type ConvertToDataEventMap<
   EventTypes extends string | symbol | EventMap,
-  Target extends DataEventEmitter<EventTypes, Target>
+  Target extends DataEventEmitter<EventTypes, Target>,
 > = EventTypes extends string | symbol
   ? Record<EventTypes, [DataEvent<string, unknown, Target>]>
   : {
@@ -23,7 +23,11 @@ export type ConvertToDataEventMap<
         : EventTypes[P] extends DataEvent<string, any, any>
         ? [data: DataEvent<P, EventTypes[P]['data'], Target>]
         : [
-            data: DataEvent<P, EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown, Target>
+            data: DataEvent<
+              P,
+              EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown,
+              Target
+            >,
           ];
     };
 
@@ -33,13 +37,13 @@ type ExtractTuple<T extends Record<string, EventArgs>> = {
 
 export type DataEventMap<
   Map extends EventMap,
-  Target extends DataEventEmitter<Map, Target>
+  Target extends DataEventEmitter<Map, Target>,
 > = ExtractTuple<ConvertToDataEventMap<Map, Target>>;
 
 export type DataEventListener<
   EventTypes extends string | symbol | EventMap,
   K extends EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>,
-  Target extends DataEventEmitter<EventTypes, Target>
+  Target extends DataEventEmitter<EventTypes, Target>,
 > = EventEmitter.EventListener<ConvertToDataEventMap<EventTypes, Target>, K>;
 
 type NormalizeEventTypes<EventTypes extends string | symbol | EventMap> =
@@ -65,7 +69,7 @@ export class DataEventEmitter<
     any,
     any
   >,
-  Context = any
+  Context = any,
 > extends EventEmitter<ConvertToDataEventMap<EventTypes, Target>, Context> {
   // @ts-ignore
   emit<T extends EventEmitter.EventNames<NormalizeEventTypes<EventTypes>>>(

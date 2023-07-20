@@ -2,7 +2,7 @@ import { copyFnProps } from './copyFnProps';
 
 export function beforeCall<
   F extends AnyFunction,
-  C extends (...args: Parameters<F>) => void | Promise<void>
+  C extends (...args: Parameters<F>) => void | Promise<void>,
 >(
   fn: F,
   beforeCallback: C,

@@ -5,5 +5,5 @@ export type GetFilteredKeys<T extends AnyObject> = Extract<
 
 export type GetOverridedKeys<
   T extends string | number,
-  U extends AnyObject = EmptyObject
+  U extends AnyObject = EmptyObject,
 > = GetFilteredKeys<Merge<Record<T, true>, U>>;

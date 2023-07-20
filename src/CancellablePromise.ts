@@ -141,7 +141,7 @@ export interface CancellablePromiseConstructor
           T7 | PromiseLike<T7>,
           T8 | PromiseLike<T8>,
           T9 | PromiseLike<T9>,
-          T10 | PromiseLike<T10>
+          T10 | PromiseLike<T10>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>;
 
@@ -155,7 +155,7 @@ export interface CancellablePromiseConstructor
           T6 | PromiseLike<T6>,
           T7 | PromiseLike<T7>,
           T8 | PromiseLike<T8>,
-          T9 | PromiseLike<T9>
+          T9 | PromiseLike<T9>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
 
@@ -168,7 +168,7 @@ export interface CancellablePromiseConstructor
           T5 | PromiseLike<T5>,
           T6 | PromiseLike<T6>,
           T7 | PromiseLike<T7>,
-          T8 | PromiseLike<T8>
+          T8 | PromiseLike<T8>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7, T8]>;
 
@@ -180,7 +180,7 @@ export interface CancellablePromiseConstructor
           T4 | PromiseLike<T4>,
           T5 | PromiseLike<T5>,
           T6 | PromiseLike<T6>,
-          T7 | PromiseLike<T7>
+          T7 | PromiseLike<T7>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5, T6, T7]>;
 
@@ -191,7 +191,7 @@ export interface CancellablePromiseConstructor
           T3 | PromiseLike<T3>,
           T4 | PromiseLike<T4>,
           T5 | PromiseLike<T5>,
-          T6 | PromiseLike<T6>
+          T6 | PromiseLike<T6>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5, T6]>;
 
@@ -201,7 +201,7 @@ export interface CancellablePromiseConstructor
           T2 | PromiseLike<T2>,
           T3 | PromiseLike<T3>,
           T4 | PromiseLike<T4>,
-          T5 | PromiseLike<T5>
+          T5 | PromiseLike<T5>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4, T5]>;
 
@@ -210,7 +210,7 @@ export interface CancellablePromiseConstructor
           T1 | PromiseLike<T1>,
           T2 | PromiseLike<T2>,
           T3 | PromiseLike<T3>,
-          T4 | PromiseLike<T4>
+          T4 | PromiseLike<T4>,
         ]
       ): CancellablePromise<[T1, T2, T3, T4]>;
 

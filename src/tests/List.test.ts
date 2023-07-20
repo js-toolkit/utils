@@ -69,8 +69,8 @@ test('reverse', () => {
 });
 
 test('map', () => {
-  expect(list.map(_ => _ * 2).toArray()).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
-  expect(Nil.map(_ => _ * 2)).toBe(Nil);
+  expect(list.map((_) => _ * 2).toArray()).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
+  expect(Nil.map((_) => _ * 2)).toBe(Nil);
 });
 
 test('append', () => {
@@ -88,23 +88,23 @@ test('concat', () => {
 });
 
 test('filter', () => {
-  expect(list.filter(_ => _ > 10)).toBe(Nil);
-  expect(list.filter(_ => _ > 8).toArray()).toEqual([9, 10]);
-  expect(Nil.filter(_ => _ > 8)).toBe(Nil);
+  expect(list.filter((_) => _ > 10)).toBe(Nil);
+  expect(list.filter((_) => _ > 8).toArray()).toEqual([9, 10]);
+  expect(Nil.filter((_) => _ > 8)).toBe(Nil);
 
   const l = list
-    .filter(_ => _ > 8)
+    .filter((_) => _ > 8)
     .concat(List.of(0))
-    .replace(v => v === 0, 100);
+    .replace((v) => v === 0, 100);
   expect(l.size()).toEqual(l.toArray().length);
 });
 
 test('replace', () => {
-  expect(list.replace(_ => _ === 5, 500).toArray()).toEqual([1, 2, 3, 4, 500, 6, 7, 8, 9, 10]);
-  expect(list.replace(_ => _ === 1, 100).toArray()).toEqual([100, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-  expect(list.replace(_ => _ === 10, 1000).toArray()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 1000]);
-  expect(list.replace(_ => _ === -1, 500)).toBe(list);
-  expect(Nil.replace(_ => _ === -1, 500)).toBe(Nil);
+  expect(list.replace((_) => _ === 5, 500).toArray()).toEqual([1, 2, 3, 4, 500, 6, 7, 8, 9, 10]);
+  expect(list.replace((_) => _ === 1, 100).toArray()).toEqual([100, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  expect(list.replace((_) => _ === 10, 1000).toArray()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 1000]);
+  expect(list.replace((_) => _ === -1, 500)).toBe(list);
+  expect(Nil.replace((_) => _ === -1, 500)).toBe(Nil);
 });
 
 test('join', () => {

@@ -5,7 +5,7 @@ import { es5ErrorCompat } from './es5ErrorCompat';
  * that the element being requested does not exist.
  */
 export class NoSuchElementError extends Error {
-  constructor(message?: string|undefined) {
+  constructor(message?: string | undefined) {
     super(message);
     es5ErrorCompat(this, NoSuchElementError);
   }

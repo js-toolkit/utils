@@ -24,7 +24,7 @@ type ValidProps<A extends AnyObject, OmitKeys extends keyof any> = ExcludeFuncti
 type JSONArrayOf<
   A,
   IsReadonly extends boolean,
-  OmitKeys extends ExtractKeys<A>
+  OmitKeys extends ExtractKeys<A>,
 > = IsReadonly extends true ? ReadonlyArray<Jsonify<A, OmitKeys>> : Array<Jsonify<A, OmitKeys>>;
 
 type Optional<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = {

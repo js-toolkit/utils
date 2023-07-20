@@ -2,11 +2,14 @@
 
 export function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
   // Do not use `Object.getOwnPropertyDescriptors` for ES5 capability
-  const descs = Object.getOwnPropertyNames(source).reduce((acc, prop) => {
-    const desc = Object.getOwnPropertyDescriptor(source, prop);
-    desc && (acc[prop as keyof Function] = desc);
-    return acc;
-  }, {} as Partial<Record<keyof Function, PropertyDescriptor>>);
+  const descs = Object.getOwnPropertyNames(source).reduce(
+    (acc, prop) => {
+      const desc = Object.getOwnPropertyDescriptor(source, prop);
+      desc && (acc[prop as keyof Function] = desc);
+      return acc;
+    },
+    {} as Partial<Record<keyof Function, PropertyDescriptor>>
+  );
 
   delete descs.arguments;
   delete descs.caller;
