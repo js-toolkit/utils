@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-use-before-define */
 
 type OmitByPredicate<O extends AnyObject, T extends O[keyof O] = O[keyof O]> =
@@ -13,12 +13,12 @@ export function omitBy<O extends AnyObject, T extends O[keyof O]>(
 ): O[keyof O] extends T ? Partial<O> : PartialSome<O, KeysOfType<O, T>> {
   // ): O[keyof O] extends T ? Partial<O> : ExcludeKeysOfType<O, T> {
   const result: AnyObject = {};
-  Object.getOwnPropertyNames(obj).forEach((key) => {
+  for (const key in obj) {
     const equals = predicate(obj[key], key);
     if (!equals) {
       result[key] = obj[key];
     }
-  });
+  }
   return result as any;
 }
 
