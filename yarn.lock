@@ -831,9 +831,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jstoolkit/utils@workspace:.":
+"@js-toolkit/utils@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@jstoolkit/utils@workspace:."
+  resolution: "@js-toolkit/utils@workspace:."
   dependencies:
     "@js-toolkit/configs": ^3.87.5
     "@js-toolkit/node-utils": ^1.1.4
