@@ -1,5 +1,5 @@
-export function promisify<R = void>(fn: () => R): Promise<R> {
+export function promisify<R = void>(fn: () => R): Promise<Awaited<R>> {
   return new Promise((resolve) => {
-    resolve(fn());
+    resolve(fn() as Awaited<R>);
   });
 }
