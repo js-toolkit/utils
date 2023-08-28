@@ -1,3 +1,5 @@
+import { promisify } from './promisify';
+
 export class CacheMap<K, V> extends Map<K, V> {
   private readonly queue = new Map<K, Promise<unknown>>();
 
@@ -8,8 +10,7 @@ export class CacheMap<K, V> extends Map<K, V> {
     if (!this.has(key) && !this.queue.has(key)) {
       this.queue.set(
         key,
-        Promise.resolve()
-          .then(() => factory())
+        promisify(factory)
           .then((val) => this.set(key, val))
           .finally(() => this.queue.delete(key))
       );
