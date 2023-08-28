@@ -11,7 +11,7 @@ export class PromiseCancelledError extends Error {
 function catchCancel(
   // eslint-disable-next-line no-shadow
   handler?: ((value: any) => unknown) | null | undefined,
-  value?: any | undefined
+  value?: any
 ): unknown {
   // console.log('catchCancel', value, onrejected);
   if (value instanceof PromiseCancelledError || !handler) {
@@ -27,10 +27,10 @@ export class CancellablePromise<T> extends Promise<T> {
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any | undefined) => void,
+          reject: (reason?: any) => void,
           cancel: VoidFunction
         ) => void)
-      | Promise<T>
+      | CancellablePromise<T>
   ) {
     let canceller: VoidFunction | undefined;
 
@@ -43,7 +43,7 @@ export class CancellablePromise<T> extends Promise<T> {
         currentCanceller;
 
       if (executorOrPromise instanceof CancellablePromise) {
-        executorOrPromise.cancelled(currentCanceller).then(resolve, reject);
+        executorOrPromise.cancelled<any>(currentCanceller).then(resolve, reject);
       } else if (executorOrPromise instanceof Promise) {
         // Use chain to avoid dynamically inserting into the chain a regular Promise which hasn't cancel handler.
         executorOrPromise.then(resolve, reject);
@@ -124,7 +124,7 @@ export interface CancellablePromiseConstructor
 
       readonly [Symbol.species]: CancellablePromiseConstructor;
 
-      reject<T = never>(reason?: any | undefined): CancellablePromise<T>;
+      reject<T = never>(reason?: any): CancellablePromise<T>;
 
       resolve(): CancellablePromise<void>;
 
@@ -251,7 +251,7 @@ export interface CancellablePromiseConstructor
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any | undefined) => void,
+          reject: (reason?: any) => void,
           cancel: VoidFunction
         ) => void)
       | Promise<T>
