@@ -47,9 +47,9 @@ export abstract class Try<A> {
 
   private readonly isSuccessTag: boolean;
 
-  private readonly value: A | unknown;
+  private readonly value: A;
 
-  protected constructor(value: A | unknown, tag: 'failure' | 'success') {
+  protected constructor(value: A, tag: 'failure' | 'success') {
     this.isSuccessTag = tag === 'success';
     this.value = value;
   }
@@ -81,7 +81,7 @@ export abstract class Try<A> {
    */
   get(): A {
     if (this.isFailure()) throw (this as Failure).value;
-    return this.value as A;
+    return this.value;
   }
 
   /**
@@ -94,7 +94,7 @@ export abstract class Try<A> {
    * ```
    */
   getOrElse<AA>(fallback: AA): A | AA {
-    return this.isSuccess() ? (this.value as A) : fallback;
+    return this.isSuccess() ? this.value : fallback;
   }
 
   /**
@@ -107,7 +107,7 @@ export abstract class Try<A> {
    * ```
    */
   getOrElseL<AA>(thunk: () => AA): A | AA {
-    return this.isSuccess() ? (this.value as A) : thunk();
+    return this.isSuccess() ? this.value : thunk();
   }
 
   /**
@@ -126,7 +126,7 @@ export abstract class Try<A> {
    * ```
    */
   orNull(): A | null {
-    return this.isSuccess() ? (this.value as A) : null;
+    return this.isSuccess() ? this.value : null;
   }
 
   /**
@@ -145,7 +145,7 @@ export abstract class Try<A> {
    * ```
    */
   orUndefined(): A | undefined {
-    return this.isSuccess() ? (this.value as A) : undefined;
+    return this.isSuccess() ? this.value : undefined;
   }
 
   /**
@@ -204,7 +204,7 @@ export abstract class Try<A> {
    * ```
    */
   fold<R>(failure: (error: unknown) => R, success: (a: A) => R): R {
-    return this.isSuccess() ? success(this.value as A) : failure((this as Failure).value);
+    return this.isSuccess() ? success(this.value) : failure((this as Failure).value);
   }
 
   /**
@@ -220,7 +220,7 @@ export abstract class Try<A> {
   filter(p: (a: A) => boolean): Try<A> {
     if (this.isFailure()) return this;
     try {
-      if (p(this.value as A)) return this;
+      if (p(this.value)) return this;
       return Failure(new NoSuchElementError(`Predicate does not hold for ${String(this.value)}`));
     } catch (ex: unknown) {
       return Failure(ex);
@@ -244,7 +244,7 @@ export abstract class Try<A> {
   flatMap<B>(f: (a: A) => Try<B>): Try<B> {
     if (this.isFailure()) return this;
     try {
-      return f(this.value as A);
+      return f(this.value);
     } catch (ex: unknown) {
       return Failure(ex);
     }
@@ -265,7 +265,7 @@ export abstract class Try<A> {
    *         source mapped by the given function
    */
   map<B>(f: (a: A) => B): Try<B> {
-    return this.isSuccess() ? Try.of(() => f(this.value as A)) : this;
+    return this.isSuccess() ? Try.of(() => f(this.value)) : this;
   }
 
   /**
@@ -273,7 +273,7 @@ export abstract class Try<A> {
    * returns `void` if this is a [[Failure]].
    */
   forEach(cb: (a: A) => void): void {
-    if (this.isSuccess()) cb(this.value as A);
+    if (this.isSuccess()) cb(this.value);
   }
 
   /**
@@ -297,7 +297,7 @@ export abstract class Try<A> {
    * ```
    */
   recover<AA>(f: (error: unknown) => AA): Try<A | AA> {
-    return this.isSuccess() ? this : Try.of(() => f(this.value));
+    return this.isSuccess() ? this : Try.of(() => f((this as Failure).value));
   }
 
   /**
@@ -341,7 +341,7 @@ export abstract class Try<A> {
    * ```
    */
   toOption(): Option<A> {
-    return this.isSuccess() ? Option.of(this.value as A) : None;
+    return this.isSuccess() ? Option.of(this.value) : None;
   }
 
   equals(that: Try<A>): boolean {
@@ -369,9 +369,9 @@ export function Success<A>(value: A): Try<A> {
  * represent failures, as opposed to [[Success]].
  */
 export function Failure<A = never>(error: unknown): Try<A> {
-  return new (class extends Try<never> {
+  return new (class extends Try<A> {
     constructor() {
-      super(error, 'failure');
+      super(error as A, 'failure');
     }
   })();
 }
