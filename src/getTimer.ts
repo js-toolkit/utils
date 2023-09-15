@@ -14,16 +14,16 @@ export interface Timer {
 
 // type
 interface Options {
-  callback: VoidFunction | (() => Promise<void>);
+  readonly callback: ((timer: Timer) => void) | ((timer: Timer) => Promise<void>);
   /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick) */
-  interval: number | (() => number);
+  readonly interval: number | (() => number);
   /** Default `true` */
-  autostart?: boolean | undefined;
+  readonly autostart?: boolean | undefined;
   /** Used only if `interval` is a function and callback returns `Promise`. */
-  waitCallback?: boolean | undefined;
-  onStart?: VoidFunction | undefined;
-  onStop?: VoidFunction | undefined;
-  onPause?: VoidFunction | undefined;
+  readonly waitCallback?: boolean | undefined;
+  readonly onStart?: VoidFunction | undefined;
+  readonly onStop?: VoidFunction | undefined;
+  readonly onPause?: VoidFunction | undefined;
 }
 
 export function getTimer({
@@ -35,16 +35,16 @@ export function getTimer({
   autostart = true,
   waitCallback,
 }: Options): Timer {
-  let timer: any;
+  let timerId: any;
   let sessionId = 0;
   let startTime = 0;
   let remainingTime = 0;
   let lastTimeout = 0;
 
   const clearTimers = (): void => {
-    clearInterval(timer);
-    clearTimeout(timer);
-    timer = undefined;
+    clearInterval(timerId);
+    clearTimeout(timerId);
+    timerId = undefined;
   };
 
   const stop = (): void => {
@@ -56,7 +56,7 @@ export function getTimer({
   };
 
   const pause = (): void => {
-    if (timer != null) {
+    if (timerId != null) {
       remainingTime = Math.max(0, lastTimeout - (Date.now() - startTime));
     }
     clearTimers();
@@ -64,7 +64,7 @@ export function getTimer({
   };
 
   const start = ({ immediately }: TimerStartOptions = {}): void => {
-    timer != null && stop();
+    timerId != null && stop();
 
     if (sessionId >= Number.MAX_SAFE_INTEGER) {
       sessionId = 0;
@@ -77,20 +77,20 @@ export function getTimer({
           remainingTime = 0;
           let loopInvoked = false;
           try {
-            const result = callback();
+            const result = callback(timer);
             if (waitCallback && result instanceof Promise) {
               loopInvoked = true;
               const id = sessionId;
-              result.finally(() => (timer != null || init) && id === sessionId && loop());
+              void result.finally(() => (timerId != null || init) && id === sessionId && loop());
             }
           } finally {
-            (timer != null || init) && !loopInvoked && loop();
+            (timerId != null || init) && !loopInvoked && loop();
           }
         };
 
         const loop = (): void => {
           const timeout = remainingTime > 0 ? remainingTime : interval();
-          timer = setTimeout(timerCallback, timeout);
+          timerId = setTimeout(timerCallback, timeout);
           startTime = Date.now();
           lastTimeout = timeout;
         };
@@ -100,24 +100,24 @@ export function getTimer({
       } else {
         const timerCallback = (): void => {
           try {
-            void callback();
+            void callback(timer);
           } finally {
             startTime = Date.now();
           }
         };
 
         const startInterval = (): void => {
-          timer = setInterval(timerCallback, interval);
+          timerId = setInterval(timerCallback, interval);
           startTime = Date.now();
           lastTimeout = interval;
         };
 
         const init = (): void => {
           if (remainingTime > 0) {
-            timer = setTimeout(() => {
+            timerId = setTimeout(() => {
               remainingTime = 0;
               try {
-                void callback();
+                void callback(timer);
               } finally {
                 startInterval();
               }
@@ -130,7 +130,7 @@ export function getTimer({
         };
 
         try {
-          if (immediately) void callback();
+          if (immediately) void callback(timer);
         } finally {
           init();
         }
@@ -140,16 +140,18 @@ export function getTimer({
     }
   };
 
-  if (autostart) start();
-
-  return {
+  const timer: Timer = {
     start,
     stop,
     pause,
     get active() {
-      return timer != null;
+      return timerId != null;
     },
   };
+
+  if (autostart) timer.start();
+
+  return timer;
 }
 
 export default getTimer;
