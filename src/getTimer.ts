@@ -10,6 +10,7 @@ export interface Timer {
   readonly start: (options?: TimerStartOptions | undefined) => void;
   readonly stop: VoidFunction;
   readonly pause: VoidFunction;
+  readonly getState: () => 'active' | 'stopped' | 'paused';
 }
 
 // type
@@ -37,7 +38,7 @@ export function getTimer({
 }: Options): Timer {
   let timerId: any;
   let sessionId = 0;
-  let startTime = 0;
+  let startIterationTime = 0;
   let remainingTime = 0;
   let lastTimeout = 0;
 
@@ -48,7 +49,8 @@ export function getTimer({
   };
 
   const stop = (): void => {
-    startTime = 0;
+    sessionId = 0;
+    startIterationTime = 0;
     remainingTime = 0;
     lastTimeout = 0;
     clearTimers();
@@ -57,7 +59,7 @@ export function getTimer({
 
   const pause = (): void => {
     if (timerId != null) {
-      remainingTime = Math.max(0, lastTimeout - (Date.now() - startTime));
+      remainingTime = Math.max(0, lastTimeout - (Date.now() - startIterationTime));
     }
     clearTimers();
     onPause && onPause();
@@ -73,7 +75,7 @@ export function getTimer({
 
     try {
       if (typeof interval === 'function') {
-        const timerCallback = (init?: boolean): void => {
+        const timerCallback = (/* init?: boolean */): void => {
           remainingTime = 0;
           let loopInvoked = false;
           try {
@@ -81,34 +83,40 @@ export function getTimer({
             if (waitCallback && result instanceof Promise) {
               loopInvoked = true;
               const id = sessionId;
-              void result.finally(() => (timerId != null || init) && id === sessionId && loop());
+              // void result.finally(() => (timerId != null || init) && id === sessionId && loop());
+              void result.finally(() => timerId != null && id === sessionId && loop());
             }
           } finally {
-            (timerId != null || init) && !loopInvoked && loop();
+            // (timerId != null || init) && !loopInvoked && loop();
+            timerId != null && !loopInvoked && loop();
           }
         };
 
         const loop = (): void => {
           const timeout = remainingTime > 0 ? remainingTime : interval();
           timerId = setTimeout(timerCallback, timeout);
-          startTime = Date.now();
+          startIterationTime = Date.now();
           lastTimeout = timeout;
         };
 
-        if (immediately) timerCallback(true);
-        else loop();
+        if (immediately) {
+          timerId = -1;
+          timerCallback(/* true */);
+        } else {
+          loop();
+        }
       } else {
         const timerCallback = (): void => {
           try {
             void callback(timer);
           } finally {
-            startTime = Date.now();
+            startIterationTime = Date.now();
           }
         };
 
         const startInterval = (): void => {
           timerId = setInterval(timerCallback, interval);
-          startTime = Date.now();
+          startIterationTime = Date.now();
           lastTimeout = interval;
         };
 
@@ -122,7 +130,7 @@ export function getTimer({
                 startInterval();
               }
             }, remainingTime);
-            startTime = Date.now();
+            startIterationTime = Date.now();
             lastTimeout = remainingTime;
           } else {
             startInterval();
@@ -130,7 +138,10 @@ export function getTimer({
         };
 
         try {
-          if (immediately) void callback(timer);
+          if (immediately) {
+            timerId = -1;
+            void callback(timer);
+          }
         } finally {
           init();
         }
@@ -146,6 +157,11 @@ export function getTimer({
     pause,
     get active() {
       return timerId != null;
+    },
+    getState: () => {
+      if (timerId != null) return 'active';
+      if (sessionId > 0) return 'paused';
+      return 'stopped';
     },
   };
 
