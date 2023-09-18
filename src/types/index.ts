@@ -54,11 +54,17 @@ type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
   ? Then
   : Else;
 
-type KeysOfType<A extends AnyObject, B, Strict extends boolean = true> = NonNullable<
-  {
-    [P in keyof A]: Strict extends true ? IfExtends<A[P], B, P, never> : A[P] extends B ? P : never;
-  }[keyof A]
->;
+type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
+  ? NonNullable<
+      {
+        [P in keyof T]: Strict extends true
+          ? IfExtends<T[P], Type, P, never>
+          : T[P] extends Type
+          ? P
+          : never;
+      }[keyof T]
+    >
+  : never;
 
 type ExcludeKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<
   A,
@@ -119,11 +125,11 @@ type ExcludeTypes<
   false
 >;
 
-type OmitIndex<T extends AnyObject> = {
-  [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P];
-};
+type OmitIndex<T extends AnyObject> = T extends T
+  ? { [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P] }
+  : never;
 
-type WithIndex<T extends AnyObject> = T & Record<string, any>;
+type WithIndex<T extends AnyObject> = T extends T ? T & Record<string, any> : never;
 
 // type KeepTypes<A extends AnyObject, B, K extends keyof A = keyof A> = ExcludeKeysOfType<
 // { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
@@ -153,7 +159,7 @@ type KeepTypes<
   false
 >;
 
-type Writeable<A extends AnyObject> = { -readonly [P in keyof A]: A[P] };
+type Writeable<T extends AnyObject> = T extends T ? { -readonly [P in keyof T]: T[P] } : never;
 
 // type DeepWriteable<T extends AnyObject> = IfExtends<
 //   T,
@@ -221,32 +227,38 @@ type DeepReadonly<T, Depth extends number = never, R extends unknown[] = [any]> 
   T
 >;
 
-type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
-  ? U extends Record<keyof U, [any]>
-    ? { [K in keyof U]: U[K][0] }
+type RequiredKeepUndefined<T> = T extends T
+  ? { [K in keyof T]-?: [T[K]] } extends infer U
+    ? U extends Record<keyof U, [any]>
+      ? { [K in keyof U]: U[K][0] }
+      : never
     : never
   : never;
 
 type PromiseType<T> = T extends Promise<infer R> ? R : T;
 
-type RequiredSome<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
+type RequiredSome<T, K extends keyof T> = T extends T
+  ? Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
+  : never;
 
-type RequiredBut<T, K extends keyof T> = Pick<T, K> & {
-  [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined>;
-};
+type RequiredBut<T, K extends keyof T> = T extends T
+  ? Pick<T, K> & { [P in Exclude<keyof T, K>]-?: Exclude<T[P], undefined> }
+  : never;
 
-type RequiredStrict<T> = {
-  [P in keyof T]-?: Exclude<T[P], undefined>;
-};
+type RequiredStrict<T> = T extends T ? { [P in keyof T]-?: Exclude<T[P], undefined> } : never;
 
-type PartialSome<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] };
+type PartialSome<T, K extends keyof T> = T extends T ? Omit<T, K> & { [P in K]?: T[P] } : never;
 
-type PartialBut<T, K extends keyof T> = Pick<T, K> & { [P in Exclude<keyof T, K>]?: T[P] };
+type PartialBut<T, K extends keyof T> = T extends T
+  ? Pick<T, K> & { [P in Exclude<keyof T, K>]?: T[P] }
+  : never;
 
 type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
 
 /** Useful with `exactOptionalPropertyTypes` option. */
-type OptionalToUndefined<T> = { [K in keyof T]: undefined extends T[K] ? T[K] | undefined : T[K] };
+type OptionalToUndefined<T> = T extends T
+  ? { [K in keyof T]: undefined extends T[K] ? T[K] | undefined : T[K] }
+  : never;
 // type OptionalToUndefined<T> = { [K in keyof T]: [T[K]] } extends infer U
 //   ? U extends PartialRecord<keyof U, [any]>
 //     ? {
@@ -259,37 +271,49 @@ type OptionalToUndefined<T> = { [K in keyof T]: undefined extends T[K] ? T[K] | 
 //     : never
 //   : never;
 
-type RequiredInner<T, K extends keyof T> = {
-  [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P];
-};
+type RequiredInner<T, K extends keyof T> = T extends T
+  ? { [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P] }
+  : never;
 
-type RequiredInnerKeepUndefined<T, K extends keyof T> = {
-  [P in keyof T]: P extends K
-    ? IfExtends<T[P], AnyObject, RequiredKeepUndefined<T[P]>, T[P]>
-    : T[P];
-};
+type RequiredInnerKeepUndefined<T, K extends keyof T> = T extends T
+  ? {
+      [P in keyof T]: P extends K
+        ? IfExtends<T[P], AnyObject, RequiredKeepUndefined<T[P]>, T[P]>
+        : T[P];
+    }
+  : never;
 
-type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
-  [P in keyof T]: P extends K ? Pick<NonNullable<T[P]>, IK extends Keys<T[P]> ? IK : never> : T[P];
-};
+type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = T extends T
+  ? {
+      [P in keyof T]: P extends K
+        ? Pick<NonNullable<T[P]>, IK extends Keys<T[P]> ? IK : never>
+        : T[P];
+    }
+  : never;
 
-type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = {
-  [P in keyof T]: P extends K
-    ? OmitStrict<NonNullable<T[K]>, IK extends Keys<T[K]> ? IK : never>
-    : T[P];
-};
+type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = T extends T
+  ? {
+      [P in keyof T]: P extends K
+        ? OmitStrict<NonNullable<T[K]>, IK extends Keys<T[K]> ? IK : never>
+        : T[P];
+    }
+  : never;
 
 /** Swap key and value */
-type ReverseObject<T extends Record<keyof T, string | number>> = {
-  [P in keyof T as T[P]]: P;
-  // [P in T[keyof T]]: {
-  //   [K in keyof T]: T[K] extends P ? K : never;
-  // }[keyof T];
-};
+type ReverseObject<T extends Record<keyof T, string | number>> = T extends T
+  ? {
+      [P in keyof T as T[P]]: P;
+      // [P in T[keyof T]]: {
+      //   [K in keyof T]: T[K] extends P ? K : never;
+      // }[keyof T];
+    }
+  : never;
 
-type LowercaseKeys<T extends AnyObject> = {
-  [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
-};
+type LowercaseKeys<T extends AnyObject> = T extends T
+  ? {
+      [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
+    }
+  : never;
 
 /** Requires to define all of the keys. */
 type DefineAll<Enum extends string | number | symbol, T extends Record<Enum, unknown>> = T;
@@ -379,19 +403,17 @@ type IfTuple<T, Then = T, Else = never> = T extends ArrayLike<any>
   : Else;
 
 /** Returns union of tuple indices. */
-type TupleIndices<T extends readonly any[]> = Extract<
-  keyof T,
-  `${number}`
-> extends `${infer N extends number}`
-  ? N
+type TupleIndices<T extends readonly any[]> = T extends T
+  ? Extract<keyof T, `${number}`> extends `${infer N extends number}`
+    ? N
+    : never
   : never;
 
 /** Returns union of tuple values. */
-type TupleToUnion<T extends readonly any[]> = Extract<
-  keyof T,
-  `${number}`
-> extends `${infer N extends number}`
-  ? T[N]
+type TupleToUnion<T extends readonly any[]> = T extends T
+  ? Extract<keyof T, `${number}`> extends `${infer N extends number}`
+    ? T[N]
+    : never
   : never;
 
 /**
@@ -411,28 +433,32 @@ type MapToKey<U extends AnyObject, K extends keyof U> = U extends U
  * type A = { a: number; b: number }
  * type R = MapKeyAsArray<A, 'a'>; // { { a: number[]; b: number } }
  */
-type MapKeyAsArray<T extends AnyObject, K extends keyof T> = {
-  [P in keyof T]: P extends K ? readonly T[P][] : T[P];
-};
+type MapKeyAsArray<T extends AnyObject, K extends keyof T> = T extends T
+  ? { [P in keyof T]: P extends K ? readonly T[P][] : T[P] }
+  : never;
 
 /**
  * Replace getters functions by the same props.
  */
-type GettersToProps<T extends AnyObject> = {
-  [P in keyof T as P extends `get${infer S}` ? Uncapitalize<S> : P]: P extends `get${string}`
-    ? T[P] extends AnyFunction
-      ? ReturnType<T[P]>
-      : T[P]
-    : T[P];
-};
+type GettersToProps<T extends AnyObject> = T extends T
+  ? {
+      [P in keyof T as P extends `get${infer S}` ? Uncapitalize<S> : P]: P extends `get${string}`
+        ? T[P] extends AnyFunction
+          ? ReturnType<T[P]>
+          : T[P]
+        : T[P];
+    }
+  : never;
 
 /**
  * Replace setters functions by the same props.
  */
-type SettersToProps<T extends AnyObject> = {
-  [P in keyof T as P extends `set${infer S}` ? Uncapitalize<S> : P]: P extends `set${string}`
-    ? T[P] extends (value: infer V) => any
-      ? V
-      : T[P]
-    : T[P];
-};
+type SettersToProps<T extends AnyObject> = T extends T
+  ? {
+      [P in keyof T as P extends `set${infer S}` ? Uncapitalize<S> : P]: P extends `set${string}`
+        ? T[P] extends (value: infer V) => any
+          ? V
+          : T[P]
+        : T[P];
+    }
+  : never;
