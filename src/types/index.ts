@@ -51,8 +51,8 @@ type Overwrite<
 type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
   ? Else
   : Extract<T, Type> extends Type
-  ? Then
-  : Else;
+    ? Then
+    : Else;
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
   ? NonNullable<
@@ -60,8 +60,8 @@ type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T ex
         [P in keyof T]: Strict extends true
           ? IfExtends<T[P], Type, P, never>
           : T[P] extends Type
-          ? P
-          : never;
+            ? P
+            : never;
       }[keyof T]
     >
   : never;
@@ -79,10 +79,10 @@ type ExtractKeysOfType<A extends AnyObject, B, Strict extends boolean = false> =
 type BaseTypeOf<T> = T extends string
   ? string | T
   : T extends number
-  ? number | T
-  : T extends boolean
-  ? boolean | T
-  : T;
+    ? number | T
+    : T extends boolean
+      ? boolean | T
+      : T;
 
 /** Useful for union types because `keyof <union type>` is `never` */
 // type Keys<T> = T extends T ? keyof T : never;
@@ -107,8 +107,8 @@ type ExcludeTypes<
   K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
     ? never
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
-    ? ExcludeTypesOptions<A>
-    : never = { pick: keyof A },
+      ? ExcludeTypesOptions<A>
+      : never = { pick: keyof A },
 > = ExcludeKeysOfType<
   {
     [P in keyof A]: 'omit' extends keyof K
@@ -116,10 +116,10 @@ type ExcludeTypes<
         ? A[P]
         : Exclude<A[P], T>
       : 'pick' extends keyof K
-      ? P extends K['pick']
-        ? Exclude<A[P], T>
-        : A[P]
-      : Exclude<A[P], T>;
+        ? P extends K['pick']
+          ? Exclude<A[P], T>
+          : A[P]
+        : Exclude<A[P], T>;
   },
   never | undefined,
   false
@@ -141,8 +141,8 @@ type KeepTypes<
   K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
     ? never
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
-    ? ExcludeTypesOptions<A>
-    : never = { pick: keyof A },
+      ? ExcludeTypesOptions<A>
+      : never = { pick: keyof A },
 > = ExcludeKeysOfType<
   {
     [P in keyof A]: 'omit' extends keyof K
@@ -150,10 +150,10 @@ type KeepTypes<
         ? A[P]
         : Extract<A[P], T>
       : 'pick' extends keyof K
-      ? P extends K['pick']
-        ? Extract<A[P], T>
-        : A[P]
-      : Extract<A[P], T>;
+        ? P extends K['pick']
+          ? Extract<A[P], T>
+          : A[P]
+        : Extract<A[P], T>;
   },
   never | undefined,
   false
@@ -340,10 +340,10 @@ type Tail<
 > = T['length'] extends 0
   ? R
   : R['length'] extends Length
-  ? R
-  : T extends readonly [...infer I, (infer L)?]
-  ? Tail<I, Length, [L, ...R]>
-  : R;
+    ? R
+    : T extends readonly [...infer I, (infer L)?]
+      ? Tail<I, Length, [L, ...R]>
+      : R;
 
 type Skip<
   T extends readonly unknown[],
@@ -352,18 +352,18 @@ type Skip<
 > = T['length'] extends 0
   ? T
   : R['length'] extends Length
-  ? T
-  : T extends readonly [unknown?, ...infer Rest]
-  ? Skip<Rest, Length, [...R, unknown]>
-  : T;
+    ? T
+    : T extends readonly [unknown?, ...infer Rest]
+      ? Skip<Rest, Length, [...R, unknown]>
+      : T;
 
 type InArray<T, Item> = T extends readonly [Item, ...infer _]
   ? true
   : T extends readonly [Item]
-  ? true
-  : T extends readonly [infer _, ...infer Rest]
-  ? InArray<Rest, Item>
-  : false;
+    ? true
+    : T extends readonly [infer _, ...infer Rest]
+      ? InArray<Rest, Item>
+      : false;
 
 type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
