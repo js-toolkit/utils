@@ -4,7 +4,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-types
 type NonNullValue = {};
 
-type AnyObject = Record<string, any>;
+type AnyObject = Record<PropertyKey, any>;
 
 type EmptyObject = Record<PropertyKey, never>;
 
@@ -121,7 +121,7 @@ type ExcludeTypes<
           : A[P]
         : Exclude<A[P], T>;
   },
-  never | undefined,
+  undefined,
   false
 >;
 
@@ -155,7 +155,7 @@ type KeepTypes<
           : A[P]
         : Extract<A[P], T>;
   },
-  never | undefined,
+  undefined,
   false
 >;
 
