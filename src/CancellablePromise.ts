@@ -258,16 +258,11 @@ export interface CancellablePromiseConstructor
   ): CancellablePromise<T>;
 }
 
-// interface CancellablePromise<T> extends CancellablePromiseClass<T> {}
-
-// const CancellablePromise: CancellablePromiseConstructor =
-//   CancellablePromiseClass as unknown as CancellablePromiseConstructor;
-
-export default CancellablePromise as OmitStrict<
-  typeof CancellablePromise,
-  CancellablePromiseConstructor
-> &
-  CancellablePromiseConstructor;
+// export default CancellablePromise as OmitStrict<
+//   typeof CancellablePromise,
+//   CancellablePromiseConstructor
+// > &
+//   CancellablePromiseConstructor;
 
 // const p = new CancellablePromise<void>((resolve, reject, cancel) => {
 //   // setTimeout(() => cancel(), 200);

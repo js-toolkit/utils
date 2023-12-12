@@ -10,5 +10,3 @@ export class NoSuchElementError extends Error {
     es5ErrorCompat(this, NoSuchElementError);
   }
 }
-
-export default NoSuchElementError;

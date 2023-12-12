@@ -21,14 +21,14 @@ export type ConvertToDataEventMap<
       [P in keyof EventTypes]: EventTypes[P] extends [DataEvent<string, any, any>]
         ? [data: DataEvent<P, EventTypes[P][0]['data'], Target>]
         : EventTypes[P] extends DataEvent<string, any, any>
-        ? [data: DataEvent<P, EventTypes[P]['data'], Target>]
-        : [
-            data: DataEvent<
-              P,
-              EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown,
-              Target
-            >,
-          ];
+          ? [data: DataEvent<P, EventTypes[P]['data'], Target>]
+          : [
+              data: DataEvent<
+                P,
+                EventTypes[P] extends EventArgs ? EventTypes[P][0] : unknown,
+                Target
+              >,
+            ];
     };
 
 type ExtractTuple<T extends Record<string, EventArgs>> = {
@@ -90,5 +90,3 @@ export class DataEventEmitter<
     );
   }
 }
-
-export default DataEventEmitter;

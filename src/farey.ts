@@ -32,7 +32,5 @@ export function farey(
   }
 }
 
-export default farey;
-
 // console.log(farey(Math.PI, 50));
 // console.log(farey(1035 / 582, 50));

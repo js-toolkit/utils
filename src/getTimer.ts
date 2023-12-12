@@ -169,5 +169,3 @@ export function getTimer({
 
   return timer;
 }
-
-export default getTimer;

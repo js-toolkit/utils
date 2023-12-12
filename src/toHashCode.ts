@@ -16,5 +16,3 @@ export function toHashCode(str: string): number {
 
   return hash;
 }
-
-export default toHashCode;

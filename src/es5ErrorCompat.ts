@@ -12,5 +12,3 @@ export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target.constructor = TargetCtor;
   (target as AnyObject)['__proto__'] = TargetCtor.prototype;
 }
-
-export default es5ErrorCompat;

@@ -11,5 +11,3 @@ export function clear<T extends AnyObject>(obj: T): ClearResult<T> {
   }
   return obj as ClearResult<T>;
 }
-
-export default clear;

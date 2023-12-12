@@ -11,5 +11,3 @@ export function isEmptyObject<T extends AnyObject>(obj: T): boolean {
   }
   return true;
 }
-
-export default isEmptyObject;

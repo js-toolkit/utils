@@ -24,5 +24,3 @@ export function debounce<T extends AnyFunction>(
   debounced.cancel = beforeCall(debounced.cancel.bind(debounced), unpending);
   return debounced;
 }
-
-export default debounce;

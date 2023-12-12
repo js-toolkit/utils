@@ -25,5 +25,3 @@ export function getErrorMessage(error: unknown): string {
   // If error is instance of some class
   return `${error.constructor.name}: ${objectToString(error)}`;
 }
-
-export default getErrorMessage;

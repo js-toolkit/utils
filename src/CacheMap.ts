@@ -29,5 +29,3 @@ export class CacheMap<K, V> extends Map<K, V> {
     return this.get(key) as Awaited<ReturnType<F>>;
   }
 }
-
-export default CacheMap;

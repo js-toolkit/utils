@@ -155,5 +155,3 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
     cancel,
   };
 }
-
-export default getTreeIterator;

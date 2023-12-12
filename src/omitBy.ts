@@ -22,7 +22,5 @@ export function omitBy<O extends AnyObject, T extends O[keyof O]>(
   return result as any;
 }
 
-export default omitBy;
-
 // const o = omitBy({ a: 0, b: undefined }, (val) => val != null);
 // const o = omitBy({ a: 0, b: undefined }, (val): val is undefined => val == null);

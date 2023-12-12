@@ -7,5 +7,3 @@
 export function asUniqueArray<A extends ReadonlyArray<any>>(array: AsUniqueArray<A>): A {
   return array as A;
 }
-
-export default asUniqueArray;

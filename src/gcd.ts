@@ -9,5 +9,3 @@ export function gcd(x: number, y: number): number {
 
   return a;
 }
-
-export default gcd;

@@ -93,5 +93,3 @@ export function getTaskCounter<K extends string = never>({
 
   return counter;
 }
-
-export default getTaskCounter;

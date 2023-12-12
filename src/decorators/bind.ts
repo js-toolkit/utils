@@ -39,5 +39,3 @@ export function bind<T extends (...args: any[]) => any>(
     },
   };
 }
-
-export default bind;

@@ -21,5 +21,3 @@ export function beforeCall<
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return copyFnProps(fn, wrapper) as any;
 }
-
-export default beforeCall;

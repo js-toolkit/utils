@@ -25,5 +25,3 @@ export function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
 
   return dest;
 }
-
-export default copyFnProps;

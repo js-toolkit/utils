@@ -6,5 +6,3 @@ export class TimeoutError extends Error {
     es5ErrorCompat(this, TimeoutError);
   }
 }
-
-export default TimeoutError;

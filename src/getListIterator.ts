@@ -91,5 +91,3 @@ export function getListIterator(
     cancel,
   };
 }
-
-export default getListIterator;

@@ -87,8 +87,6 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
   };
 }
 
-export default getAwaiter;
-
 // const w = getAwaiter<number>();
 
 // setTimeout(() => {

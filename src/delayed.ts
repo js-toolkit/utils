@@ -45,5 +45,3 @@ export function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc
 export namespace delayed {
   export type Func<T extends AnyFunction> = DelayedFunc<T>;
 }
-
-export default delayed;

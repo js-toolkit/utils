@@ -6,5 +6,3 @@ export class UnreachableCaseError extends Error {
     es5ErrorCompat(this, UnreachableCaseError);
   }
 }
-
-export default UnreachableCaseError;
