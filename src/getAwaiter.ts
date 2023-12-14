@@ -4,7 +4,7 @@ export interface Awaiter<T> {
   readonly pending: boolean;
   wait: (timeout?: number | undefined) => Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any | undefined) => void;
+  reject: (reason?: any) => void;
 }
 
 export interface AwaiterOptions {

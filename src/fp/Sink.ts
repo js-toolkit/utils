@@ -28,10 +28,10 @@ export class Sink<A> {
   private readonly promise: Promise<void>;
   private readonly cancelOnError: boolean;
   private pending;
-  private waitTimeoutHandler: unknown | undefined;
+  private waitTimeoutHandler: unknown;
   private cancelling: Promise<void> | undefined;
   private resolve: VoidFunction | undefined;
-  private reject: ((reason?: unknown | undefined) => void) | undefined;
+  private reject: ((reason?: unknown) => void) | undefined;
   private finalizator: Sink.Finalizator | undefined;
   private pipeHandler: ((value: A) => Promise<any>) | undefined;
 
@@ -48,7 +48,9 @@ export class Sink<A> {
 
       const cancel: this['cancel'] = (...args) => this.cancel(...args);
       const pipe = (value: A): void => {
-        this.pipeHandler && this.pipeHandler(value).catch(this.cancelOnError ? cancel : undefined);
+        if (this.pipeHandler) {
+          void this.pipeHandler(value).catch(this.cancelOnError ? cancel : undefined);
+        }
       };
       const finalizator = executor(pipe, cancel);
 
@@ -77,7 +79,7 @@ export class Sink<A> {
   }
 
   /** Stop pipes and free resources. */
-  cancel(reason?: unknown | undefined): Promise<void> {
+  cancel(reason?: unknown): Promise<void> {
     if (this.cancelling) return this.cancelling;
     if (!this.isPending) return Promise.resolve();
     // if (this.cancelling) return Promise.reject(new Error('Already in cancelling state.'));
