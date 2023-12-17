@@ -186,30 +186,45 @@ type DeepWriteable<T, Depth extends number = never, R extends unknown[] = [any]>
 //   IfExtends<T, ReadonlyArray<any>, T, { [P in keyof T]?: DeepPartial<T[P]> }>,
 //   T
 // >;
-type DeepPartial<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+type DeepPartial<
+  T,
+  Depth extends number = never,
+  ExactOptional extends boolean = true,
+  R extends unknown[] = [any],
+> = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
     ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
-      ? Array<DeepPartial<I, Depth, R>>
-      : ReadonlyArray<DeepPartial<RI, Depth, R>>
+      ? Array<DeepPartial<I, Depth, ExactOptional, R>>
+      : ReadonlyArray<DeepPartial<RI, Depth, ExactOptional, R>>
     : {
-        [P in keyof T]?: R['length'] extends Depth ? T[P] : DeepPartial<T[P], Depth, Push<R, any>>;
+        [P in keyof T]?:
+          | (R['length'] extends Depth
+              ? T[P]
+              : DeepPartial<T[P], Depth, ExactOptional, Push<R, any>>)
+          | (ExactOptional extends false ? undefined : never);
       },
   T
 >;
 
-type DeepRequired<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
+type DeepRequired<
+  T,
+  Depth extends number = never,
+  ExactOptional extends boolean = true,
+  R extends unknown[] = [any],
+> = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
     ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
-      ? Array<DeepRequired<I, Depth, R>>
-      : ReadonlyArray<DeepRequired<RI, Depth, R>>
+      ? Array<DeepRequired<I, Depth, ExactOptional, R>>
+      : ReadonlyArray<DeepRequired<RI, Depth, ExactOptional, R>>
     : {
-        [P in keyof T]-?: R['length'] extends Depth
-          ? T[P]
-          : DeepRequired<T[P], Depth, Push<R, any>>;
+        [P in keyof T]-?: Exclude<
+          R['length'] extends Depth ? T[P] : DeepRequired<T[P], Depth, ExactOptional, Push<R, any>>,
+          ExactOptional extends false ? undefined : never
+        >;
       },
   T
 >;
