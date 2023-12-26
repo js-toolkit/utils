@@ -2,7 +2,7 @@ type ClearResult<T extends AnyObject> = T extends ReadonlyArray<unknown> ? T : P
 
 export function clear<T extends AnyObject>(obj: T): ClearResult<T> {
   if (Array.isArray(obj)) {
-    obj.splice(0, obj.length);
+    obj.length > 0 && obj.splice(0, obj.length);
   } else {
     Object.getOwnPropertyNames(obj).forEach((key) => {
       // eslint-disable-next-line no-param-reassign
