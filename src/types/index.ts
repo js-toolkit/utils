@@ -335,8 +335,10 @@ type DefineAll<Enum extends string | number | symbol, T extends Record<Enum, unk
 
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 
+/** Used in `LiftInvalid`. */
 type Invalid<T> = Error & { __errorMessage: T };
 
+/** Used in `AsUniqueArray`. */
 type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
   A[number],
   Invalid<any>,
@@ -344,10 +346,26 @@ type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
   A
 >;
 
-type Last<T extends unknown[]> = T extends [any, ...infer Rest] ? Rest : [];
+/** Exclude the first element. Using with const arrays (tuples). */
+type Last<T extends readonly unknown[]> = T extends [any, ...infer Rest] ? Rest : [];
 
+/** Append to the last of const array (tuple). */
 type Push<A extends readonly unknown[], T> = [...A, T];
 
+/** Returns the number (Length) of first elements. */
+type Head<
+  T extends readonly unknown[],
+  Length extends number = never,
+  R extends readonly unknown[] = [],
+> = T['length'] extends 0
+  ? R
+  : R['length'] extends Length
+    ? R
+    : T extends readonly [infer I, ...infer Rest]
+      ? Head<Rest, Length, [...R, I]>
+      : R;
+
+/** Returns the number (Length) of last elements. */
 type Tail<
   T extends readonly unknown[],
   Length extends number = never,
@@ -360,6 +378,7 @@ type Tail<
       ? Tail<I, Length, [L, ...R]>
       : R;
 
+/** Skip the number (Length) of first elements. */
 type Skip<
   T extends readonly unknown[],
   Length extends number = never,
@@ -380,14 +399,17 @@ type InArray<T, Item> = T extends readonly [Item, ...infer _]
       ? InArray<Rest, Item>
       : false;
 
+/** Useful with type checking utility like `asUniqueArray`. */
 type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
     ? [Invalid<['Encountered value with duplicates:', X]>]
     : readonly [X, ...ToUniqueArray<Rest>]
   : T;
 
+/** Useful with type checking utility like `asUniqueArray`. */
 type UniqueArray<T extends ReadonlyArray<any>> = LiftInvalid<ToUniqueArray<T>>;
 
+/** Used with type checking utility `asUniqueArray`. */
 type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<{
   [I in keyof A]: unknown extends {
     [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
@@ -396,10 +418,12 @@ type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<{
     : A[I];
 }>;
 
+/** Used in `NonUnion`. */
 type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) extends (k: infer I) => void
   ? I
   : never;
 
+/** Used in `UnionToTuple`. */
 type LastOfUnion<T> = UnionToIntersection<T extends T ? () => T : never> extends () => infer R
   ? R
   : never;
@@ -407,6 +431,25 @@ type LastOfUnion<T> = UnionToIntersection<T extends T ? () => T : never> extends
 type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
   ? []
   : [...UnionToTuple<Exclude<T, L>>, L];
+
+/** `RequiredUnionToTuple<'1' | '2' | '3', ['1', '3', '2']>` */
+type RequiredUnionToTuple<
+  U,
+  A extends readonly unknown[],
+  F = Head<A, 1>,
+  UA = F extends readonly any[] ? TupleToUnion<F> : never,
+  Nothing = [U] extends [never] ? true : false,
+> = number extends A['length']
+  ? never
+  : true extends Nothing
+    ? A['length'] extends 0
+      ? []
+      : never
+    : A['length'] extends 0
+      ? true extends Nothing
+        ? []
+        : never
+      : [UA, ...RequiredUnionToTuple<Exclude<U, UA>, Skip<A, 1>>];
 
 /** Returns `never` if T is union type. */
 type NonUnion<T> = [T] extends [UnionToIntersection<T>] ? T : never;
