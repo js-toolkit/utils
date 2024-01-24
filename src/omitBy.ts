@@ -1,8 +1,7 @@
-/* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-use-before-define */
 
-type OmitByPredicate<O extends AnyObject, T extends O[keyof O], K extends keyof O> =
+export type SelectByPredicate<O extends AnyObject, T extends O[keyof O], K extends keyof O> =
   | ((value: O[typeof key], key: keyof O) => value is T)
   | ((value: O[typeof key], key: keyof O) => key is K)
   | ((value: O[typeof key], key: keyof O) => boolean);
@@ -22,11 +21,10 @@ export function omitBy<
   O extends AnyObject,
   T extends O[keyof O] = never,
   K extends keyof O = never,
->(obj: O, predicate: OmitByPredicate<O, T, K>): OmitByResult<O, T, K> {
+>(obj: O, predicate: SelectByPredicate<O, T, K>): OmitByResult<O, T, K> {
   const result: AnyObject = {};
   for (const key in obj) {
-    const equals = predicate(obj[key], key);
-    if (!equals) {
+    if (!predicate(obj[key], key)) {
       result[key] = obj[key];
     }
   }
