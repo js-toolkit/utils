@@ -20,13 +20,26 @@ function objectToString(error: AnyObject): string {
 
 export function getErrorMessage(error: unknown): string {
   // If error is not object
-  if (typeof error !== 'object' || error == null) return String(error);
-  // If error has own implementation of `toString()`.
-  if (Object.hasOwn(error, 'toString')) return (error as Object).toString();
+  if (typeof error !== 'object' || error == null) {
+    return String(error);
+  }
+  // If error (simple object) has own implementation of `toString()`.
+  if (Object.hasOwn(error, 'toString')) {
+    return error.toString();
+  }
   // If error is simple object
-  if (error.constructor === {}.constructor) return objectToString(error);
+  if (error.constructor === {}.constructor) {
+    return objectToString(error);
+  }
+  // If error (instance of class) has implementation of `toString()`.
+  const proto = Object.getPrototypeOf(error) as object;
+  if (proto && Object.hasOwn(proto, 'toString')) {
+    return error.toString();
+  }
   // If error is instance of some class
-  if (error.constructor.name) return `${error.constructor.name}: ${objectToString(error)}`;
+  if (error.constructor.name) {
+    return `${error.constructor.name}: ${objectToString(error)}`;
+  }
   // Other cases
   return objectToString(error);
 }
