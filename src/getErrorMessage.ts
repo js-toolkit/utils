@@ -26,5 +26,7 @@ export function getErrorMessage(error: unknown): string {
   // If error is simple object
   if (error.constructor === {}.constructor) return objectToString(error);
   // If error is instance of some class
-  return `${error.constructor.name}: ${objectToString(error)}`;
+  if (error.constructor.name) return `${error.constructor.name}: ${objectToString(error)}`;
+  // Other cases
+  return objectToString(error);
 }
