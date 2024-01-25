@@ -15,8 +15,8 @@
     "build": "npm run clean && tsc --build ./tsconfig.json && npm run minify",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "patch-publish": "yarn run build && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags",
-    "minor-publish": "yarn run build && npm version minor --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags"
+    "patch-publish": "yarn run build && npm version patch --force --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags",
+    "minor-publish": "yarn run build && npm version minor --force --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags"
   },
   "optionalDependencies": {
     "@js-toolkit/node-utils": "^1.2.0"
