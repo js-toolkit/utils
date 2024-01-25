@@ -1,12 +1,15 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-base-to-string */
 
 function objectToString(error: AnyObject): string {
-  const msg = error.message as string;
-  if (msg) return msg;
+  const { message, cause } = error as Error;
+  if (message) {
+    return cause ? `${message} => cause: ${getErrorMessage(cause)}` : message;
+  }
 
-  const errStr = (error as Object).toString();
+  const errStr = (error as Error).toString();
 
+  // If error is just a simple object ("[object Object]").
   if (errStr === {}.toString()) {
     try {
       return JSON.stringify(error);
