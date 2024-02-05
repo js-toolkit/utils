@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { copyFnProps } from './copyFnProps';
 
 export function beforeCall<
@@ -6,18 +8,19 @@ export function beforeCall<
 >(
   fn: F,
   beforeCallback: C,
-  context: any = undefined
+  /** Might be a function. */
+  context: unknown = undefined
 ): C extends AnyAsyncFunction
   ? ((...args: Parameters<F>) => Promise<ReturnType<F>>) & AsObject<F>
   : F {
-  const wrapper: AnyFunction = (...args: Parameters<F>) => {
-    const cbResult = beforeCallback.apply(context, args);
+  function wrapper(...args: Parameters<F>): unknown {
+    const contexValue = typeof context === 'function' ? context() : context;
+    const cbResult = beforeCallback.apply(contexValue, args);
     if (cbResult instanceof Promise) {
-      return cbResult.finally(() => fn.apply(context, args) as ReturnType<F>);
+      return cbResult.finally(() => fn.apply(contexValue, args));
     }
-    return fn.apply(context, args) as ReturnType<F>;
-  };
+    return fn.apply(contexValue, args);
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return copyFnProps(fn, wrapper) as any;
+  return copyFnProps(fn, wrapper as AnyFunction) as any;
 }
