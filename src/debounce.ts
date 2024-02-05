@@ -11,16 +11,24 @@ export function debounce<T extends AnyFunction>(
   wait?: number | undefined,
   options?: DebounceSettings | undefined
 ): DebouncedFunc<T> {
+  let pending = false;
+
   const unpending = (): void => {
-    // eslint-disable-next-line no-use-before-define
-    debounced.isPending = false;
+    pending = false;
   };
 
   const debounced = beforeCall(origin(beforeCall(fn, unpending), wait, options), () => {
-    debounced.isPending = true;
+    pending = true;
   }) as DebouncedFunc<T>;
 
-  debounced.isPending = false;
+  debounced.isPending = pending;
   debounced.cancel = beforeCall(debounced.cancel.bind(debounced), unpending);
+
+  Object.defineProperty(debounced, 'isPending', {
+    get() {
+      return pending;
+    },
+  });
+
   return debounced;
 }
