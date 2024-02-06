@@ -9,5 +9,6 @@
     "incremental": true,
     "diagnostics": true
   },
-  "include": ["src/**/*"]
+  "include": ["src"],
+  "exclude": ["src/log"]
 }
