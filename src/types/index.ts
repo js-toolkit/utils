@@ -48,11 +48,8 @@ type Overwrite<
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never,
 > = Override<A, B>;
 
-type IfExtends<T, Type, Then = T, Else = never> = Extract<T, Type> extends never
-  ? Else
-  : Extract<T, Type> extends Type
-    ? Then
-    : Else;
+type IfExtends<T, Type, Then = T, Else = never> =
+  Extract<T, Type> extends never ? Else : Extract<T, Type> extends Type ? Then : Else;
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
   ? NonNullable<
@@ -324,6 +321,11 @@ type ReverseObject<T extends Record<keyof T, string | number>> = T extends T
     }
   : never;
 
+/** Get values of enum as union. */
+type EnumToUnion<T extends Record<keyof T, string | number>> = Keys<{
+  [P in keyof T as `${T[P]}`]: P;
+}>;
+
 type LowercaseKeys<T extends AnyObject> = T extends T
   ? {
       [P in keyof T as P extends number ? P : Lowercase<Extract<P, string>>]: T[P];
@@ -424,9 +426,8 @@ type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) extends (k:
   : never;
 
 /** Used in `UnionToTuple`. */
-type LastOfUnion<T> = UnionToIntersection<T extends T ? () => T : never> extends () => infer R
-  ? R
-  : never;
+type LastOfUnion<T> =
+  UnionToIntersection<T extends T ? () => T : never> extends () => infer R ? R : never;
 
 type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
   ? []
@@ -454,11 +455,8 @@ type RequiredUnionToTuple<
 /** Returns `never` if T is union type. */
 type NonUnion<T> = [T] extends [UnionToIntersection<T>] ? T : never;
 
-type IfTuple<T, Then = T, Else = never> = T extends ArrayLike<any>
-  ? number extends T['length']
-    ? Then
-    : Else
-  : Else;
+type IfTuple<T, Then = T, Else = never> =
+  T extends ArrayLike<any> ? (number extends T['length'] ? Then : Else) : Else;
 
 /** Returns union of tuple indices. */
 type TupleIndices<T extends readonly any[]> = T extends T
