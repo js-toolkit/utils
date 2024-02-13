@@ -26,6 +26,11 @@ export function getErrorMessage(error: unknown): string {
   if (typeof error !== 'object' || error == null) {
     return String(error);
   }
+  const proto = Object.getPrototypeOf(error) as object;
+  // If error is instance of Error with cause.
+  if (error instanceof Error && proto === Error.prototype && error.cause != null) {
+    return `${error.constructor.name}: ${error.message} => cause: ${getErrorMessage(error.cause)}`;
+  }
   // If error (simple object) has own implementation of `toString()`.
   if (Object.hasOwn(error, 'toString')) {
     return error.toString();
@@ -35,7 +40,6 @@ export function getErrorMessage(error: unknown): string {
     return objectToString(error);
   }
   // If error (instance of class) has implementation of `toString()`.
-  const proto = Object.getPrototypeOf(error) as object;
   if (proto && Object.hasOwn(proto, 'toString')) {
     return error.toString();
   }
