@@ -53,7 +53,8 @@ export function getErrorMessage(error: unknown, options: GetErrorMessageOptions 
   // If error is instance of some class
   if (!options.simple && error.constructor.name) {
     const str = objectToString(error, options);
-    return `${error.constructor.name}${str ? `: ${str}` : ''}`;
+    const prefix = (error instanceof Error && error.name) || error.constructor.name;
+    return `${prefix}${str ? `: ${str}` : ''}`;
   }
   // Other cases
   return objectToString(error, options);
