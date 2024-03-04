@@ -1,27 +1,33 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-base-to-string */
 
-function objectToString(error: AnyObject): string {
+export interface GetErrorMessageOptions {
+  /** Exclude constructor name if possible. */
+  readonly simple?: boolean;
+}
+
+function objectToString(error: AnyObject, options: GetErrorMessageOptions): string {
   const { message, cause } = error as Error;
   if (message) {
-    return cause ? `${message} => cause: ${getErrorMessage(cause)}` : message;
+    return cause ? `${message} => cause: ${getErrorMessage(cause, options)}` : message;
   }
 
   const errStr = (error as Error).toString();
 
   // If error is just a simple object ("[object Object]").
-  if (errStr === {}.toString()) {
+  if (error.constructor.name && errStr === `[object ${error.constructor.name}]`) {
     try {
-      return JSON.stringify(error);
-    } catch {
-      console.warn('Stringify object failed:', error);
+      const jsonStr = JSON.stringify(error);
+      return jsonStr === '{}' ? '' : jsonStr;
+    } catch (ex) {
+      console.warn('Stringify object failed:', error, ex);
     }
   }
 
   return errStr;
 }
 
-export function getErrorMessage(error: unknown): string {
+export function getErrorMessage(error: unknown, options: GetErrorMessageOptions = {}): string {
   // If error is not object
   if (typeof error !== 'object' || error == null) {
     return String(error);
@@ -29,7 +35,8 @@ export function getErrorMessage(error: unknown): string {
   const proto = Object.getPrototypeOf(error) as object;
   // If error is instance of Error with cause.
   if (error instanceof Error && proto === Error.prototype && error.cause != null) {
-    return `${error.constructor.name}: ${error.message} => cause: ${getErrorMessage(error.cause)}`;
+    const prefix = options.simple ? '' : `${error.constructor.name}: `;
+    return `${prefix}${error.message} => cause: ${getErrorMessage(error.cause, options)}`;
   }
   // If error (simple object) has own implementation of `toString()`.
   if (Object.hasOwn(error, 'toString')) {
@@ -37,16 +44,17 @@ export function getErrorMessage(error: unknown): string {
   }
   // If error is simple object
   if (error.constructor === {}.constructor) {
-    return objectToString(error);
+    return objectToString(error, options);
   }
   // If error (instance of class) has implementation of `toString()`.
   if (proto && Object.hasOwn(proto, 'toString')) {
     return error.toString();
   }
   // If error is instance of some class
-  if (error.constructor.name) {
-    return `${error.constructor.name}: ${objectToString(error)}`;
+  if (!options.simple && error.constructor.name) {
+    const str = objectToString(error, options);
+    return `${error.constructor.name}${str ? `: ${str}` : ''}`;
   }
   // Other cases
-  return objectToString(error);
+  return objectToString(error, options);
 }
