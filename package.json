@@ -22,13 +22,13 @@
     "@js-toolkit/node-utils": "^1.2.0"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.90.0",
+    "@js-toolkit/configs": "^3.92.0",
     "@types/jest": "^29.5.12",
     "@types/lodash.debounce": "^4.0.9",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
@@ -38,7 +38,7 @@
     "lodash.debounce": "^4.0.8",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
-    "terser": "^5.27.0",
+    "terser": "^5.28.1",
     "ts-jest": "^29.1.2",
     "typescript": "^5.3.3",
     "yargs": "^17.7.2"
