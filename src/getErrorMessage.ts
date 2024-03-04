@@ -35,7 +35,7 @@ export function getErrorMessage(error: unknown, options: GetErrorMessageOptions 
   const proto = Object.getPrototypeOf(error) as object;
   // If error is instance of Error with cause.
   if (error instanceof Error && proto === Error.prototype && error.cause != null) {
-    const prefix = options.simple ? '' : `${error.constructor.name}: `;
+    const prefix = options.simple ? '' : `${error.name || error.constructor.name}: `;
     return `${prefix}${error.message} => cause: ${getErrorMessage(error.cause, options)}`;
   }
   // If error (simple object) has own implementation of `toString()`.
