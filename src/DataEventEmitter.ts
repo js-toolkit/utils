@@ -46,6 +46,14 @@ export type DataEventListener<
   Target, // extends DataEventEmitter<EventTypes, Target>,
 > = EventEmitter.EventListener<ConvertToDataEventMap<EventTypes, Target>, K>;
 
+type ListenersMap<EventTypes extends string | symbol | EventMap, Target> = {
+  [P in EventEmitter.EventNames<ConvertToDataEventMap<EventTypes, Target>>]: DataEventListener<
+    EventTypes,
+    P,
+    Target
+  >[];
+};
+
 type NormalizeEventTypes<EventTypes extends string | symbol | EventMap> =
   EventTypes extends EventMap
     ? EventTypes extends Record<string, DataEvent<string, any, any>>
@@ -87,6 +95,17 @@ export class DataEventEmitter<
           Target
         >
       >)
+    );
+  }
+
+  listenersMap(): ListenersMap<EventTypes, Target> {
+    return this.eventNames().reduce(
+      (acc, name) => {
+        acc[name] = acc[name] ?? [];
+        acc[name] = this.listeners(name);
+        return acc;
+      },
+      {} as ListenersMap<EventTypes, Target>
     );
   }
 }
