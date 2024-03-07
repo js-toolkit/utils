@@ -52,14 +52,15 @@ type IfExtends<T, Type, Then = T, Else = never> =
   Extract<T, Type> extends never ? Else : Extract<T, Type> extends Type ? Then : Else;
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
-  ? NonNullable<
+  ? Exclude<
       {
         [P in keyof T]: Strict extends true
           ? IfExtends<T[P], Type, P, never>
           : T[P] extends Type
             ? P
             : never;
-      }[keyof T]
+      }[keyof T],
+      null | undefined
     >
   : never;
 
