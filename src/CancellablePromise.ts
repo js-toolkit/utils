@@ -116,6 +116,10 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 }
 
+interface CancellablePromiseWithResolvers<T> extends PromiseWithResolvers<T> {
+  promise: CancellablePromise<T>;
+}
+
 export interface CancellablePromiseConstructor
   extends DefineAll<
     keyof PromiseConstructor,
@@ -245,6 +249,8 @@ export interface CancellablePromiseConstructor
       ): CancellablePromise<PromiseSettledResult<T extends PromiseLike<infer U> ? U : T>[]>;
 
       any<T>(values: (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>): CancellablePromise<T>;
+
+      withResolvers<T>(): CancellablePromiseWithResolvers<T>;
     }
   > {
   new <T>(
