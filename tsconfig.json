@@ -1,14 +1,13 @@
 {
   "extends": "@js-toolkit/configs/ts/common.tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "outDir": "dist",
+    "baseUrl": "src",
     "exactOptionalPropertyTypes": true,
     "sourceMap": false,
     "declaration": true,
     "incremental": true,
     "diagnostics": true
   },
-  "include": ["src"],
-  "exclude": ["src/log"]
+  "include": ["src"]
 }
