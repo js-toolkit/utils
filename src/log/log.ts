@@ -57,7 +57,7 @@ function defaultMethodFactory(
 }
 
 function buildMethods(logger: log.Logger): void {
-  const levelIdx = state.levels.indexOf(logger.getLevel());
+  const levelIdx = logger.getLevelNumber();
   for (let i = 0; i < state.levels.length - 1; i += 1) {
     const level = state.levels[i];
     logger[level] = levelIdx < i ? noop : state.factory(level, logger, state.plugins);
@@ -95,6 +95,10 @@ class Logger {
     return this.#level ?? this.#defaultLevel;
   }
 
+  getLevelNumber(): number {
+    return this.getLevels().indexOf(this.getLevel());
+  }
+
   setLevel(level: log.Level | log.LevelNumber): this {
     const nextLevel = log.normalizeLevel(level);
     const prevLevel = this.#level;
@@ -113,6 +117,10 @@ class Logger {
       prevLevel != null && getPluginsList().forEach((plugin) => plugin.notifyOfChange(this));
     }
     return this;
+  }
+
+  isLevelEnabled(level: log.Level | log.LevelNumber): boolean {
+    return this.getLevelNumber() >= this.getLevels().indexOf(log.normalizeLevel(level));
   }
 
   log(...message: unknown[]): void {
