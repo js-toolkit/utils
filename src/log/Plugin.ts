@@ -9,7 +9,7 @@ export abstract class Plugin {
 
   abstract factory(
     logger: log.Logger,
-    method: log.Level,
+    level: log.Level,
     config: AnyObject
   ): log.LoggingMethod | undefined;
 

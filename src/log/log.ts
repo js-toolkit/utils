@@ -17,14 +17,27 @@ type PluginConfigMap = Record<
   [plugin: log.Plugin, configs: Record<log.Logger['name'], AnyObject>]
 >;
 
-const state = {
-  rootLoggerName: '',
-  defaultLevel: 'debug' satisfies log.Level as log.Level,
-  loggers: {} as Record<string, log.Logger>,
-  plugins: {} as PluginConfigMap,
-  levels: ['none', 'error', 'warn', 'info', 'debug', 'trace'] as const as log.Levels,
-  factory: defaultMethodFactory as LogMethodFactory,
-};
+type LevelsMap = Record<log.Level, number>;
+
+const state = (() => {
+  const levels = ['none', 'error', 'warn', 'info', 'debug', 'trace'] as const as log.Levels;
+  return {
+    rootLoggerName: '',
+    defaultLevel: 'debug' satisfies log.Level as log.Level,
+    loggers: {} as Record<string, log.Logger>,
+    plugins: {} as PluginConfigMap,
+    levels,
+    levelsMap: levelsToMap(levels),
+    factory: defaultMethodFactory as LogMethodFactory,
+  };
+})();
+
+function levelsToMap(levels: log.Levels): LevelsMap {
+  return levels.reduce((acc, level, i) => {
+    acc[level] = i;
+    return acc;
+  }, {} as LevelsMap);
+}
 
 function getLoggersList(): log.Logger[] {
   return Object.values(state.loggers);
@@ -49,6 +62,8 @@ function defaultMethodFactory(
     newMethod && chain.push(newMethod);
   });
 
+  if (chain.length === 0) return noop;
+
   return (...message: unknown[]) => {
     for (let i = 0; i < chain.length; i += 1) {
       chain[i](...message);
@@ -57,16 +72,19 @@ function defaultMethodFactory(
 }
 
 function buildMethods(logger: log.Logger): void {
-  const levelIdx = logger.getLevelNumber();
-  for (let i = 0; i < state.levels.length - 1; i += 1) {
-    const level = state.levels[i];
-    logger[level] = levelIdx < i ? noop : state.factory(level, logger, state.plugins);
+  const levels = logger.getLevels();
+  for (let i = 0; i < levels.length; i += 1) {
+    const level = levels[i];
+    logger[level] = logger.isLevelEnabled(level)
+      ? state.factory(level, logger, state.plugins)
+      : noop;
   }
 }
 
 function removeMethods(logger: log.Logger): void {
-  for (let i = 0; i < state.levels.length - 1; i += 1) {
-    delete logger[state.levels[i]];
+  const levels = logger.getLevels();
+  for (let i = 0; i < levels.length; i += 1) {
+    delete logger[levels[i]];
   }
 }
 
@@ -96,19 +114,13 @@ class Logger {
   }
 
   getLevelNumber(): number {
-    return this.getLevels().indexOf(this.getLevel());
+    return state.levelsMap[this.getLevel()] ?? -1;
   }
 
   setLevel(level: log.Level | log.LevelNumber): this {
     const nextLevel = log.normalizeLevel(level);
     const prevLevel = this.#level;
-
     if (prevLevel === nextLevel) return this;
-
-    if (!this.getLevels().includes(nextLevel)) {
-      throw new Error(`Invalid level: ${nextLevel}`);
-    }
-
     this.#level = nextLevel;
     // If really changed
     if (prevLevel !== this.#level) {
@@ -120,11 +132,11 @@ class Logger {
   }
 
   isLevelEnabled(level: log.Level | log.LevelNumber): boolean {
-    return this.getLevelNumber() >= this.getLevels().indexOf(log.normalizeLevel(level));
+    return this.getLevelNumber() >= state.levelsMap[log.normalizeLevel(level)];
   }
 
   log(...message: unknown[]): void {
-    this.debug && this.debug(...message);
+    this.info && this.info(...message);
   }
 
   use(plugin: log.Plugin | string, config?: AnyObject | undefined): this {
@@ -170,7 +182,12 @@ namespace log {
   }
 
   export function normalizeLevel(level: Level | LevelNumber): log.Level {
-    return typeof level === 'number' ? state.levels[level] : level;
+    const normLevel =
+      typeof level === 'number'
+        ? state.levels[level]
+        : (state.levelsMap[level] == null && undefined) || level;
+    if (normLevel == null) throw new Error(`Invalid level: ${level}`);
+    return normLevel;
   }
 
   export function getDefaultLevel(): Level {
@@ -221,6 +238,7 @@ namespace log {
     loggers.forEach((logger) => removeMethods(logger));
 
     state.levels = newLevels;
+    state.levelsMap = levelsToMap(newLevels);
     setDefaultLevel(newLevel);
     if (factory) {
       state.factory = factory;

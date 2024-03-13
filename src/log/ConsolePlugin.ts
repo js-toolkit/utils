@@ -1,6 +1,5 @@
 /* eslint-disable class-methods-use-this */
 import { hasIn } from '../hasIn';
-import { noop } from '../noop';
 import { Plugin } from './Plugin';
 import type log from './log';
 
@@ -11,16 +10,16 @@ export class ConsolePlugin extends Plugin {
 
   override notifyOfChange(): void {}
 
-  override factory(_logger: log.Logger, method: log.Level): log.LoggingMethod {
+  override factory(_logger: log.Logger, level: log.Level): log.LoggingMethod | undefined {
     if (typeof console === 'undefined') {
-      return noop;
+      return undefined;
     }
-    const level = method as keyof Console;
+    const method = level as keyof Console;
     const methodName =
-      hasIn(console, level) && typeof console[level] === 'function' ? level : 'log';
-    if (console[methodName]) {
+      hasIn(console, method) && typeof console[method] === 'function' ? method : undefined;
+    if (methodName) {
       return (console[methodName] as log.LoggingMethod).bind(console);
     }
-    return noop;
+    return undefined;
   }
 }
