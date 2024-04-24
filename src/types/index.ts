@@ -304,6 +304,29 @@ type PickInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = T ext
     }
   : never;
 
+type IfEquals<X, Y, A, B> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+
+/** Pick only writeable keys. */
+type PickWritable<T> = {
+  [P in keyof T as IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>]: T[P];
+};
+
+/** Pick only readonly keys. */
+type PickReadonly<T> = {
+  [P in keyof T as IfEquals<{ [Q in P]: T[P] }, { readonly [Q in P]: T[P] }, P, never>]: T[P];
+};
+
+/** Pick only optional keys. */
+type PickOptional<T> = {
+  [P in keyof T as IfEquals<{ [Q in P]: T[P] }, { [Q in P]?: T[P] }, P, never>]: T[P];
+};
+
+/** Pick only required keys. */
+type PickRequired<T> = {
+  [P in keyof T as IfEquals<{ [Q in P]: T[P] }, { [Q in P]-?: T[P] }, P, never>]: T[P];
+};
+
 type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = T extends T
   ? {
       [P in keyof T]: P extends K
