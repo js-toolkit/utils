@@ -202,17 +202,12 @@ namespace log {
     return state.levels;
   }
 
-  export function getLogger(name: string, level?: Level | LevelNumber | undefined): Logger {
+  export function getLogger(name: string, defaultLevel?: Level | LevelNumber | undefined): Logger {
     if (!state.loggers[name]) {
-      const logger = new Logger(name, normalizeLevel(level ?? getDefaultLevel()));
+      const logger = new Logger(name, normalizeLevel(defaultLevel ?? getDefaultLevel()));
       state.loggers[name] = logger;
     }
-    const logger = state.loggers[name];
-    // If update level of existing logger
-    if (level != null && logger.getLevel() !== normalizeLevel(level)) {
-      logger.setLevel(level);
-    }
-    return logger;
+    return state.loggers[name];
   }
 
   export function getLoggers(): Record<string, Logger> {
