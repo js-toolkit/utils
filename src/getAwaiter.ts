@@ -53,7 +53,7 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
         clearTimeout(waitTimeoutHandler);
       });
     }
-    if (timeout && timeout > 0) {
+    if (timeout && timeout > 0 && !settled) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       clearTimeout(waitTimeoutHandler);
       waitTimeoutHandler = setTimeout(
