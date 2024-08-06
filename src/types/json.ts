@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
-/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import type { Option } from '../fp/Option';
 
 export type JSONPrimitive = string | number | boolean | null | undefined;
@@ -41,32 +40,34 @@ type JSONObjectOf<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = keyof 
 > extends never
   ? A extends ValueContainer<infer R>
     ? R
-    : {} // eslint-disable-line @typescript-eslint/ban-types
+    : {}
   : Optional<A, OmitKeys> & NonOptional<A, OmitKeys>;
 
-type ExtractKeys<A> = A extends Option<infer T>
-  ? ExtractKeys<T>
-  : A extends JSONSerializable<infer T, any>
-  ? ExtractKeys<T>
-  : A extends ReadonlyArray<infer T>
-  ? ExtractKeys<T>
-  : A extends AnyObject
-  ? keyof A
-  : never;
+type ExtractKeys<A> =
+  A extends Option<infer T>
+    ? ExtractKeys<T>
+    : A extends JSONSerializable<infer T, any>
+      ? ExtractKeys<T>
+      : A extends ReadonlyArray<infer T>
+        ? ExtractKeys<T>
+        : A extends AnyObject
+          ? keyof A
+          : never;
 
-export type Jsonify<A, OmitKeys extends ExtractKeys<A> = never> = A extends Option<infer T>
-  ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>> | undefined
-  : A extends JSONSerializable<infer T, any>
-  ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>>
-  : A extends ReadonlyArray<infer T>
-  ? JSONArrayOf<T, A extends Array<any> ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
-  : A extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
-  ? Array<number>
-  : A extends AnyObject
-  ? JSONObjectOf<A, OmitKeys>
-  : A extends JSONValue
-  ? A
-  : string;
+export type Jsonify<A, OmitKeys extends ExtractKeys<A> = never> =
+  A extends Option<infer T>
+    ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>> | undefined
+    : A extends JSONSerializable<infer T, any>
+      ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>>
+      : A extends ReadonlyArray<infer T>
+        ? JSONArrayOf<T, A extends Array<any> ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
+        : A extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
+          ? Array<number>
+          : A extends AnyObject
+            ? JSONObjectOf<A, OmitKeys>
+            : A extends JSONValue
+              ? A
+              : string;
 
 // type A = Exclude<
 //   NonNullable<
