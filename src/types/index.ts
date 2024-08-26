@@ -51,16 +51,13 @@ type IfExtends<T, Type, Then = T, Else = never> =
   Extract<T, Type> extends never ? Else : Extract<T, Type> extends Type ? Then : Else;
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
-  ? Exclude<
-      {
-        [P in keyof T]: Strict extends true
-          ? IfExtends<T[P], Type, P, never>
-          : T[P] extends Type
-            ? P
-            : never;
-      }[keyof T],
-      null | undefined
-    >
+  ? {
+      [P in keyof T]-?: Strict extends true
+        ? IfExtends<T[P], Type, P, never>
+        : T[P] extends Type
+          ? P
+          : never;
+    }[keyof T]
   : never;
 
 type ExcludeKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<
@@ -96,6 +93,8 @@ type DeepKeys<T, Prop = never> = IfExtends<
   Prop
 >;
 
+type UndefinedToNever<T> = T extends undefined ? never : T;
+
 type ExcludeTypesOptions<A extends AnyObject> = { omit: keyof A } | { pick: keyof A };
 
 type ExcludeTypes<
@@ -106,21 +105,17 @@ type ExcludeTypes<
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
       ? ExcludeTypesOptions<A>
       : never = { pick: keyof A },
-> = ExcludeKeysOfType<
-  {
-    [P in keyof A]: 'omit' extends keyof K
-      ? P extends K['omit']
-        ? A[P]
-        : Exclude<A[P], T>
-      : 'pick' extends keyof K
-        ? P extends K['pick']
-          ? Exclude<A[P], T>
-          : A[P]
-        : Exclude<A[P], T>;
-  },
-  undefined,
-  false
->;
+> = {
+  [P in keyof A]: 'omit' extends keyof K
+    ? P extends K['omit']
+      ? A[P]
+      : UndefinedToNever<Exclude<A[P], T>>
+    : 'pick' extends keyof K
+      ? P extends K['pick']
+        ? UndefinedToNever<Exclude<A[P], T>>
+        : A[P]
+      : UndefinedToNever<Exclude<A[P], T>>;
+};
 
 type OmitIndex<T extends AnyObject> = T extends T
   ? { [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P] }
@@ -132,6 +127,7 @@ type WithIndex<T extends AnyObject> = T extends T ? T & Record<string, any> : ne
 // { [P in keyof A]: P extends K ? Extract<A[P], B> : A[P] },
 // never | undefined
 // >;
+// type Q = 0 extends never ? 1 : 0
 type KeepTypes<
   A extends AnyObject,
   T extends Extract<BaseTypeOf<A[keyof A]>, T>,
@@ -140,9 +136,23 @@ type KeepTypes<
     : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
       ? ExcludeTypesOptions<A>
       : never = { pick: keyof A },
-> = ExcludeKeysOfType<
+> = ExcludeTypes<
   {
-    [P in keyof A]: 'omit' extends keyof K
+    [P in keyof A as 'omit' extends keyof K
+      ? P extends K['omit']
+        ? P
+        : Extract<A[P], T> extends never
+          ? never
+          : P
+      : 'pick' extends keyof K
+        ? P extends K['pick']
+          ? Extract<A[P], T> extends never
+            ? never
+            : P
+          : P
+        : Extract<A[P], T> extends never
+          ? never
+          : P]: 'omit' extends keyof K
       ? P extends K['omit']
         ? A[P]
         : Extract<A[P], T>
@@ -152,8 +162,7 @@ type KeepTypes<
           : A[P]
         : Extract<A[P], T>;
   },
-  undefined,
-  false
+  never
 >;
 
 type Writeable<T extends AnyObject> = T extends T ? { -readonly [P in keyof T]: T[P] } : never;
