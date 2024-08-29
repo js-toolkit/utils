@@ -25,7 +25,7 @@
     "@eslint/compat": "^1.1.1",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.9.1",
-    "@js-toolkit/configs": "^3.93.4",
+    "@js-toolkit/configs": "^3.93.5",
     "@types/eslint": "^9.6.1",
     "@types/eslint__eslintrc": "^2.1.2",
     "@types/eslint__js": "^8.42.3",
