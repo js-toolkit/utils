@@ -1,21 +1,20 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { noop } from '../noop';
 import type { GetOverridedKeys } from '../types/augmentation';
 import { Plugin as PluginBase } from './Plugin';
 import { ConsolePlugin } from './ConsolePlugin';
 
-type LogMethodFactory = (
-  method: log.Level | log.LevelNumber,
-  logger: log.Logger,
-  plugins: (typeof state)['plugins']
-) => log.LoggingMethod;
-
 type PluginConfigMap = Record<
   string,
   [plugin: log.Plugin, configs: Record<log.Logger['name'], AnyObject>]
 >;
+
+type LogMethodFactory = (
+  method: log.Level | log.LevelNumber,
+  logger: log.Logger,
+  plugins: PluginConfigMap
+) => log.LoggingMethod;
 
 type LevelsMap = Record<log.Level, number>;
 
@@ -39,14 +38,6 @@ function levelsToMap(levels: log.Levels): LevelsMap {
   }, {} as LevelsMap);
 }
 
-function getLoggersList(): log.Logger[] {
-  return Object.values(state.loggers);
-}
-
-function getPluginsList(): log.Plugin[] {
-  return Object.values(state.plugins).flatMap(([p]) => p);
-}
-
 function defaultMethodFactory(
   method: log.Level | log.LevelNumber,
   logger: log.Logger,
@@ -59,7 +50,7 @@ function defaultMethodFactory(
     const rootConfig = configs[state.rootLoggerName];
     const loggerConfig = configs[logger.name];
     const newMethod = plugin.factory(logger, level, { ...rootConfig, ...loggerConfig });
-    newMethod && chain.push(newMethod);
+    if (newMethod) chain.push(newMethod);
   });
 
   if (chain.length === 0) return noop;
@@ -69,6 +60,14 @@ function defaultMethodFactory(
       chain[i](...message);
     }
   };
+}
+
+function getLoggersList(): log.Logger[] {
+  return Object.values(state.loggers);
+}
+
+function getPluginsList(): log.Plugin[] {
+  return Object.values(state.plugins).map(([p]) => p);
 }
 
 function buildMethods(logger: log.Logger): void {
@@ -90,6 +89,7 @@ function removeMethods(logger: log.Logger): void {
 
 type LoggerMethods = { [P in log.Level]: (...args: unknown[]) => void };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Logger extends LoggerMethods {}
 
 class Logger {
@@ -126,7 +126,7 @@ class Logger {
     if (prevLevel !== this.#level) {
       buildMethods(this);
       // If not initial setup
-      prevLevel != null && getPluginsList().forEach((plugin) => plugin.notifyOfChange(this));
+      if (prevLevel != null) getPluginsList().forEach((plugin) => plugin.notifyOfChange(this));
     }
     return this;
   }
@@ -136,10 +136,10 @@ class Logger {
   }
 
   log(...message: unknown[]): void {
-    this.info && this.info(...message);
+    if (this.info) this.info(...message);
   }
 
-  use(plugin: log.Plugin | string, config?: AnyObject | undefined): this {
+  use(plugin: log.Plugin | string, config?: AnyObject): this {
     if (plugin instanceof log.Plugin) {
       log.register(plugin);
     }
@@ -157,7 +157,6 @@ type LoggerType = Logger;
 // eslint-disable-next-line @typescript-eslint/no-namespace
 namespace log {
   // Use this remap for vscode quick fix's 'Implement inherited abstract class' in custom plugin impl
-  // eslint-disable-next-line no-shadow
   export type Logger = { [P in keyof LoggerType]: LoggerType[P] };
 
   export const Plugin = PluginBase;
@@ -168,6 +167,7 @@ namespace log {
   export type Levels = UnionToTuple<Level>;
   export type LevelNumber = TupleIndices<Levels>;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface LevelsOverrides {}
 
   export type Level = GetOverridedKeys<
@@ -202,7 +202,7 @@ namespace log {
     return state.levels;
   }
 
-  export function getLogger(name: string, defaultLevel?: Level | LevelNumber | undefined): Logger {
+  export function getLogger(name: string, defaultLevel?: Level | LevelNumber): Logger {
     if (!state.loggers[name]) {
       const logger = new Logger(name, normalizeLevel(defaultLevel ?? getDefaultLevel()));
       state.loggers[name] = logger;
@@ -249,7 +249,7 @@ namespace log {
     }
   }
 
-  export function use(plugin: log.Plugin | string, config?: AnyObject | undefined): void {
+  export function use(plugin: log.Plugin | string, config?: AnyObject): void {
     if (plugin instanceof log.Plugin) {
       register(plugin);
     }
