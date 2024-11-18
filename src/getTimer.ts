@@ -1,24 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 export interface TimerStartOptions {
+  /** Invokes a timer callback immediately and starts the timer. */
   readonly immediately?: boolean | undefined;
+  /** Stops after a timer callback is invoked. */
+  readonly once?: boolean | undefined;
 }
 
 export interface Timer {
   readonly active: boolean;
-  readonly start: (options?: TimerStartOptions | undefined) => void;
+  readonly start: (options?: TimerStartOptions) => void;
   readonly stop: VoidFunction;
   readonly pause: VoidFunction;
   readonly getState: () => 'active' | 'stopped' | 'paused';
 }
 
-// type
 interface Options {
   readonly callback: ((timer: Timer) => void) | ((timer: Timer) => Promise<void>);
-  /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick) */
+  /** - function - can be used as a dynamically changing timer interval (evaluated at each timer tick). */
   readonly interval: number | (() => number);
-  /** Default `true` */
+  /** Defaults to `true`. */
   readonly autostart?: boolean | undefined;
   /** Used only if `interval` is a function and callback returns `Promise`. */
   readonly waitCallback?: boolean | undefined;
@@ -36,11 +37,11 @@ export function getTimer({
   autostart = true,
   waitCallback,
 }: Options): Timer {
-  let timerId: any;
+  let timerId: number | NodeJS.Timeout | undefined;
   let sessionId = 0;
-  let startIterationTime = 0;
+  let timeoutStartedAt = 0;
   let remainingTime = 0;
-  let lastTimeout = 0;
+  let lastInterval = 0;
 
   const clearTimers = (): void => {
     clearInterval(timerId);
@@ -50,22 +51,22 @@ export function getTimer({
 
   const stop = (): void => {
     sessionId = 0;
-    startIterationTime = 0;
+    timeoutStartedAt = 0;
     remainingTime = 0;
-    lastTimeout = 0;
+    lastInterval = 0;
     clearTimers();
     onStop && onStop();
   };
 
   const pause = (): void => {
     if (timerId != null) {
-      remainingTime = Math.max(0, lastTimeout - (Date.now() - startIterationTime));
+      remainingTime = Math.max(0, lastInterval - (Date.now() - timeoutStartedAt));
     }
     clearTimers();
     onPause && onPause();
   };
 
-  const start = ({ immediately }: TimerStartOptions = {}): void => {
+  const start = ({ immediately, once }: TimerStartOptions = {}): void => {
     timerId != null && stop();
 
     if (sessionId >= Number.MAX_SAFE_INTEGER) {
@@ -83,20 +84,26 @@ export function getTimer({
             if (waitCallback && result instanceof Promise) {
               loopInvoked = true;
               const id = sessionId;
-              // void result.finally(() => (timerId != null || init) && id === sessionId && loop());
-              void result.finally(() => timerId != null && id === sessionId && loop());
+              void result.finally(() => {
+                if (id === sessionId && timerId != null) {
+                  if (once) stop();
+                  else loop();
+                }
+              });
             }
           } finally {
-            // (timerId != null || init) && !loopInvoked && loop();
-            timerId != null && !loopInvoked && loop();
+            if (timerId != null && !loopInvoked) {
+              if (once) stop();
+              else loop();
+            }
           }
         };
 
         const loop = (): void => {
           const timeout = remainingTime > 0 ? remainingTime : interval();
           timerId = setTimeout(timerCallback, timeout);
-          startIterationTime = Date.now();
-          lastTimeout = timeout;
+          timeoutStartedAt = Date.now();
+          lastInterval = timeout;
         };
 
         if (immediately) {
@@ -110,14 +117,20 @@ export function getTimer({
           try {
             void callback(timer);
           } finally {
-            startIterationTime = Date.now();
+            if (once) stop();
+            else {
+              // For next tick in setInterval.
+              timeoutStartedAt = Date.now();
+            }
           }
         };
 
-        const startInterval = (): void => {
-          timerId = setInterval(timerCallback, interval);
-          startIterationTime = Date.now();
-          lastTimeout = interval;
+        const startTimer = (): void => {
+          timerId = once
+            ? setTimeout(timerCallback, interval)
+            : setInterval(timerCallback, interval);
+          timeoutStartedAt = Date.now();
+          lastInterval = interval;
         };
 
         const init = (): void => {
@@ -127,13 +140,14 @@ export function getTimer({
               try {
                 void callback(timer);
               } finally {
-                startInterval();
+                if (once) stop();
+                else startTimer();
               }
             }, remainingTime);
-            startIterationTime = Date.now();
-            lastTimeout = remainingTime;
+            timeoutStartedAt = Date.now();
+            lastInterval = remainingTime;
           } else {
-            startInterval();
+            startTimer();
           }
         };
 
