@@ -8,8 +8,8 @@ export interface DebouncedFunc<T extends AnyFunction> extends DebouncedFuncOrigi
 
 export function debounce<T extends AnyFunction>(
   fn: T,
-  wait?: number | undefined,
-  options?: DebounceSettings | undefined
+  wait?: number,
+  options?: DebounceSettings
 ): DebouncedFunc<T> {
   let pending = false;
 
