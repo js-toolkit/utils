@@ -7,10 +7,17 @@ export interface TimerStartOptions {
   readonly once?: boolean | undefined;
 }
 
+interface TimerStopOptions {
+  /** If there is a pending invocation of the callback function, invoke it immediately. */
+  readonly flush?: boolean;
+}
+
 export interface Timer {
+  /** @deprecated Use isActive(). */
   readonly active: boolean;
+  readonly isActive: () => boolean;
   readonly start: (options?: TimerStartOptions) => void;
-  readonly stop: VoidFunction;
+  readonly stop: (options?: TimerStopOptions) => void;
   readonly pause: VoidFunction;
   readonly getState: () => 'active' | 'stopped' | 'paused';
 }
@@ -49,17 +56,23 @@ export function getTimer({
     timerId = undefined;
   };
 
-  const stop = (): void => {
-    sessionId = 0;
-    timeoutStartedAt = 0;
-    remainingTime = 0;
-    lastInterval = 0;
-    clearTimers();
-    onStop && onStop();
+  const stop = ({ flush }: TimerStopOptions = {}): void => {
+    try {
+      if (flush && timer.isActive()) {
+        void callback(timer);
+      }
+    } finally {
+      sessionId = 0;
+      timeoutStartedAt = 0;
+      remainingTime = 0;
+      lastInterval = 0;
+      clearTimers();
+      onStop && onStop();
+    }
   };
 
   const pause = (): void => {
-    if (timerId != null) {
+    if (timer.isActive()) {
       remainingTime = Math.max(0, lastInterval - (Date.now() - timeoutStartedAt));
     }
     clearTimers();
@@ -67,7 +80,7 @@ export function getTimer({
   };
 
   const start = ({ immediately, once }: TimerStartOptions = {}): void => {
-    timerId != null && stop();
+    if (timer.isActive()) stop();
 
     if (sessionId >= Number.MAX_SAFE_INTEGER) {
       sessionId = 0;
@@ -172,8 +185,9 @@ export function getTimer({
     get active() {
       return timerId != null;
     },
+    isActive: () => timerId != null,
     getState: () => {
-      if (timerId != null) return 'active';
+      if (timer.isActive()) return 'active';
       if (sessionId > 0) return 'paused';
       return 'stopped';
     },
