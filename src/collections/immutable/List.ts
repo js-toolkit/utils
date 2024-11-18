@@ -1,6 +1,5 @@
-/* eslint-disable no-shadow */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable max-classes-per-file */
 
@@ -14,7 +13,7 @@ export interface ListLike<T> extends Iterable<T> {
   every(f: (value: T) => boolean): boolean;
   some(f: (value: T) => boolean): boolean;
   filter(f: (value: T) => boolean): ListLike<T>;
-  sort(compareFn?: ((a: T, b: T) => number) | undefined): ListLike<T>;
+  sort(compareFn?: (a: T, b: T) => number): ListLike<T>;
   forEach(f: (value: T) => any): void;
   map<U>(f: (value: T) => U): ListLike<U>;
   reduce<U>(f: (previousValue: U, currentValue: T) => U, initialValue: U): U;
@@ -23,7 +22,7 @@ export interface ListLike<T> extends Iterable<T> {
   concat(tail: ListLike<T>): ListLike<T>;
   append(...items: T[]): ListLike<T>;
   prepend(...items: T[]): ListLike<T>;
-  join(separator?: string | undefined): string;
+  join(separator?: string): string;
   toArray(): T[];
 }
 
@@ -99,7 +98,7 @@ export class List<T> implements ListLike<T> {
   /** Returns head list, last list and current iteration list */
   private copy(
     predicate: (value: T) => boolean,
-    stop?: ((v: T) => boolean) | undefined
+    stop?: (v: T) => boolean
   ): [ListInternal<T> | undefined, ListInternal<T> | undefined, List<T>] {
     let h: ListInternal<T> | undefined; // in order to keep the head list for return
     let t: ListInternal<T> | undefined; // last list
@@ -134,7 +133,6 @@ export class List<T> implements ListLike<T> {
     if (h === undefined) return new List(newValue, this.tail);
     // if not found
     if (last === Nil) return this;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     t!.next = new List(newValue, last.tail);
     return h;
   }
@@ -157,7 +155,7 @@ export class List<T> implements ListLike<T> {
     return h || Nil;
   }
 
-  sort(compare?: ((a: T, b: T) => number) | undefined): List<T> {
+  sort(compare?: (a: T, b: T) => number): List<T> {
     if (this === Nil) return Nil;
     // todo: slow
     return List.of(...this.toArray().sort(compare));
