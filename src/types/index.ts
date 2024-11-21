@@ -505,7 +505,7 @@ type TupleToUnion<T extends readonly any[]> = T extends T
   : never;
 
 /** @private */
-type OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverload extends (
+type _OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverload extends (
   ...args: infer TArgs
 ) => infer TReturn
   ? // Prevent infinite recursion by stopping recursion when TPartialOverload
@@ -513,7 +513,7 @@ type OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverload
     TPartialOverload extends TOverload
     ? never
     :
-        | OverloadToUnionRecursive<
+        | _OverloadToUnionRecursive<
             TPartialOverload & TOverload,
             TPartialOverload & ((...args: TArgs) => TReturn) & AsObject<TOverload>
           >
@@ -529,7 +529,7 @@ type OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverload
  * https://github.com/microsoft/TypeScript/issues/32164
  */
 type OverloadToUnion<TOverload extends (...args: any[]) => any> = Exclude<
-  OverloadToUnionRecursive<
+  _OverloadToUnionRecursive<
     // The "() => never" signature must be hoisted to the "front" of the
     // intersection, for two reasons: a) because recursion stops when it is
     // encountered, and b) it seems to prevent the collapse of subsequent
