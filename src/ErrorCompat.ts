@@ -5,11 +5,7 @@ export interface ErrorCompatOptions extends ErrorOptions {
 }
 
 export abstract class ErrorCompat extends Error {
-  constructor(
-    SelfConstructor: AnyConstructor,
-    message?: string | undefined,
-    options?: ErrorCompatOptions | undefined
-  ) {
+  constructor(SelfConstructor: AnyConstructor, message?: string, options?: ErrorCompatOptions) {
     super(message, options);
     es5ErrorCompat(this, SelfConstructor);
     if (options?.name != null) {

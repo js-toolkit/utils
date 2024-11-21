@@ -2,12 +2,12 @@ export type PendingTasks<K extends string> = { default: number } & PartialRecord
 
 export interface TaskCounter<K extends string> {
   /** true - while has at least 1 running task by key. */
-  isPending: (key?: keyof PendingTasks<K> | undefined) => boolean;
+  isPending: (key?: keyof PendingTasks<K>) => boolean;
   /** true - while has at least 1 running task. */
   isAnyPending: () => boolean;
-  push: (key?: keyof PendingTasks<K> | undefined) => void;
-  pop: (key?: keyof PendingTasks<K> | undefined) => void;
-  reset: (key?: keyof PendingTasks<K> | undefined) => void;
+  push: (key?: keyof PendingTasks<K>) => void;
+  pop: (key?: keyof PendingTasks<K>) => void;
+  reset: (key?: keyof PendingTasks<K>) => void;
   resetAll: VoidFunction;
 }
 

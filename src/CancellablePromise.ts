@@ -2,17 +2,13 @@
 import { es5ErrorCompat } from './es5ErrorCompat';
 
 export class PromiseCancelledError extends Error {
-  constructor(message?: string | undefined) {
+  constructor(message?: string) {
     super(message);
     es5ErrorCompat(this, PromiseCancelledError);
   }
 }
 
-function catchCancel(
-  // eslint-disable-next-line no-shadow
-  handler?: ((value: any) => unknown) | null | undefined,
-  value?: any
-): unknown {
+function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): unknown {
   // console.log('catchCancel', value, onrejected);
   if (value instanceof PromiseCancelledError || !handler) {
     throw value;
@@ -64,7 +60,7 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   cancelled<TResult = never>(
-    oncancelled?: (() => TResult | PromiseLike<TResult>) | null | undefined
+    oncancelled?: (() => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
     const next = super.then(
       (value) => {
@@ -88,8 +84,8 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   override then<TResult1 = T, TResult2 = never>(
-    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
   ): CancellablePromise<TResult1 | TResult2> {
     const next = super.then(
       (value) => catchCancel(onfulfilled, value),
@@ -100,7 +96,7 @@ export class CancellablePromise<T> extends Promise<T> {
   }
 
   override catch<TResult = never>(
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined
+    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
     const next = super.then(undefined, (reason) =>
       catchCancel(onrejected, reason)
@@ -109,7 +105,7 @@ export class CancellablePromise<T> extends Promise<T> {
     return next;
   }
 
-  override finally(onfinally?: VoidFunction | null | undefined): CancellablePromise<T> {
+  override finally(onfinally?: VoidFunction | null): CancellablePromise<T> {
     const next = super.finally(onfinally) as CancellablePromise<T>;
     next.canceller = this.canceller;
     return next;
