@@ -504,22 +504,6 @@ type TupleToUnion<T extends readonly any[]> = T extends T
     : never
   : never;
 
-/** @private */
-type _OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverload extends (
-  ...args: infer TArgs
-) => infer TReturn
-  ? // Prevent infinite recursion by stopping recursion when TPartialOverload
-    // has accumulated all of the TOverload signatures.
-    TPartialOverload extends TOverload
-    ? never
-    :
-        | _OverloadToUnionRecursive<
-            TPartialOverload & TOverload,
-            TPartialOverload & ((...args: TArgs) => TReturn) & AsObject<TOverload>
-          >
-        | ((...args: TArgs) => TReturn)
-  : never;
-
 /**
  * Converts `interface Methods {
      method(arg: 'type_1'): void;
@@ -528,17 +512,33 @@ type _OverloadToUnionRecursive<TOverload, TPartialOverload = unknown> = TOverloa
    }` to `(arg: 'type_1') => void | (arg: 'type_2') => void | (arg: 'type_3') => void`
  * https://github.com/microsoft/TypeScript/issues/32164
  */
-type OverloadToUnion<TOverload extends (...args: any[]) => any> = Exclude<
-  _OverloadToUnionRecursive<
-    // The "() => never" signature must be hoisted to the "front" of the
-    // intersection, for two reasons: a) because recursion stops when it is
-    // encountered, and b) it seems to prevent the collapse of subsequent
-    // "compatible" signatures (eg. "() => void" into "(a?: 1) => void"),
-    // which gives a direct conversion to a union.
-    (() => never) & TOverload
-  >,
-  TOverload extends () => never ? never : () => never
->;
+type OverloadToUnion<
+  TOverload extends (...args: any[]) => any,
+  TPartialOverload = unknown,
+> = TOverload extends (...args: infer TArgs) => infer TReturn
+  ? // Prevent infinite recursion by stopping recursion when TPartialOverload
+    // has accumulated all of the TOverload signatures.
+    TPartialOverload extends TOverload
+    ? never
+    :
+        | OverloadToUnion<
+            TPartialOverload & TOverload,
+            TPartialOverload & ((...args: TArgs) => TReturn) & AsObject<TOverload>
+          >
+        | ((...args: TArgs) => TReturn)
+  : never;
+
+// type OverloadToUnion<TOverload extends (...args: any[]) => any> = Exclude<
+//   _OverloadToUnionRecursive<
+//     // The "() => never" signature must be hoisted to the "front" of the
+//     // intersection, for two reasons: a) because recursion stops when it is
+//     // encountered, and b) it seems to prevent the collapse of subsequent
+//     // "compatible" signatures (eg. "() => void" into "(a?: 1) => void"),
+//     // which gives a direct conversion to a union.
+//     (() => never) & TOverload
+//   >,
+//   TOverload extends () => never ? never : () => never
+// >;
 
 // Inferring a union of parameter tuples or return types is now possible.
 // type OverloadParameters<T extends (...args: any[]) => any> = Parameters<OverloadUnion<T>>;
