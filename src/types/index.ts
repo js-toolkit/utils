@@ -590,3 +590,10 @@ type SettersToProps<T extends AnyObject> = T extends T
         : T[P];
     }
   : never;
+
+/**
+ * Remove part from the string.
+ */
+type RemovePart<T extends string, Part extends string> = T extends `${infer S1}${Part}${infer S2}`
+  ? `${S1}${S2}`
+  : T;
