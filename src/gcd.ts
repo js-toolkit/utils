@@ -1,4 +1,4 @@
-/** Greatest common divisor */
+/** Greatest common divisor. */
 export function gcd(x: number, y: number): number {
   let a = Math.abs(x);
   let b = Math.abs(y);

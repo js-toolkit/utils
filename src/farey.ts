@@ -8,13 +8,12 @@
  */
 export function farey(
   value: number,
-  /** Max denominator */
+  /** Max denominator. */
   limit: number
 ): readonly [numerator: number, denominator: number] {
   let lower: readonly [number, number] = [0, 1];
   let upper: readonly [number, number] = [1, 0];
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const mediant: readonly [number, number] = [lower[0] + upper[0], lower[1] + upper[1]];
 
