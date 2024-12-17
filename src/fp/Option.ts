@@ -1,5 +1,4 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable max-classes-per-file */
 import { NoSuchElementError } from '../NoSuchElementError';
 
@@ -12,9 +11,9 @@ export abstract class Option<A> {
     return option(value);
   }
 
-  private readonly value: NonNullable<A> | never;
+  private readonly value: NonNullable<A>;
 
-  protected constructor(ref: NonNullable<A> | never) {
+  protected constructor(ref: NonNullable<A>) {
     this.value = ref;
   }
 
@@ -244,7 +243,7 @@ export abstract class Option<A> {
  */
 export function some<A>(value: NonNullable<A>): Option<A> {
   if (value == null) throw new Error(`Unable to create '${Some.name}' with value ${String(value)}`);
-
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   return new (class Some extends Option<A> {
     constructor() {
       super(value);
@@ -274,6 +273,7 @@ export function Some<A>(value: NonNullable<A>): Option<A> {
  * The `None` data constructor for [[Option]] represents non-existing
  * values for any type.
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export const None: None = new (class None extends Option<never> {
   constructor() {
     super(undefined as never);

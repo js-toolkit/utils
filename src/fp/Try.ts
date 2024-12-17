@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
 import { NoSuchElementError } from '../NoSuchElementError';
 import { Option, None } from './Option';
@@ -80,7 +79,7 @@ export abstract class Try<A> {
    * a runtime exception will get thrown. Use with care.
    */
   get(): A {
-    if (this.isFailure()) throw (this as Failure).value;
+    if (this.isFailure()) throw (this as Try<unknown>).value;
     return this.value;
   }
 

@@ -2,7 +2,7 @@ import { TimeoutError } from './TimeoutError';
 
 export interface Awaiter<T> {
   readonly pending: boolean;
-  wait: (timeout?: number | undefined) => Promise<T>;
+  wait: (timeout?: number) => Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: any) => void;
 }
@@ -37,13 +37,14 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
     rejectRef && rejectRef(error);
   };
 
-  const wait = (timeout?: number | undefined): Promise<T> => {
+  const wait = (timeout?: number): Promise<T> => {
     if (promise == null) {
       promise = new Promise<T>((resolve, reject) => {
         pending = true;
         resolveRef = resolve;
         rejectRef = reject;
         if (resolved) resolve(resolveValue);
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         if (rejected) reject(rejectValue);
       }).finally(() => {
         // Changed only after all chain will resolved.

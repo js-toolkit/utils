@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { TimeoutError } from '../TimeoutError';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace

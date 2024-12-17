@@ -39,10 +39,10 @@ export class CancellablePromise<T> extends Promise<T> {
         currentCanceller;
 
       if (executorOrPromise instanceof CancellablePromise) {
-        executorOrPromise.cancelled<any>(currentCanceller).then(resolve, reject);
+        executorOrPromise.cancelled<any>(currentCanceller).then(resolve).catch(reject);
       } else if (executorOrPromise instanceof Promise) {
         // Use chain to avoid dynamically inserting into the chain a regular Promise which hasn't cancel handler.
-        executorOrPromise.then(resolve, reject);
+        executorOrPromise.then(resolve).catch(reject);
       } else {
         executorOrPromise(resolve, reject, canceller);
       }

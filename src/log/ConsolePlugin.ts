@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable class-methods-use-this */
 import { hasIn } from '../hasIn';
 import { Plugin } from './Plugin';
