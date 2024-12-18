@@ -15,15 +15,17 @@ type AnyConstructor = new (...args: any) => any;
 
 type AsObject<A extends AnyObject> = { [P in keyof A]: A[P] };
 
-/** Exclude keys of B from keys of A */
+/** Exclude keys of B from keys of A and returns keys. */
 type DiffKeys<A extends AnyObject, B extends AnyObject> = Exclude<Keys<A>, Keys<B>>;
 
+/** Exclude keys of B from keys of A and returns object. */
 type Diff<A extends AnyObject, B extends AnyObject> = Pick<A, DiffKeys<A, B>>;
 
 type IntersectionKeys<A extends AnyObject, B extends AnyObject> = Extract<Keys<A>, Keys<B>>;
 
 type Intersection<A extends AnyObject, B extends AnyObject> = Pick<A, IntersectionKeys<A, B>>;
 
+/** Merge objects. */
 type Merge<A extends AnyObject, B extends AnyObject> = Diff<A, B> & B;
 
 type OmitStrict<
@@ -84,37 +86,32 @@ type Keys<T, OnlyObject extends boolean = true> = T extends T
   ? IfExtends<OnlyObject, true, IfExtends<T, AnyObject, keyof T, never>, keyof T>
   : never;
 
-type DeepKeys<T, Prop = never> = IfExtends<
+/** Returns keys recursively. */
+type DeepKeys<T, FallbackProps = never> = IfExtends<
   T,
   AnyObject,
   IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer ItemType>
-    ? DeepKeys<ItemType, Prop>
+    ? DeepKeys<ItemType, FallbackProps>
     : Required<Extract<{ [P in keyof T]: DeepKeys<NonNullable<T>[P], P> }, AnyObject>>[Keys<T>],
-  Prop
+  FallbackProps
 >;
-
-type UndefinedToNever<T> = T extends undefined ? never : T;
-
-type ExcludeTypesOptions<A extends AnyObject> = { omit: keyof A } | { pick: keyof A };
 
 type ExcludeTypes<
   A extends AnyObject,
-  T extends Extract<BaseTypeOf<A[keyof A]>, T>,
-  K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
-    ? never
-    : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
-      ? ExcludeTypesOptions<A>
-      : never = { pick: keyof A },
+  T extends K['baseTypes'] extends true
+    ? Extract<BaseTypeOf<A[import('./internal').GetKeys<A, K>]>, T>
+    : Extract<A[import('./internal').GetKeys<A, K>], T>,
+  K extends import('./internal').ExcludeTypesOptions<A> = { pick: keyof A },
 > = {
   [P in keyof A]: 'omit' extends keyof K
     ? P extends K['omit']
       ? A[P]
-      : UndefinedToNever<Exclude<A[P], T>>
+      : Exclude<A[P], T>
     : 'pick' extends keyof K
       ? P extends K['pick']
-        ? UndefinedToNever<Exclude<A[P], T>>
+        ? Exclude<A[P], T>
         : A[P]
-      : UndefinedToNever<Exclude<A[P], T>>;
+      : never;
 };
 
 type OmitIndex<T extends AnyObject> = T extends T
@@ -131,10 +128,10 @@ type WithIndex<T extends AnyObject> = T extends T ? T & Record<string, any> : ne
 type KeepTypes<
   A extends AnyObject,
   T extends Extract<BaseTypeOf<A[keyof A]>, T>,
-  K extends Exclude<Keys<ExcludeTypesOptions<A>>, keyof K> extends never
+  K extends Exclude<Keys<import('./internal').GetKeysOptions<A>>, keyof K> extends never
     ? never
-    : Exclude<keyof K, Keys<ExcludeTypesOptions<A>>> extends never
-      ? ExcludeTypesOptions<A>
+    : Exclude<keyof K, Keys<import('./internal').GetKeysOptions<A>>> extends never
+      ? import('./internal').GetKeysOptions<A>
       : never = { pick: keyof A },
 > = ExcludeTypes<
   {
@@ -256,8 +253,6 @@ type RequiredKeepUndefined<T> = T extends T
     : never
   : never;
 
-type PromiseType<T> = T extends Promise<infer R> ? R : T;
-
 type RequiredSome<T, K extends keyof T> = T extends T
   ? Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
   : never;
@@ -367,19 +362,6 @@ type LowercaseKeys<T extends AnyObject> = T extends T
 /** Requires to define all of the keys. */
 type DefineAll<Enum extends string | number | symbol, T extends Record<Enum, unknown>> = T;
 
-// https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
-
-/** Used in `LiftInvalid`. */
-type Invalid<T> = Error & { __errorMessage: T };
-
-/** Used in `AsUniqueArray`. */
-type LiftInvalid<A extends ReadonlyArray<any>> = IfExtends<
-  A[number],
-  Invalid<any>,
-  Extract<A[number], Invalid<any>>,
-  A
->;
-
 /** Exclude the first element. Using with const arrays (tuples). */
 type Last<T extends readonly unknown[]> = T extends [any, ...infer Rest] ? Rest : [];
 
@@ -433,37 +415,32 @@ type InArray<T, Item> = T extends readonly [Item, ...infer _]
       ? InArray<Rest, Item>
       : false;
 
+// https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 /** Useful with type checking utility like `asUniqueArray`. */
 type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
-    ? [Invalid<['Encountered value with duplicates:', X]>]
+    ? [import('./internal').Invalid<['Encountered value with duplicates:', X]>]
     : readonly [X, ...ToUniqueArray<Rest>]
   : T;
 
 /** Useful with type checking utility like `asUniqueArray`. */
-type UniqueArray<T extends ReadonlyArray<any>> = LiftInvalid<ToUniqueArray<T>>;
+type UniqueArray<T extends ReadonlyArray<any>> = import('./internal').LiftInvalid<ToUniqueArray<T>>;
 
 /** Used with type checking utility `asUniqueArray`. */
-type AsUniqueArray<A extends ReadonlyArray<any>> = LiftInvalid<{
+type AsUniqueArray<A extends ReadonlyArray<any>> = import('./internal').LiftInvalid<{
   [I in keyof A]: unknown extends {
     [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
   }[number]
-    ? Invalid<['Encountered value with duplicates:', A[I]]>
+    ? import('./internal').Invalid<['Encountered value with duplicates:', A[I]]>
     : A[I];
 }>;
 
-/** Used in `NonUnion`. */
-type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) extends (k: infer I) => void
-  ? I
-  : never;
-
-/** Used in `UnionToTuple`. */
-type LastOfUnion<T> =
-  UnionToIntersection<T extends T ? () => T : never> extends () => infer R ? R : never;
-
-type UnionToTuple<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
-  ? []
-  : [...UnionToTuple<Exclude<T, L>>, L];
+/** */
+type UnionToTuple<
+  T,
+  L = import('./internal').LastOfUnion<T>,
+  N = [T] extends [never] ? true : false,
+> = true extends N ? [] : [...UnionToTuple<Exclude<T, L>>, L];
 
 /** `RequiredUnionToTuple<'1' | '2' | '3', ['1', '3', '2']>` */
 type RequiredUnionToTuple<
@@ -485,7 +462,7 @@ type RequiredUnionToTuple<
       : [UA, ...RequiredUnionToTuple<Exclude<U, UA>, Skip<A, 1>>];
 
 /** Returns `never` if T is union type. */
-type NonUnion<T> = [T] extends [UnionToIntersection<T>] ? T : never;
+type NonUnion<T> = [T] extends [import('./internal').UnionToIntersection<T>] ? T : never;
 
 type IfTuple<T, Then = T, Else = never> =
   T extends ArrayLike<any> ? (number extends T['length'] ? Then : Else) : Else;
