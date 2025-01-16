@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-/* eslint-disable no-use-before-define */
 
 export type SelectByPredicate<O extends AnyObject, T extends O[keyof O], K extends keyof O> =
   | ((value: O[typeof key], key: keyof O) => value is T)

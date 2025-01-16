@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable dot-notation */
 /* eslint-disable no-proto */
