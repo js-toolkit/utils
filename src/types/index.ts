@@ -574,3 +574,8 @@ type SettersToProps<T extends AnyObject> = T extends T
 type RemovePart<T extends string, Part extends string> = T extends `${infer S1}${Part}${infer S2}`
   ? `${S1}${S2}`
   : T;
+
+/**
+ * Returns type of array item.
+ */
+type ArrayItem<T extends ArrayLike<any>> = T extends ArrayLike<infer U> ? U : never;
