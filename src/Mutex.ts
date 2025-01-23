@@ -16,7 +16,7 @@ export class Mutex<I extends string = string> {
   /** Acquires the mutex, as soon as possible. */
   async acquire(identifier: I): Promise<Disposable> {
     this.logger.trace(`${identifier} has requested mutex.`);
-    if (this.acquiredIdentifier) {
+    if (this.acquiredIdentifier != null) {
       await new Promise<void>((resolve) => {
         this.unlockQueue.push(resolve);
       });
