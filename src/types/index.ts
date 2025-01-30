@@ -288,7 +288,7 @@ type OptionalToUndefined<T> = T extends T
 //   : never;
 
 type RequiredInner<T, K extends keyof T> = T extends T
-  ? { [P in keyof T]: P extends K ? IfExtends<T[K], AnyObject, Required<T[K]>, T[K]> : T[P] }
+  ? { [P in keyof T]: P extends K ? IfExtends<T[P], AnyObject, Required<T[P]>, T[P]> : T[P] }
   : never;
 
 type RequiredInnerKeepUndefined<T, K extends keyof T> = T extends T
@@ -333,7 +333,7 @@ type PickRequired<T> = {
 type OmitInner<T, K extends keyof T, IK extends keyof NonNullable<T[K]>> = T extends T
   ? {
       [P in keyof T]: P extends K
-        ? OmitStrict<NonNullable<T[K]>, IK extends Keys<T[K]> ? IK : never>
+        ? OmitStrict<NonNullable<T[P]>, IK extends Keys<T[P]> ? IK : never>
         : T[P];
     }
   : never;
