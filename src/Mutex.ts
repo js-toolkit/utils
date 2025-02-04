@@ -4,9 +4,11 @@ export class Mutex<I extends string = string> {
   private readonly logger: log.Logger;
   private readonly unlockQueue: VoidFunction[] = [];
   private acquiredIdentifier: I | undefined;
+  private readonly prefix: string;
 
-  constructor(logger?: log.Logger) {
+  constructor(prefix?: string, logger?: log.Logger) {
     this.logger = logger ?? log.getLogger('mutex');
+    this.prefix = prefix || '';
   }
 
   isAcquired(): boolean {
@@ -15,14 +17,14 @@ export class Mutex<I extends string = string> {
 
   /** Acquires the mutex, as soon as possible. */
   async acquire(identifier: I): Promise<Disposable> {
-    this.logger.debug(`${identifier} has requested mutex.`);
+    this.logger.debug(`${this.prefix}${identifier} has requested mutex.`);
     if (this.acquiredIdentifier != null) {
       await new Promise<void>((resolve) => {
         this.unlockQueue.push(resolve);
       });
     }
     this.acquiredIdentifier = identifier;
-    this.logger.debug(`${identifier} has acquired mutex.`);
+    this.logger.debug(`${this.prefix}${identifier} has acquired mutex.`);
     const dispose = (): void => this.release();
     return {
       [Symbol.dispose](): void {
@@ -33,7 +35,7 @@ export class Mutex<I extends string = string> {
 
   /** Releases your hold on the mutex. */
   release(): void {
-    this.logger.debug(`${this.acquiredIdentifier} has released mutex.`);
+    this.logger.debug(`${this.prefix}${this.acquiredIdentifier} has released mutex.`);
     const resolve = this.unlockQueue.shift();
     if (resolve) {
       resolve();
