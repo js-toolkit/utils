@@ -15,14 +15,14 @@ export class Mutex<I extends string = string> {
 
   /** Acquires the mutex, as soon as possible. */
   async acquire(identifier: I): Promise<Disposable> {
-    this.logger.trace(`${identifier} has requested mutex.`);
+    this.logger.debug(`${identifier} has requested mutex.`);
     if (this.acquiredIdentifier != null) {
       await new Promise<void>((resolve) => {
         this.unlockQueue.push(resolve);
       });
     }
     this.acquiredIdentifier = identifier;
-    this.logger.trace(`${identifier} has acquired mutex.`);
+    this.logger.debug(`${identifier} has acquired mutex.`);
     const dispose = (): void => this.release();
     return {
       [Symbol.dispose](): void {
@@ -33,7 +33,7 @@ export class Mutex<I extends string = string> {
 
   /** Releases your hold on the mutex. */
   release(): void {
-    this.logger.trace(`${this.acquiredIdentifier} has released mutex.`);
+    this.logger.debug(`${this.acquiredIdentifier} has released mutex.`);
     const resolve = this.unlockQueue.shift();
     if (resolve) {
       resolve();
