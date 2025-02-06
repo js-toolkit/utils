@@ -22,7 +22,7 @@
     "@js-toolkit/node-utils": "^1.2.1"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.2.5",
+    "@eslint/compat": "^1.2.6",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.19.0",
     "@js-toolkit/configs": "^3.94.0",
@@ -41,10 +41,10 @@
     "lodash.debounce": "^4.0.8",
     "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "terser": "^5.37.0",
+    "terser": "^5.38.0",
     "ts-jest": "^29.2.5",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.22.0",
+    "typescript-eslint": "^8.23.0",
     "yargs": "^17.7.2"
   }
 }
