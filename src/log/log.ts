@@ -19,7 +19,16 @@ type LogMethodFactory = (
 type LevelsMap = Record<log.Level, number>;
 
 const state = (() => {
-  const levels = ['none', 'error', 'warn', 'info', 'debug', 'trace'] as const as log.Levels;
+  const levels = [
+    'none',
+    'error',
+    'warn',
+    'info',
+    'debug',
+    'v1',
+    'v2',
+    'trace',
+  ] as const as log.Levels;
   return {
     rootLoggerName: '',
     defaultLevel: 'debug' satisfies log.Level as log.Level,
@@ -171,7 +180,7 @@ namespace log {
   export interface LevelsOverrides {}
 
   export type Level = GetOverridedKeys<
-    'none' | 'error' | 'warn' | 'info' | 'debug' | 'trace',
+    'none' | 'error' | 'warn' | 'info' | 'debug' | 'v1' | 'v2' | 'trace',
     LevelsOverrides
   >;
 
