@@ -579,3 +579,13 @@ type RemovePart<T extends string, Part extends string> = T extends `${infer S1}$
  * Returns type of array item.
  */
 type ArrayItem<T extends ArrayLike<any>> = T extends ArrayLike<infer U> ? U : never;
+
+/**
+ * Returns `true` if type is any, or `false` for any other type.
+ */
+type IsAny<T> = 0 extends 1 & T ? true : false;
+// type IsAny<T> = import('./internal').UnionToIntersection<
+//   import('./internal').UnionForAny<T>
+// > extends never
+//   ? true
+//   : false;

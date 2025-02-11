@@ -31,3 +31,6 @@ export type UnionToIntersection<U> = (U extends U ? (k: U) => void : never) exte
 /** Used in `UnionToTuple`. */
 export type LastOfUnion<T> =
   UnionToIntersection<T extends T ? () => T : never> extends () => infer R ? R : never;
+
+// /** Used in `IsAny`. If T is `any` a union of both side of the condition is returned. */
+// export type UnionForAny<T> = T extends never ? 'A' : 'B';
