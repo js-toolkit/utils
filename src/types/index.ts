@@ -49,8 +49,15 @@ type Overwrite<
   B extends DiffKeys<B, A> extends never ? Intersection<B, A> : never,
 > = Override<A, B>;
 
-type IfExtends<T, Type, Then = T, Else = never> =
-  Extract<T, Type> extends never ? Else : Extract<T, Type> extends Type ? Then : Else;
+type IfExtends<T, Type, Then = T, Else = never> = [Type] extends [never]
+  ? [T] extends [never]
+    ? Then
+    : Else
+  : Extract<T, Type> extends never
+    ? Else
+    : Extract<T, Type> extends Type
+      ? Then
+      : Else;
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
   ? {
