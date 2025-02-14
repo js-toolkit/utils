@@ -5,32 +5,34 @@ type EventArgs = [any] | [any?] | [];
 type EventMap = Record<string, EventArgs | EventEmitter.DataEvent<string, any, any>>;
 
 type GetEventObjectTuple<Map extends EventMap, K extends keyof Map, Target> = Map[K] extends [
-  EventEmitter.DataEvent<infer _P1, infer _D1, any>,
+  EventEmitter.DataEvent<any, any, any>,
 ]
-  ? [data: EventEmitter.DataEvent<_P1, _D1, Target>]
-  : Map[K] extends EventEmitter.DataEvent<infer _P2, infer _D2, any>
-    ? [data: EventEmitter.DataEvent<_P2, _D2, Target>]
+  ? [data: EventEmitter.DataEvent<K, Map[K][0]['data'], Target>]
+  : Map[K] extends EventEmitter.DataEvent<any, any, any>
+    ? [data: EventEmitter.DataEvent<K, Map[K]['data'], Target>]
     : [data: EventEmitter.DataEvent<K, Map[K] extends EventArgs ? Map[K][0] : unknown, Target>];
 
-type GetEventDataTuple<Map extends EventMap, K extends keyof Map> = Map[K] extends readonly any[]
-  ? Map[K]
-  : Exclude<Exclude<Map[K], any[]>['data'], undefined> extends never
-    ? []
-    : IfExtends<
-        Exclude<Map[K], any[]>['data'],
-        undefined,
-        [data?: Exclude<Map[K], any[]>['data'] | undefined],
-        [data: Exclude<Map[K], any[]>['data']]
-      >;
+type ToArgs<Data> = IfExtends<
+  Exclude<Data, undefined>,
+  never,
+  [],
+  IfExtends<Data, undefined, [Data?], [Data]>
+>;
+
+type GetEventDataTuple<Map extends EventMap, K extends keyof Map> = ToArgs<
+  GetEventObjectTuple<Map, K, any>[0]['data']
+>;
 
 interface EE {
   readonly fn: AnyFunction;
   readonly once: boolean;
 }
 
+type DataEventNames<T extends string | symbol | EventMap> = T extends string | symbol ? T : keyof T;
+
 type Events<EventTypes extends string | symbol | EventMap> = PartialRecord<
-  EventEmitter.DataEventNames<EventTypes>,
-  Map<AnyFunction, EE>
+  DataEventNames<EventTypes>,
+  Map<EventEmitter.DataEventListener<EventTypes, any, any>, EE>
 >;
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -45,19 +47,15 @@ export namespace EventEmitter {
     [P in keyof Map]: GetEventObjectTuple<Map, P, Target>[0];
   };
 
-  export type DataEventNames<T extends string | symbol | EventMap> = T extends string | symbol
-    ? T
-    : keyof T;
+  type Listener<Args extends any[]> = (...args: Args) => void;
 
   export type DataEventListener<
     EventTypes extends string | symbol | EventMap,
     K extends DataEventNames<EventTypes>,
     Target,
-  > = (
-    ...args: EventTypes extends EventMap
-      ? GetEventObjectTuple<EventTypes, Extract<K, keyof EventTypes>, Target>
-      : [EventEmitter.DataEvent<EventTypes, unknown, Target>]
-  ) => void;
+  > = EventTypes extends EventMap
+    ? Listener<[event: DataEventMap<EventTypes, Target>[Extract<K, keyof EventTypes>]]>
+    : Listener<[event: EventEmitter.DataEvent<EventTypes, unknown, Target>]>;
 
   export type DataEventArgs<
     EventTypes extends string | symbol | EventMap,
@@ -110,16 +108,18 @@ export class EventEmitter<
     );
   }
 
-  getListenerCount<T extends EventEmitter.DataEventNames<EventTypes>>(event: T): number {
+  getListenerCount<T extends DataEventNames<EventTypes>>(event: T): number {
     return this[eventsKey][event]?.size ?? 0;
   }
 
-  on<T extends EventEmitter.DataEventNames<EventTypes>>(
+  on<T extends DataEventNames<EventTypes>>(
     event: T,
     fn: EventEmitter.DataEventListener<EventTypes, T, Target>,
     options?: EventEmitter.AddEventListenerOptions
   ): this {
-    const map = this[eventsKey][event] ?? new Map<AnyFunction, EE>();
+    const map =
+      this[eventsKey][event] ??
+      new Map<EventEmitter.DataEventListener<EventTypes, T, Target>, EE>();
     const ee = map.get(fn);
     // Recreate if once different.
     if (ee && ee.once === !!options?.once) return this;
@@ -141,14 +141,14 @@ export class EventEmitter<
     return this;
   }
 
-  once<T extends EventEmitter.DataEventNames<EventTypes>>(
+  once<T extends DataEventNames<EventTypes>>(
     event: T,
     fn: EventEmitter.DataEventListener<EventTypes, T, Target>
   ): this {
     return this.on(event, fn, { once: true });
   }
 
-  off<T extends EventEmitter.DataEventNames<EventTypes>>(
+  off<T extends DataEventNames<EventTypes>>(
     event: T,
     fn?: EventEmitter.DataEventListener<EventTypes, T, Target>
   ): this {
@@ -162,7 +162,7 @@ export class EventEmitter<
     return this;
   }
 
-  removeAllListeners(event?: EventEmitter.DataEventNames<EventTypes>): this {
+  removeAllListeners(event?: DataEventNames<EventTypes>): this {
     if (event) {
       return this.off(event);
     }
@@ -170,14 +170,14 @@ export class EventEmitter<
     return this;
   }
 
-  removeAllListenersBut(...events: EventEmitter.DataEventNames<EventTypes>[]): this {
+  removeAllListenersBut(...events: DataEventNames<EventTypes>[]): this {
     if (events.length === 0) {
       return this.removeAllListeners();
     }
     const set = new Set(events);
     // eslint-disable-next-line no-restricted-syntax, guard-for-in
     for (const key in this[eventsKey]) {
-      const ev = key as EventEmitter.DataEventNames<EventTypes>;
+      const ev = key as DataEventNames<EventTypes>;
       if (!set.has(ev)) {
         this.off(ev);
       }
@@ -185,7 +185,7 @@ export class EventEmitter<
     return this;
   }
 
-  emit<T extends EventEmitter.DataEventNames<EventTypes>>(
+  emit<T extends DataEventNames<EventTypes>>(
     event: T,
     ...args: EventEmitter.DataEventArgs<EventTypes, T>
   ): boolean {
