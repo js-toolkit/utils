@@ -9,6 +9,10 @@
     "incremental": true,
     "diagnostics": true
   },
+  "ts-node": {
+    "transpileOnly": true,
+    "esm": true
+  },
   "include": ["src"],
   "exclude": ["src/DataEventEmitter.ts"]
 }

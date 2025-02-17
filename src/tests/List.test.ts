@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { List, Nil } from '../collections/immutable';
 
 const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -5,19 +6,22 @@ const list = List.of(...arr);
 
 test('Assign unknown property', () => {
   expect(() => {
-    (list as any).q = 0;
+    // @ts-expect-error
+    list.q = 0;
   }).toThrow();
 });
 
 test('Assign head', () => {
   expect(() => {
-    (list as any).head = 0;
+    // @ts-expect-error
+    list.head = 0;
   }).toThrow();
 });
 
 test('Assign size', () => {
   expect(() => {
-    (list as any).size = 0;
+    // @ts-expect-error
+    list.size = 0;
   }).toThrow();
 });
 
