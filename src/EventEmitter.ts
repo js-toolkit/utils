@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
 import { clear } from './clear';
 
 type EventArgs = [any] | [any?] | [];
@@ -57,7 +59,7 @@ export namespace EventEmitter {
     ? Listener<[event: DataEventMap<EventTypes, Target>[Extract<K, keyof EventTypes>]]>
     : Listener<[event: EventEmitter.DataEvent<EventTypes, unknown, Target>]>;
 
-  export type DataEventArgs<
+  export type EmitEventArgs<
     EventTypes extends string | symbol | EventMap,
     K extends DataEventNames<EventTypes>,
   > = EventTypes extends EventMap
@@ -88,13 +90,21 @@ export class EventEmitter<
     'on' | 'once' | 'off' | 'removeAllListeners' | 'emit'
   > = EventEmitter<EventTypes, any>,
 > {
-  private readonly [optionsKey]: EventEmitter.Options;
+  private readonly [optionsKey]: RequiredStrict<EventEmitter.Options>;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   private readonly [eventsKey]: Events<EventTypes> = Object.create(null);
 
   constructor(options?: EventEmitter.Options) {
     this[optionsKey] = { ...options, ignoreListenerError: options?.ignoreListenerError ?? true };
+  }
+
+  setOptions(options: Partial<EventEmitter.Options>): this {
+    const prev = this[optionsKey];
+    Object.assign(this[optionsKey], {
+      ignoreListenerError: options.ignoreListenerError ?? prev.ignoreListenerError,
+    });
+    return this;
   }
 
   getEventListeners(): EventEmitter.EventListeners<EventTypes, Target> {
@@ -108,8 +118,13 @@ export class EventEmitter<
     );
   }
 
-  getListenerCount<T extends DataEventNames<EventTypes>>(event: T): number {
-    return this[eventsKey][event]?.size ?? 0;
+  getListenerCount<T extends DataEventNames<EventTypes>>(event?: T): number {
+    if (event) return this[eventsKey][event]?.size ?? 0;
+    let count = 0;
+    for (const key in this[eventsKey]) {
+      count += this.getListenerCount(key as DataEventNames<EventTypes>);
+    }
+    return count;
   }
 
   on<T extends DataEventNames<EventTypes>>(
@@ -175,7 +190,6 @@ export class EventEmitter<
       return this.removeAllListeners();
     }
     const set = new Set(events);
-    // eslint-disable-next-line no-restricted-syntax, guard-for-in
     for (const key in this[eventsKey]) {
       const ev = key as DataEventNames<EventTypes>;
       if (!set.has(ev)) {
@@ -187,12 +201,12 @@ export class EventEmitter<
 
   emit<T extends DataEventNames<EventTypes>>(
     event: T,
-    ...args: EventEmitter.DataEventArgs<EventTypes, T>
+    ...args: EventEmitter.EmitEventArgs<EventTypes, T>
   ): boolean {
     const map = this[eventsKey][event];
     if (!map) return false;
     // Replace event data with type and data
-    const data = args[0] as EventEmitter.DataEventArgs<EventTypes, T>[0];
+    const data = args[0] as EventEmitter.EmitEventArgs<EventTypes, T>[0];
     const eventObject: EventEmitter.DataEvent<T, typeof data, this> = {
       type: event,
       data,
