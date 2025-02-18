@@ -6,13 +6,14 @@ const emitter = new EventEmitter<EventMap>({
   ignoreListenerError: true,
 });
 
-const event1Handler = jest.fn<void, [EventEmitter.DataEventMap<EventMap, any>['event1']]>();
-const event2Handler = jest.fn<void, [EventEmitter.DataEventMap<EventMap, any>['event2']]>();
+const event1Handler = jest.fn<void, [EventEmitter.EventMap<EventMap, any>['event1']]>();
+const event2Handler = jest.fn<void, [EventEmitter.EventMap<EventMap, any>['event2']]>();
 
 test('Add 2 same handlers', () => {
   emitter.on('event1', event1Handler);
   emitter.on('event1', event1Handler);
   emitter.on('event2', event2Handler);
+  expect(emitter.getListenerCount()).toBe(2);
   expect(emitter.getListenerCount('event1')).toBe(1);
 });
 
