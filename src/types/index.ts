@@ -61,17 +61,34 @@ type IfExtends<T, Type, Then = T, Else = never> = [Type] extends [never]
 
 type KeysOfType<T extends AnyObject, Type, Strict extends boolean = true> = T extends T
   ? {
-      [P in keyof T]-?: Strict extends true
-        ? IfExtends<T[P], Type, P, never>
-        : T[P] extends Type
-          ? P
-          : never;
+      [P in keyof T]-?: import('./internal').IsType<T[P], Type, Strict> extends true ? P : never;
     }[keyof T]
   : never;
 
 type ExcludeKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<
   A,
   Exclude<keyof A, KeysOfType<A, B, Strict>>
+>;
+
+type DeepExcludeKeysOfType<
+  A,
+  B,
+  Strict extends boolean = true,
+  Depth extends number = never,
+  R extends unknown[] = [],
+> = IfExtends<
+  A,
+  AnyObject,
+  IfExtends<A, ReadonlyArray<any>, NonNullable<A>, unknown> extends ReadonlyArray<infer I>
+    ? Array<DeepExcludeKeysOfType<I, B, Strict, Depth, R>>
+    : {
+        [P in keyof A as import('./internal').IsType<A[P], B, Strict> extends true
+          ? never
+          : P]: R['length'] extends Depth
+          ? A[P]
+          : DeepExcludeKeysOfType<A[P], B, Strict, Depth, Push<R, unknown>>;
+      },
+  A
 >;
 
 type ExtractKeysOfType<A extends AnyObject, B, Strict extends boolean = false> = Pick<

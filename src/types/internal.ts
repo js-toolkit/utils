@@ -34,3 +34,9 @@ export type LastOfUnion<T> =
 
 // /** Used in `IsAny`. If T is `any` a union of both side of the condition is returned. */
 // export type UnionForAny<T> = T extends never ? 'A' : 'B';
+
+export type IsType<T, Type, Strict extends boolean = true> = Strict extends true
+  ? IfExtends<T, Type, true, false>
+  : T extends Type
+    ? true
+    : false;
