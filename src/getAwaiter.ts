@@ -43,6 +43,7 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
 
   const wait = (timeout?: number): Promise<T> => {
     if (promise == null) {
+      // Do not use race in order to able to renew wait timeout.
       promise = new Promise<T>((resolve, reject) => {
         pending = true;
         resolveRef = resolve as typeof resolveRef;
@@ -66,7 +67,6 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> 
         timeout
       );
     }
-
     return promise;
   };
 
