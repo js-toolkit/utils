@@ -28,7 +28,6 @@ export interface TaskCounterOptions<K extends string> {
 export function getTaskCounter<K extends string = never>({
   pendingTasks = { default: 0 },
   resetTask = (tasks, key) => {
-    /* eslint-disable no-param-reassign */
     if (key === 'default') {
       tasks.default = 0;
       return;
