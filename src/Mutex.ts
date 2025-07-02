@@ -1,13 +1,13 @@
 import log from './log';
 
 export class Mutex<I extends string = string> {
-  private readonly logger: log.Logger;
+  private readonly logger: log.ReadonlyLogger;
   private readonly unlockQueue: VoidFunction[] = [];
   private acquiredIdentifier: I | undefined;
   private readonly prefix: string;
 
-  constructor(prefix?: string, logger?: log.Logger) {
-    this.logger = logger ?? log.getLogger('mutex');
+  constructor(prefix?: string, logger?: log.ReadonlyLogger) {
+    this.logger = logger?.getLogger('mutex') ?? log.getLogger('mutex');
     this.prefix = prefix || '';
   }
 

@@ -2,7 +2,7 @@
 /* eslint-disable class-methods-use-this */
 import { hasIn } from '../hasIn';
 import { Plugin } from './Plugin';
-import log from './log';
+import type log from './log';
 
 // const levelMethodMap: Record<log.Level, keyof Console | 'none'> = {
 //   none: 'none',
@@ -22,7 +22,10 @@ export class ConsolePlugin extends Plugin {
 
   override notifyOfChange(): void {}
 
-  override factory(_logger: log.Logger, level: log.Level): log.LoggingMethod | undefined {
+  override factory(
+    _logger: log.Logger | log.ReadonlyLogger,
+    level: log.Level
+  ): log.LoggingMethod | undefined {
     if (typeof console === 'undefined' || level === 'none') {
       return undefined;
     }

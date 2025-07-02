@@ -4,6 +4,7 @@ import { noop } from '../noop';
 import type { GetOverridedKeys } from '../types/augmentation';
 import { Plugin as PluginBase } from './Plugin';
 import { ConsolePlugin } from './ConsolePlugin';
+import { ChildLogger } from './ChildLogger';
 
 type PluginConfigMap = Record<
   string,
@@ -12,7 +13,7 @@ type PluginConfigMap = Record<
 
 type LogMethodFactory = (
   method: log.Level | log.LevelNumber,
-  logger: log.Logger,
+  logger: log.Logger | ChildLogger,
   plugins: PluginConfigMap
 ) => log.LoggingMethod;
 
@@ -49,7 +50,7 @@ function levelsToMap(levels: log.Levels): LevelsMap {
 
 function defaultMethodFactory(
   method: log.Level | log.LevelNumber,
-  logger: log.Logger,
+  logger: ChildLogger,
   plugins: PluginConfigMap
 ): log.LoggingMethod {
   const chain: log.LoggingMethod[] = [];
@@ -79,7 +80,7 @@ function getPluginsList(): log.Plugin[] {
   return Object.values(state.plugins).map(([p]) => p);
 }
 
-function buildMethods(logger: log.Logger): void {
+function buildMethods(logger: log.Logger | ChildLogger): void {
   const levels = logger.getLevels();
   for (let i = 0; i < levels.length; i += 1) {
     const level = levels[i];
@@ -105,6 +106,7 @@ class Logger {
   readonly name: string;
   readonly #defaultLevel: log.Level;
   #level: log.Level | undefined;
+  #children: Record<string, ChildLogger> = {};
 
   constructor(name: string, defaultLevel: log.Level) {
     this.name = name;
@@ -134,6 +136,7 @@ class Logger {
     // If really changed
     if (prevLevel !== this.#level) {
       buildMethods(this);
+      Object.values(this.#children).forEach(buildMethods);
       // If not initial setup
       if (prevLevel != null) getPluginsList().forEach((plugin) => plugin.notifyOfChange(this));
     }
@@ -157,7 +160,17 @@ class Logger {
     if (!usePlugin) throw new Error(`Invalid plugin: ${pluginName}`);
     usePlugin['1'][this.name] = config || {};
     buildMethods(this);
+    Object.values(this.#children).forEach(buildMethods);
     return this;
+  }
+
+  getLogger(name: string): log.ReadonlyLogger {
+    if (!this.#children[name]) {
+      const logger = new ChildLogger(name, this);
+      buildMethods(logger);
+      this.#children[name] = logger;
+    }
+    return this.#children[name];
   }
 }
 
@@ -167,6 +180,7 @@ type LoggerType = Logger;
 namespace log {
   // Use this remap for vscode quick fix's 'Implement inherited abstract class' in custom plugin impl
   export type Logger = { [P in keyof LoggerType]: LoggerType[P] };
+  export type ReadonlyLogger = { [P in keyof ChildLogger]: ChildLogger[P] };
 
   export const Plugin = PluginBase;
   export type Plugin = PluginBase;

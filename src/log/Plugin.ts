@@ -8,7 +8,7 @@ export abstract class Plugin {
   abstract initialize(logger: log.Logger): void;
 
   abstract factory(
-    logger: log.Logger,
+    logger: log.Logger | log.ReadonlyLogger,
     level: log.Level,
     config: AnyObject
   ): log.LoggingMethod | undefined;
