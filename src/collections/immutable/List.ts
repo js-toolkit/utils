@@ -260,6 +260,7 @@ export class List<T> implements ListLike<T> {
     return items.reduceRight((tail, item) => this.from(item, tail), Nil);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   static empty: Nil = new (class Nil extends List<undefined> {
     constructor() {
       super(undefined, undefined as never);

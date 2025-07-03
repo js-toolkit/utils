@@ -6,9 +6,10 @@
  */
 export function toHashCode(str: string): number {
   let hash = 0;
-  if (str.length === 0) return hash;
+  const { length } = str;
+  if (length === 0) return hash;
 
-  for (let i = 0; i < str.length; i += 1) {
+  for (let i = 0; i < length; i += 1) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash &= hash; // Convert to 32bit integer

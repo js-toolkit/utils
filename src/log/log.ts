@@ -66,7 +66,8 @@ function defaultMethodFactory(
   if (chain.length === 0) return noop;
 
   return (...message: unknown[]) => {
-    for (let i = 0; i < chain.length; i += 1) {
+    const { length } = chain;
+    for (let i = 0; i < length; i += 1) {
       chain[i](...message);
     }
   };
@@ -82,7 +83,8 @@ function getPluginsList(): log.Plugin[] {
 
 function buildMethods(logger: log.Logger | ChildLogger): void {
   const levels = logger.getLevels();
-  for (let i = 0; i < levels.length; i += 1) {
+  const { length } = levels;
+  for (let i = 0; i < length; i += 1) {
     const level = levels[i];
     logger[level] = logger.isLevelEnabled(level)
       ? state.factory(level, logger, state.plugins)
@@ -92,7 +94,8 @@ function buildMethods(logger: log.Logger | ChildLogger): void {
 
 function removeMethods(logger: log.Logger): void {
   const levels = logger.getLevels();
-  for (let i = 0; i < levels.length; i += 1) {
+  const { length } = levels;
+  for (let i = 0; i < length; i += 1) {
     delete logger[levels[i]];
   }
 }

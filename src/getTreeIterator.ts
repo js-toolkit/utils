@@ -47,9 +47,10 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
     // Down to children
     if (!visited.has(node)) {
       const children = getChildren(node);
-      if (children && children.length > 0) {
-        const nextIdx = step + (step > 0 ? -1 : children.length);
-        if (nextIdx >= 0 && nextIdx <= children.length - 1) {
+      const length = children?.length;
+      if (children && length != null && length > 0) {
+        const nextIdx = step + (step > 0 ? -1 : length);
+        if (nextIdx >= 0 && nextIdx <= length - 1) {
           const nextNode = children[nextIdx];
           if (scope.stop(nextNode)) return nextNode as SN;
           return selectNext(nextNode, step, loop, visited);

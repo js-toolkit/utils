@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 type ClearResult<T extends AnyObject> = T extends ReadonlyArray<unknown> ? T : Partial<T>;
 
 export function clear<T extends AnyObject>(obj: T): ClearResult<T> {
