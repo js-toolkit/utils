@@ -56,7 +56,7 @@ export function getTimer({
     timerId = undefined;
   };
 
-  const stop = ({ flush }: TimerStopOptions = {}): void => {
+  const stop = ({ flush }: TimerStopOptions = Object.create(null)): void => {
     try {
       if (flush && timer.isActive()) {
         void callback(timer);
@@ -79,7 +79,7 @@ export function getTimer({
     onPause && onPause();
   };
 
-  const start = ({ immediately, once }: TimerStartOptions = {}): void => {
+  const start = ({ immediately, once }: TimerStartOptions = Object.create(null)): void => {
     if (timer.isActive()) stop();
 
     if (sessionId >= Number.MAX_SAFE_INTEGER) {

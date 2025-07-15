@@ -89,7 +89,7 @@ export class EventEmitter<
         acc[ev] = this[eventsKey][ev]!.keys().toArray();
         return acc;
       },
-      {} as EventEmitter.EventListeners<EventTypes, Target>
+      Object.create(null) as EventEmitter.EventListeners<EventTypes, Target>
     );
   }
 

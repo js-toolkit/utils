@@ -33,8 +33,8 @@ const state = (() => {
   return {
     rootLoggerName: '',
     defaultLevel: 'debug' satisfies log.Level as log.Level,
-    loggers: {} as Record<string, log.Logger>,
-    plugins: {} as PluginConfigMap,
+    loggers: Object.create(null) as Record<string, log.Logger>,
+    plugins: Object.create(null) as PluginConfigMap,
     levels,
     levelsMap: levelsToMap(levels),
     factory: defaultMethodFactory as LogMethodFactory,
@@ -42,10 +42,13 @@ const state = (() => {
 })();
 
 function levelsToMap(levels: log.Levels): LevelsMap {
-  return levels.reduce((acc, level, i) => {
-    acc[level] = i;
-    return acc;
-  }, {} as LevelsMap);
+  return levels.reduce(
+    (acc, level, i) => {
+      acc[level] = i;
+      return acc;
+    },
+    Object.create(null) as LevelsMap
+  );
 }
 
 function defaultMethodFactory(
@@ -109,7 +112,7 @@ class Logger {
   readonly name: string;
   readonly #defaultLevel: log.Level;
   #level: log.Level | undefined;
-  #children: Record<string, ChildLogger> = {};
+  #children: Record<string, ChildLogger> = Object.create(null);
 
   constructor(name: string, defaultLevel: log.Level) {
     this.name = name;
@@ -161,7 +164,7 @@ class Logger {
     const pluginName = typeof plugin === 'string' ? plugin : plugin.name;
     const usePlugin = state.plugins[pluginName];
     if (!usePlugin) throw new Error(`Invalid plugin: ${pluginName}`);
-    usePlugin['1'][this.name] = config || {};
+    usePlugin['1'][this.name] = config || Object.create(null);
     buildMethods(this);
     Object.values(this.#children).forEach(buildMethods);
     return this;
@@ -246,7 +249,7 @@ namespace log {
         acc[name] = pl;
         return acc;
       },
-      {} as Record<string, Plugin>
+      Object.create(null) as Record<string, Plugin>
     );
   }
 
@@ -271,7 +274,7 @@ namespace log {
   export function register(plugin: log.Plugin): void {
     const pluginName = plugin.name;
     if (!state.plugins[pluginName]) {
-      state.plugins[pluginName] = [plugin, {}];
+      state.plugins[pluginName] = [plugin, Object.create(null)];
     }
   }
 

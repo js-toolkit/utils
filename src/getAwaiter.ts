@@ -13,9 +13,7 @@ export interface AwaiterOptions {
   readonly lazy?: boolean | undefined;
 }
 
-// getAwaiter<any>().resolve()
-
-export function getAwaiter<T = void>({ lazy }: AwaiterOptions = {}): Awaiter<T> {
+export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(null)): Awaiter<T> {
   // https://stackoverflow.com/a/42118995
 
   let pending = false;

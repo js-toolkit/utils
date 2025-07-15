@@ -21,7 +21,7 @@ export function omitBy<
   T extends O[keyof O] = never,
   K extends keyof O = never,
 >(obj: O, predicate: SelectByPredicate<O, T, K>): OmitByResult<O, T, K> {
-  const result: AnyObject = {};
+  const result: AnyObject = Object.create(null);
   for (const key in obj) {
     if (!predicate(obj[key], key)) {
       result[key] = obj[key];

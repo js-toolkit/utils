@@ -2,7 +2,7 @@ import { Plugin } from './Plugin';
 import type log from './log';
 
 export class LocalStoragePlugin extends Plugin {
-  private readonly levelMap: Record<string, log.Level> = {};
+  private readonly levelMap: Record<string, log.Level> = Object.create(null);
 
   constructor(
     name: string,

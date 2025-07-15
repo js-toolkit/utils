@@ -53,7 +53,7 @@ export function getEnumValues<Enum extends string | number, K extends string>(
 export function reverseEnum<Enum extends string | number, K extends string>(
   enumeration: Record<K, Enum>
 ): Record<Enum, K> {
-  const result: Record<Enum, K> = {} as Record<Enum, K>;
+  const result: Record<Enum, K> = Object.create(null) as Record<Enum, K>;
   for (const prop in enumeration) {
     const val = enumeration[prop];
     result[val] = prop;

@@ -62,10 +62,10 @@ export function getListIterator(
   const cancel = (): void => delayedNext.cancel();
 
   const next: ListIterator['next'] = beforeCall(
-    ({ delay = options?.delay } = {}) => {
+    ({ delay = options?.delay } = Object.create(null)) => {
       nextIndex >= 0 && delayedNext.delay(delay ?? 0);
     },
-    async ({ loop = options?.loop } = {}) => {
+    async ({ loop = options?.loop } = Object.create(null)) => {
       nextIndex = await getNextItem(loop);
     }
   );

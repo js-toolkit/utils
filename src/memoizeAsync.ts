@@ -9,7 +9,7 @@ export interface MemoizeAsyncOptions {
 
 export function memoizeAsync<T extends AnyAsyncFunction>(
   func: T,
-  options: MemoizeAsyncOptions = {},
+  options: MemoizeAsyncOptions = Object.create(null),
   ...rest: Parameters<ReturnType<T>['then']>
 ): MemoizedAsync<T> {
   let callPromise: Promise<unknown> | undefined;

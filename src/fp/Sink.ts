@@ -36,7 +36,7 @@ export class Sink<A> {
 
   constructor(
     executor: (pipe: (value: A) => void, cancel: Sink<A>['cancel']) => Sink.Finalizator | void,
-    { cancelOnPipeError = true }: Sink.Options = {}
+    { cancelOnPipeError = true }: Sink.Options = Object.create(null)
   ) {
     this.pending = true;
     this.cancelOnError = cancelOnPipeError;
@@ -65,7 +65,7 @@ export class Sink<A> {
   }
 
   /** Wait until Sink is finished/cancelled. */
-  wait({ timeout, errorOnTimeout = true }: Sink.WaitOptions = {}): Promise<void> {
+  wait({ timeout, errorOnTimeout = true }: Sink.WaitOptions = Object.create(null)): Promise<void> {
     if (this.isPending && timeout && timeout > 0) {
       stopTimer(this.waitTimeoutHandler);
       this.waitTimeoutHandler = createTimer(() => {

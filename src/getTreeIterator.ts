@@ -124,20 +124,20 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
   const cancel = (): void => delayedSwitch.cancel();
 
   const next: TreeIterator<N, SN>['next'] = beforeCall(
-    ({ delay = options?.delay } = {}) => {
+    ({ delay = options?.delay } = Object.create(null)) => {
       nextTreeNode != null && delayedSwitch.delay(delay ?? 0);
     },
-    ({ loop = options?.loop } = {}) => {
+    ({ loop = options?.loop } = Object.create(null)) => {
       cancel();
       nextTreeNode = getNextNode(loop);
     }
   );
 
   const back: TreeIterator<N, SN>['back'] = beforeCall(
-    ({ delay = options?.delay } = {}) => {
+    ({ delay = options?.delay } = Object.create(null)) => {
       nextTreeNode != null && delayedSwitch.delay(delay ?? 0);
     },
-    ({ loop = options?.loop } = {}) => {
+    ({ loop = options?.loop } = Object.create(null)) => {
       cancel();
       nextTreeNode = getPrevNode(loop);
     }

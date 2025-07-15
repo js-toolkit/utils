@@ -27,7 +27,10 @@ function objectToString(error: AnyObject, options: GetErrorMessageOptions): stri
   return errStr;
 }
 
-export function getErrorMessage(error: unknown, options: GetErrorMessageOptions = {}): string {
+export function getErrorMessage(
+  error: unknown,
+  options: GetErrorMessageOptions = Object.create(null)
+): string {
   // If error is not object
   if (typeof error !== 'object' || error == null) {
     return String(error);

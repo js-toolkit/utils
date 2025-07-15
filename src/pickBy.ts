@@ -25,7 +25,7 @@ export function pickBy<
   predicate: SelectByPredicate<O, T, K>,
   map?: MapCallback<IfExtends<K, keyof O, Pick<O, K>, O>>
 ): PickByResult<O, T, K> {
-  const result: AnyObject = {};
+  const result: AnyObject = Object.create(null);
   for (const key in obj) {
     if (predicate(obj[key], key)) {
       const val = obj[key];

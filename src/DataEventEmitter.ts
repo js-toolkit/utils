@@ -104,7 +104,7 @@ export class DataEventEmitter<
         acc[name] = this.listeners(name);
         return acc;
       },
-      {} as ListenersMap<EventTypes, Target>
+      Object.create(null) as ListenersMap<EventTypes, Target>
     );
   }
 }

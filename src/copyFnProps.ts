@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 
 export function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
   // Do not use `Object.getOwnPropertyDescriptors` for ES5 capability
@@ -8,7 +8,7 @@ export function copyFnProps<T extends AnyFunction>(source: T, dest: T): T {
       desc && (acc[prop as keyof Function] = desc);
       return acc;
     },
-    {} as Partial<Record<keyof Function, PropertyDescriptor>>
+    Object.create(null) as Partial<Record<keyof Function, PropertyDescriptor>>
   );
 
   delete descs.arguments;
