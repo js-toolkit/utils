@@ -12,10 +12,13 @@ function objectToString(error: AnyObject, options: GetErrorMessageOptions): stri
     return cause ? `${message} => cause: ${getErrorMessage(cause, options)}` : message;
   }
 
-  const errStr = (error as Error).toString();
+  const errStr = error.toString?.() ?? 'Unknown';
 
-  // If error is just a simple object ("[object Object]").
-  if (error.constructor.name && errStr === `[object ${error.constructor.name}]`) {
+  if (
+    !error.toString ||
+    // If error is just a simple object ("[object Object]").
+    (error.constructor?.name && errStr === `[object ${error.constructor.name}]`)
+  ) {
     try {
       const jsonStr = JSON.stringify(error);
       return jsonStr === '{}' ? '' : jsonStr;
@@ -54,7 +57,7 @@ export function getErrorMessage(
     return error.toString();
   }
   // If error is instance of some class
-  if (!options.simple && error.constructor.name) {
+  if (!options.simple && error.constructor?.name) {
     const str = objectToString(error, options);
     const prefix = (error instanceof Error && error.name) || error.constructor.name;
     return `${prefix}${str ? `: ${str}` : ''}`;
