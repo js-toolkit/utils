@@ -46,13 +46,14 @@ export class Sink<A> {
       this.reject = reject;
 
       const cancel: this['cancel'] = (...args) => this.cancel(...args);
+
       const pipe = (value: A): void => {
         if (this.pipeHandler) {
           void this.pipeHandler(value).catch(this.cancelOnError ? cancel : undefined);
         }
       };
-      const finalizator = executor(pipe, cancel);
 
+      const finalizator = executor(pipe, cancel);
       this.finalizator = typeof finalizator === 'function' ? finalizator : undefined;
     }).finally(() => {
       this.pending = false;
