@@ -40,3 +40,7 @@ export type IsType<T, Type, Strict extends boolean = true> = Strict extends true
   : T extends Type
     ? true
     : false;
+
+export type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
+  ? Acc[number]
+  : Enumerate<N, [...Acc, Acc['length']]>;

@@ -613,3 +613,9 @@ type IsAny<T> = 0 extends 1 & T ? true : false;
 // > extends never
 //   ? true
 //   : false;
+
+/** Returns array of integers, eg: [5, 6, 7, 8, 9] */
+type IntRange<Start extends number, End extends number> = Exclude<
+  import('./internal').Enumerate<End>,
+  import('./internal').Enumerate<Start>
+>;
