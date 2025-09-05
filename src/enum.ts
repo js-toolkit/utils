@@ -50,13 +50,13 @@ export function getEnumValues<Enum extends string | number, K extends string>(
   return mapEnumNames(enumeration, (prop) => enumeration[prop]);
 }
 
-export function reverseEnum<Enum extends string | number, K extends string>(
-  enumeration: Record<K, Enum>
-): Record<Enum, K> {
-  const result: Record<Enum, K> = Object.create(null) as Record<Enum, K>;
+export function reverseEnum<T extends Record<keyof T, string | number>>(
+  enumeration: T
+): ReverseObject<T> {
+  const result = Object.create(null) as Record<string | number, keyof T>;
   for (const prop in enumeration) {
     const val = enumeration[prop];
     result[val] = prop;
   }
-  return result;
+  return result as ReverseObject<T>;
 }
