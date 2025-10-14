@@ -1,3 +1,4 @@
+import { createDisposable } from './createDisposable';
 import log from './log';
 
 export class Mutex<I extends string = string> {
@@ -25,12 +26,7 @@ export class Mutex<I extends string = string> {
     }
     this.acquiredIdentifier = identifier;
     this.logger.v2(`${this.prefix}${identifier} has acquired mutex.`);
-    const dispose = (): void => this.release();
-    return {
-      [Symbol.dispose](): void {
-        dispose();
-      },
-    };
+    return createDisposable(() => this.release());
   }
 
   /** Releases your hold on the mutex. */
