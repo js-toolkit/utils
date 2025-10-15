@@ -4,16 +4,9 @@ import { hasIn } from '../hasIn';
 import { Plugin } from './Plugin';
 import type log from './log';
 
-// const levelMethodMap: Record<log.Level, keyof Console | 'none'> = {
-//   none: 'none',
-//   error: 'error',
-//   warn: 'warn',
-//   info: 'info',
-//   debug: 'debug',
-//   v1: 'debug',
-//   v2: 'debug',
-//   trace: 'trace',
-// };
+interface Config {
+  readonly prefix?: boolean;
+}
 
 // Build the best logging method possible for this env
 // Wherever possible we want to bind, not wrap, to preserve stack traces
@@ -23,8 +16,9 @@ export class ConsolePlugin extends Plugin {
   override notifyOfChange(): void {}
 
   override factory(
-    _logger: log.Logger | log.ReadonlyLogger,
-    level: log.Level
+    logger: log.Logger | log.ReadonlyLogger,
+    level: log.Level,
+    { prefix = false }: Config
   ): log.LoggingMethod | undefined {
     if (typeof console === 'undefined' || level === 'none') {
       return undefined;
@@ -33,11 +27,12 @@ export class ConsolePlugin extends Plugin {
     const method = level as keyof Console;
     const methodName =
       hasIn(console, method) && typeof console[method] === 'function' ? method : 'debug';
-    return (console[methodName] as log.LoggingMethod).bind(console);
-    // if (methodName) {
-    //   return (console[methodName] as log.LoggingMethod).bind(console);
-    // }
-    // console.warn(`Unknown method '${methodName}'.`);
-    // return undefined;
+    const origin = (console[methodName] as log.LoggingMethod).bind(console);
+    if (prefix) {
+      return (...args) => {
+        return origin(`${logger.name}:`, ...args);
+      };
+    }
+    return origin;
   }
 }
