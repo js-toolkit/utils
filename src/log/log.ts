@@ -8,7 +8,7 @@ import { ChildLogger } from './ChildLogger';
 
 type PluginConfigMap = Record<
   string,
-  [plugin: log.Plugin, configs: Record<log.Logger['name'], AnyObject>]
+  [plugin: log.Plugin, defaultConfig: AnyObject, configs: Record<log.Logger['name'], AnyObject>]
 >;
 
 type LogMethodFactory = (
@@ -59,10 +59,14 @@ function defaultMethodFactory(
   const chain: log.LoggingMethod[] = [];
   const level = log.normalizeLevel(method);
 
-  Object.values(plugins).forEach(([plugin, configs]) => {
+  Object.values(plugins).forEach(([plugin, defaultConfig, configs]) => {
     const rootConfig = configs[state.rootLoggerName];
     const loggerConfig = configs[logger.name];
-    const newMethod = plugin.factory(logger, level, { ...rootConfig, ...loggerConfig });
+    const newMethod = plugin.factory(logger, level, {
+      ...defaultConfig,
+      ...rootConfig,
+      ...loggerConfig,
+    });
     if (newMethod) chain.push(newMethod);
   });
 
@@ -164,7 +168,7 @@ class Logger {
     const pluginName = typeof plugin === 'string' ? plugin : plugin.name;
     const usePlugin = state.plugins[pluginName];
     if (!usePlugin) throw new Error(`Invalid plugin: ${pluginName}`);
-    usePlugin['1'][this.name] = config || Object.create(null);
+    usePlugin[2][this.name] = config || Object.create(null);
     buildMethods(this);
     Object.values(this.#children).forEach(buildMethods);
     return this;
@@ -271,19 +275,36 @@ namespace log {
     loggers.forEach((logger) => logger.setLevel(newLevel));
   }
 
-  export function register(plugin: log.Plugin): void {
+  export function register(plugin: log.Plugin, defaultConfig?: AnyObject): void {
     const pluginName = plugin.name;
     if (!state.plugins[pluginName]) {
-      state.plugins[pluginName] = [plugin, Object.create(null)];
+      state.plugins[pluginName] = [
+        plugin,
+        defaultConfig ?? Object.create(null),
+        Object.create(null),
+      ];
     }
   }
 
-  export function use(plugin: log.Plugin | string, config?: AnyObject): void {
+  export function use(plugin: log.Plugin | string, defaultConfig?: AnyObject): void {
     if (plugin instanceof log.Plugin) {
-      register(plugin);
+      register(plugin, defaultConfig);
     }
     const loggers = getLoggersList();
-    loggers.forEach((logger) => logger.use(plugin, config));
+    loggers.forEach((logger) => logger.use(plugin));
+  }
+
+  export function unregister(plugin: log.Plugin | string): void {
+    const pluginName = plugin instanceof log.Plugin ? plugin.name : plugin;
+    if (!state.plugins[pluginName]) return;
+    delete state.plugins[pluginName];
+    const loggers = getLoggersList();
+    loggers.forEach((logger) => {
+      // Rebuild methods.
+      const level = logger.getLevel();
+      logger.setLevel('none');
+      logger.setLevel(level);
+    });
   }
 
   // Use console by default
