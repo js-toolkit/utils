@@ -2,11 +2,12 @@ import { TimeoutError } from './TimeoutError';
 
 export interface Awaiter<T> {
   readonly pending: boolean;
+  readonly settled: boolean;
   wait: (timeout?: number) => Promise<T>;
   resolve: IsAny<T> extends true
-    ? (value?: T | PromiseLike<T>) => void
-    : (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any) => void;
+    ? (value?: T | PromiseLike<T>, force?: boolean) => void
+    : (value: T | PromiseLike<T>, force?: boolean) => void;
+  reject: (reason?: any, force?: boolean) => void;
 }
 
 export interface AwaiterOptions {
@@ -18,8 +19,8 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
 
   let pending = false;
   let settled = false;
-  let resolveRef: Awaiter<T>['resolve'] | undefined;
-  let rejectRef: Awaiter<T>['reject'] | undefined;
+  let resolveRef: PromiseWithResolvers<T>['resolve'] | undefined;
+  let rejectRef: PromiseWithResolvers<T>['reject'] | undefined;
 
   let resolved: boolean;
   let resolveValue: T | PromiseLike<T>;
@@ -30,32 +31,33 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
 
   let waitTimeoutHandler: any;
 
-  const rejectHandler = (error: unknown): void => {
-    if (!pending && !settled) {
+  const rejectHandler = (error: unknown, force?: boolean): void => {
+    // Resolve before wait called.
+    if (!settled && (!pending || force)) {
       rejected = true;
       rejectValue = error;
       resolved = false;
+      settled = true;
     }
-    rejectRef && rejectRef(error);
+    rejectRef?.(error);
+  };
+
+  const complete = (): void => {
+    // Changed only after all chain will resolved.
+    pending = false;
+    settled = true;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    clearTimeout(waitTimeoutHandler);
   };
 
   const wait = (timeout?: number): Promise<T> => {
     if (promise == null) {
       // Do not use race in order to able to renew wait timeout.
-      promise = new Promise<T>((resolve, reject) => {
-        pending = true;
-        resolveRef = resolve as typeof resolveRef;
-        rejectRef = reject;
-        if (resolved) resolve(resolveValue);
-        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-        if (rejected) reject(rejectValue);
-      }).finally(() => {
-        // Changed only after all chain will resolved.
-        pending = false;
-        settled = true;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        clearTimeout(waitTimeoutHandler);
-      });
+      ({ promise, resolve: resolveRef, reject: rejectRef } = Promise.withResolvers<T>());
+      pending = true;
+      void promise.finally(complete);
+      if (resolved) resolveRef(resolveValue);
+      if (rejected) rejectRef(rejectValue);
     }
     if (timeout && timeout > 0 && !settled) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -77,14 +79,19 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
     get pending() {
       return pending;
     },
+    get settled() {
+      return settled;
+    },
     wait,
-    resolve: (value?: T | PromiseLike<T>) => {
-      if (!pending && !settled) {
+    resolve: (value?: T | PromiseLike<T>, force?: boolean) => {
+      // Resolve before wait called.
+      if (!settled && (!pending || force)) {
         resolved = true;
         resolveValue = value as typeof resolveValue;
         rejected = false;
+        settled = true;
       }
-      resolveRef && resolveRef(value as NonNullable<typeof value>);
+      resolveRef?.(value as NonNullable<typeof value>);
     },
     reject: rejectHandler,
   };
