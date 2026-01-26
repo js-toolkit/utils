@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/consistent-type-definitions
 type NonNullValue = {};
 
 type AnyObject = Record<PropertyKey, any>;
@@ -79,8 +80,8 @@ type DeepExcludeKeysOfType<
 > = IfExtends<
   A,
   AnyObject,
-  IfExtends<A, ReadonlyArray<any>, NonNullable<A>, unknown> extends ReadonlyArray<infer I>
-    ? Array<DeepExcludeKeysOfType<I, B, Strict, Depth, R>>
+  IfExtends<A, readonly any[], NonNullable<A>, unknown> extends readonly (infer I)[]
+    ? DeepExcludeKeysOfType<I, B, Strict, Depth, R>[]
     : {
         [P in keyof A as import('./internal').IsType<A[P], B, Strict> extends true
           ? never
@@ -114,7 +115,7 @@ type Keys<T, OnlyObject extends boolean = true> = T extends T
 type DeepKeys<T, FallbackProps = never> = IfExtends<
   T,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer ItemType>
+  IfExtends<T, readonly any[], NonNullable<T>, unknown> extends readonly (infer ItemType)[]
     ? DeepKeys<ItemType, FallbackProps>
     : Required<Extract<{ [P in keyof T]: DeepKeys<NonNullable<T>[P], P> }, AnyObject>>[Keys<T>],
   FallbackProps
@@ -197,8 +198,8 @@ type Writeable<T extends AnyObject> = T extends T ? { -readonly [P in keyof T]: 
 type DeepWriteable<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer I>
-    ? Array<DeepWriteable<I, Depth, R>>
+  IfExtends<T, readonly any[], NonNullable<T>, unknown> extends readonly (infer I)[]
+    ? DeepWriteable<I, Depth, R>[]
     : {
         -readonly [P in keyof T]: R['length'] extends Depth
           ? T[P]
@@ -221,10 +222,10 @@ type DeepPartial<
 > = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
-    ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
-      ? Array<DeepPartial<I, Depth, ExactOptional, R>>
-      : ReadonlyArray<DeepPartial<RI, Depth, ExactOptional, R>>
+  IfExtends<T, readonly any[], NonNullable<T>, unknown> extends readonly (infer RI)[]
+    ? IfExtends<T, any[], NonNullable<T>, unknown> extends (infer I)[]
+      ? DeepPartial<I, Depth, ExactOptional, R>[]
+      : readonly DeepPartial<RI, Depth, ExactOptional, R>[]
     : {
         [P in keyof T]?:
           | (R['length'] extends Depth
@@ -243,10 +244,10 @@ type DeepRequired<
 > = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
-    ? IfExtends<T, Array<any>, NonNullable<T>, unknown> extends Array<infer I>
-      ? Array<DeepRequired<I, Depth, ExactOptional, R>>
-      : ReadonlyArray<DeepRequired<RI, Depth, ExactOptional, R>>
+  IfExtends<T, readonly any[], NonNullable<T>, unknown> extends readonly (infer RI)[]
+    ? IfExtends<T, any[], NonNullable<T>, unknown> extends (infer I)[]
+      ? DeepRequired<I, Depth, ExactOptional, R>[]
+      : readonly DeepRequired<RI, Depth, ExactOptional, R>[]
     : {
         [P in keyof T]-?: Exclude<
           R['length'] extends Depth ? T[P] : DeepRequired<T[P], Depth, ExactOptional, Push<R, any>>,
@@ -259,8 +260,8 @@ type DeepRequired<
 type DeepReadonly<T, Depth extends number = never, R extends unknown[] = [any]> = IfExtends<
   Exclude<T, AnyFunction>,
   AnyObject,
-  IfExtends<T, ReadonlyArray<any>, NonNullable<T>, unknown> extends ReadonlyArray<infer RI>
-    ? ReadonlyArray<DeepReadonly<RI, Depth, R>>
+  IfExtends<T, readonly any[], NonNullable<T>, unknown> extends readonly (infer RI)[]
+    ? readonly DeepReadonly<RI, Depth, R>[]
     : {
         readonly [P in keyof T]: R['length'] extends Depth
           ? T[P]
@@ -441,17 +442,17 @@ type InArray<T, Item> = T extends readonly [Item, ...infer _]
 
 // https://stackoverflow.com/questions/57016728/is-there-a-way-to-define-type-for-array-with-unique-items-in-typescript
 /** Useful with type checking utility like `asUniqueArray`. */
-type ToUniqueArray<T extends ReadonlyArray<any>> = T extends readonly [infer X, ...infer Rest]
+type ToUniqueArray<T extends readonly any[]> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
     ? [import('./internal').Invalid<['Encountered value with duplicates:', X]>]
     : readonly [X, ...ToUniqueArray<Rest>]
   : T;
 
 /** Useful with type checking utility like `asUniqueArray`. */
-type UniqueArray<T extends ReadonlyArray<any>> = import('./internal').LiftInvalid<ToUniqueArray<T>>;
+type UniqueArray<T extends readonly any[]> = import('./internal').LiftInvalid<ToUniqueArray<T>>;
 
 /** Used with type checking utility `asUniqueArray`. */
-type AsUniqueArray<A extends ReadonlyArray<any>> = import('./internal').LiftInvalid<{
+type AsUniqueArray<A extends readonly any[]> = import('./internal').LiftInvalid<{
   [I in keyof A]: unknown extends {
     [J in keyof A]: J extends I ? never : A[J] extends A[I] ? unknown : never;
   }[number]

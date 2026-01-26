@@ -24,7 +24,7 @@ type JSONArrayOf<
   A,
   IsReadonly extends boolean,
   OmitKeys extends ExtractKeys<A>,
-> = IsReadonly extends true ? ReadonlyArray<Jsonify<A, OmitKeys>> : Array<Jsonify<A, OmitKeys>>;
+> = IsReadonly extends true ? readonly Jsonify<A, OmitKeys>[] : Jsonify<A, OmitKeys>[];
 
 type Optional<A extends AnyObject, OmitKeys extends ExtractKeys<A>> = {
   [P in Exclude<keyof ExtractKeysOfType<A, Option<any>>, OmitKeys>]?: Jsonify<A[P], OmitKeys>;
@@ -48,7 +48,7 @@ type ExtractKeys<A> =
     ? ExtractKeys<T>
     : A extends JSONSerializable<infer T, any>
       ? ExtractKeys<T>
-      : A extends ReadonlyArray<infer T>
+      : A extends readonly (infer T)[]
         ? ExtractKeys<T>
         : A extends AnyObject
           ? keyof A
@@ -59,10 +59,10 @@ export type Jsonify<A, OmitKeys extends ExtractKeys<A> = never> =
     ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>> | undefined
     : A extends JSONSerializable<infer T, any>
       ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>>
-      : A extends ReadonlyArray<infer T>
-        ? JSONArrayOf<T, A extends Array<any> ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
+      : A extends readonly (infer T)[]
+        ? JSONArrayOf<T, A extends any[] ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
         : A extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
-          ? Array<number>
+          ? number[]
           : A extends AnyObject
             ? JSONObjectOf<A, OmitKeys>
             : A extends JSONValue

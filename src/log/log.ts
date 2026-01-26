@@ -20,16 +20,7 @@ type LogMethodFactory = (
 type LevelsMap = Record<log.Level, number>;
 
 const state = (() => {
-  const levels = [
-    'none',
-    'error',
-    'warn',
-    'info',
-    'debug',
-    'v1',
-    'v2',
-    'trace',
-  ] as const as log.Levels;
+  const levels: log.Levels = ['none', 'error', 'warn', 'info', 'debug', 'v1', 'v2', 'trace'];
   return {
     rootLoggerName: '',
     defaultLevel: 'debug' satisfies log.Level as log.Level,
@@ -107,7 +98,7 @@ function removeMethods(logger: log.Logger): void {
   }
 }
 
-type LoggerMethods = { [P in log.Level]: (...args: unknown[]) => void };
+type LoggerMethods = Record<log.Level, (...args: unknown[]) => void>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Logger extends LoggerMethods {}
@@ -168,7 +159,7 @@ class Logger {
     const pluginName = typeof plugin === 'string' ? plugin : plugin.name;
     const usePlugin = state.plugins[pluginName];
     if (!usePlugin) throw new Error(`Invalid plugin: ${pluginName}`);
-    usePlugin[2][this.name] = config || Object.create(null);
+    usePlugin[2][this.name] = config ?? Object.create(null);
     buildMethods(this);
     Object.values(this.#children).forEach(buildMethods);
     return this;
@@ -197,7 +188,8 @@ namespace log {
 
   export type LoggingMethod = (...message: unknown[]) => void;
 
-  export type Levels = UnionToTuple<Level>;
+  // export type Levels = UnionToTuple<Level>;
+  export type Levels = ['none', 'error', 'warn', 'info', 'debug', 'v1', 'v2', 'trace'];
   export type LevelNumber = TupleIndices<Levels>;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
