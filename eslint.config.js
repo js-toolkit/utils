@@ -1,6 +1,8 @@
+const common = require('@js-toolkit/configs/eslint/common');
+
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
-  ...require('@js-toolkit/configs/eslint/common'),
+  ...common,
 
   {
     rules: {
