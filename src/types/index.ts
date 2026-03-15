@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-indexed-object-style */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/consistent-type-definitions
 type NonNullValue = {};
 
 type AnyObject = Record<PropertyKey, any>;
@@ -108,7 +104,7 @@ type BaseTypeOf<T> = T extends string
 /** Useful for union types because `keyof <union type>` is `never` */
 // type Keys<T> = T extends T ? keyof T : never;
 type Keys<T, OnlyObject extends boolean = true> = T extends T
-  ? IfExtends<OnlyObject, true, IfExtends<T, AnyObject, keyof T, never>, keyof T>
+  ? IfExtends<OnlyObject, true, IfExtends<T, AnyObject, keyof T>, keyof T>
   : never;
 
 /** Returns keys recursively. */

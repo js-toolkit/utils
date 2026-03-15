@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
 import { TimeoutError } from '../TimeoutError';
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Sink {
   export type Finalizator = () => void | Promise<any>;
 
@@ -67,7 +67,7 @@ export class Sink<A> {
 
   /** Wait until Sink is finished/cancelled. */
   wait({ timeout, errorOnTimeout = true }: Sink.WaitOptions = Object.create(null)): Promise<void> {
-    if (this.isPending && timeout && timeout > 0) {
+    if (this.isPending && timeout != null && timeout > 0) {
       stopTimer(this.waitTimeoutHandler);
       this.waitTimeoutHandler = createTimer(() => {
         void this.cancel(
@@ -89,15 +89,15 @@ export class Sink<A> {
 
     this.cancelling = Promise.resolve()
       .then(this.finalizator)
-      .catch((ex) => {
-        if (reason) console.error('Cancel error:', ex);
+      .catch((ex: unknown) => {
+        if (reason != null) console.error('Cancel error:', ex);
         else throw ex;
       })
       .finally(() => {
-        if (reason) {
-          this.reject && this.reject(reason);
+        if (reason != null) {
+          this.reject?.(reason);
         } else {
-          this.resolve && this.resolve();
+          this.resolve?.();
         }
         this.cancelling = undefined;
         this.finalizator = undefined;

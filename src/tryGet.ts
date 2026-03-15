@@ -1,7 +1,7 @@
 export function tryGet<T, F>(thunk: () => T, fallback: F): T | F {
   try {
     return thunk();
-  } catch (error) {
+  } catch {
     return fallback;
   }
 }

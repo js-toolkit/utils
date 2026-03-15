@@ -11,7 +11,7 @@ export type DelayedFunc<T extends AnyFunction> = ((...args: Parameters<T>) => vo
   Delay<T>;
 
 export function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc<T> {
-  let timer: any;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   const wrapper = ((...args) => {
     wrapper.delay(wait, ...args);
@@ -41,7 +41,6 @@ export function delayed<T extends AnyFunction>(fn: T, wait: number): DelayedFunc
   return wrapper;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace delayed {
   export type Func<T extends AnyFunction> = DelayedFunc<T>;
 }

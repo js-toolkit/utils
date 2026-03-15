@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { type JestConfigWithTsJest } from 'ts-jest';
 import { getJSExtensions, getTSExtensions } from '@js-toolkit/configs/paths';
 

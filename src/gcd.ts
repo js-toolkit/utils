@@ -3,7 +3,7 @@ export function gcd(x: number, y: number): number {
   let a = Math.abs(x);
   let b = Math.abs(y);
 
-  while (b) {
+  while (b > 0) {
     [a, b] = [b, a % b];
   }
 

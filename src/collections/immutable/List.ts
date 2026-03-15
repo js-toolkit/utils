@@ -99,24 +99,23 @@ export class List<T> implements ListLike<T> {
   private copy(
     predicate: (value: T) => boolean,
     stop?: (v: T) => boolean
-  ): [ListInternal<T> | undefined, ListInternal<T> | undefined, List<T>] {
+  ): [head: ListInternal<T> | undefined, tail: ListInternal<T> | undefined, last: List<T>] {
     let h: ListInternal<T> | undefined; // in order to keep the head list for return
     let t: ListInternal<T> | undefined; // last list
     let list: List<T> = this;
 
     while (list !== Nil) {
-      if (stop && stop(list.head)) return [h, t, list];
+      if (stop?.(list.head)) return [h, t, list];
 
       if (predicate(list.head)) {
         const nx = new ListInternal(list.head, Nil);
         // if first element
         if (t === undefined) {
           h = nx;
-          t = nx;
         } else {
           t.next = nx;
-          t = nx;
         }
+        t = nx;
       }
 
       list = list.tail;
@@ -133,7 +132,7 @@ export class List<T> implements ListLike<T> {
     if (h === undefined) return new List(newValue, this.tail);
     // if not found
     if (last === Nil) return this;
-    t!.next = new List(newValue, last.tail);
+    if (t) t.next = new List(newValue, last.tail);
     return h;
   }
 
@@ -152,7 +151,7 @@ export class List<T> implements ListLike<T> {
   filter(predicate: (value: T) => boolean): List<T> {
     if (this === Nil) return Nil;
     const [h] = this.copy(predicate);
-    return h || Nil;
+    return h ?? Nil;
   }
 
   sort(compare?: (a: T, b: T) => number): List<T> {
@@ -218,13 +217,13 @@ export class List<T> implements ListLike<T> {
   }
 
   append(...items: T[]): List<T> {
-    if (!items.length) return this;
+    if (items.length === 0) return this;
     const next = items.reduceRight((tail, item) => List.from(item, tail), Nil as List<T>);
     return this.concat(next);
   }
 
   prepend(...items: T[]): List<T> {
-    if (!items.length) return this;
+    if (items.length === 0) return this;
     return items.reduceRight((tail, item) => List.from(item, tail), this as List<T>);
   }
 
@@ -256,7 +255,7 @@ export class List<T> implements ListLike<T> {
   }
 
   static of<T>(...items: T[]): List<T> {
-    if (!items.length) return Nil;
+    if (items.length === 0) return Nil;
     return items.reduceRight((tail, item) => this.from(item, tail), Nil);
   }
 

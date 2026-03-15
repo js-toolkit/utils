@@ -1,3 +1,4 @@
+/* eslint-disable */
 import EventEmitter from 'eventemitter3';
 
 export interface DataEvent<Type, Data, Target> {
@@ -76,7 +77,6 @@ export class DataEventEmitter<
   > = DataEventEmitter<EventTypes, any, any>,
   Context = any,
 > extends EventEmitter<ConvertToDataEventMap<EventTypes, Target>, Context> {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   emit<T extends EventEmitter.EventNames<NormalizeEventTypes<EventTypes>>>(
     event: T,

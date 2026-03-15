@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-for-in-array */
 /* eslint-disable no-unreachable-loop */
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 
 /**

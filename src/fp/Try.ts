@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-return-this-type */
 /* eslint-disable max-classes-per-file */
 import { NoSuchElementError } from '../NoSuchElementError';
 import { Option, None } from './Option';

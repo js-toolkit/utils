@@ -5,7 +5,7 @@ export function delay<T extends AnyFunction>(
   wait: number,
   ...args: Parameters<T>
 ): delay.Delay {
-  let timer: any;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   const cancel = (): void => {
     clearTimeout(timer);
@@ -25,7 +25,6 @@ export function delay<T extends AnyFunction>(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace delay {
   export type Delay = Pick<delayed.Func<any>, 'isPending' | 'cancel'>;
 }

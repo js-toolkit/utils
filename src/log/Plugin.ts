@@ -1,9 +1,7 @@
 import type log from './log';
 
 export abstract class Plugin {
-  constructor(public readonly name: string) {
-    //
-  }
+  constructor(public readonly name: string) {}
 
   abstract initialize(logger: log.Logger): void;
 

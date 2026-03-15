@@ -1,4 +1,6 @@
-type ClearResult<T extends AnyObject> = T extends ReadonlyArray<unknown> ? T : Partial<T>;
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
+
+type ClearResult<T extends AnyObject> = T extends readonly unknown[] ? T : Partial<T>;
 
 export function clear<T extends AnyObject>(obj: T): ClearResult<T> {
   if (Array.isArray<unknown[]>(obj)) {

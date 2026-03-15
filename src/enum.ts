@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 import { NoSuchElementError } from './NoSuchElementError';
 
@@ -32,7 +31,8 @@ export function mapEnumNames<Enum extends string | number, K extends string, M =
       (Number.isNaN(+prop) && !Number.isNaN(nameOrValue)) ||
       prop === String(nameOrValue)
     ) {
-      result.push(callback ? callback(prop) : (prop as unknown as M));
+      // result.push(callback ? callback(prop) : (prop as unknown as M));
+      result.push(callback(prop));
     }
   }
   return result;

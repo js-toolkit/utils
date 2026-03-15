@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax */
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
 /* eslint-disable guard-for-in */
 import { clear } from './clear';
 
@@ -63,7 +63,6 @@ export class EventEmitter<
 
   private readonly [optionsKey]: RequiredStrict<EventEmitter.Options>;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   private readonly [eventsKey]: Events<EventTypes> = Object.create(null);
 
   constructor(options?: EventEmitter.Options) {
@@ -83,10 +82,11 @@ export class EventEmitter<
   }
 
   getEventListeners(): EventEmitter.EventListeners<EventTypes, Target> {
-    return Object.getOwnPropertyNames(this[eventsKey]).reduce(
+    const events = this[eventsKey];
+    return Object.getOwnPropertyNames(events).reduce(
       (acc, key) => {
         const ev = key as keyof Events<EventTypes>;
-        acc[ev] = this[eventsKey][ev]!.keys().toArray();
+        acc[ev] = events[ev]?.keys().toArray() ?? [];
         return acc;
       },
       Object.create(null) as EventEmitter.EventListeners<EventTypes, Target>
@@ -94,7 +94,7 @@ export class EventEmitter<
   }
 
   getListenerCount<T extends EventNames<EventTypes>>(event?: T): number {
-    if (event) return this[eventsKey][event]?.size ?? 0;
+    if (event != null) return this[eventsKey][event]?.size ?? 0;
     let count = 0;
     for (const key in this[eventsKey]) {
       count += this.getListenerCount(key as EventNames<EventTypes>);
@@ -111,7 +111,7 @@ export class EventEmitter<
       this[eventsKey][event] ?? new Map<EventEmitter.EventListener<EventTypes, T, Target>, EE>();
     const ee = map.get(fn);
     // Recreate if once different.
-    if (ee && ee.once === !!options?.once) return this;
+    if (ee?.once === !!options?.once) return this;
 
     // const nextFn = this.options.ignoreListenerError
     //   ? (function wrappedFn(...agrs: Parameters<typeof fn>) {
@@ -152,7 +152,7 @@ export class EventEmitter<
   }
 
   removeAllListeners(event?: EventNames<EventTypes>): this {
-    if (event) {
+    if (event != null) {
       return this.off(event);
     }
     clear(this[eventsKey]);
@@ -198,7 +198,6 @@ export class EventEmitter<
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EventEmitter {
   export interface DataEvent<Type, Data, Target> {
     type: Type;

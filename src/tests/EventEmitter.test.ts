@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { EventEmitter } from '../EventEmitter';
 
 type EventMap = { event1: []; event2: [{ a: string }] };

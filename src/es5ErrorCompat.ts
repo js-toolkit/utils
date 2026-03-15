@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable dot-notation */
 /* eslint-disable no-proto */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target: S,
@@ -9,5 +8,5 @@ export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target.name = TargetCtor.name;
   // Workaround to make `instanceof` work in ES5
   target.constructor = TargetCtor;
-  (target as AnyObject)['__proto__'] = TargetCtor.prototype;
+  (target as AnyObject).__proto__ = TargetCtor.prototype;
 }

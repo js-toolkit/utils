@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable no-restricted-syntax */
 
 import type { SelectByPredicate } from './omitBy';
 

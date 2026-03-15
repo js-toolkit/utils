@@ -28,8 +28,7 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
   let rejectValue: unknown;
 
   let promise: Promise<T>;
-
-  let waitTimeoutHandler: any;
+  let waitTimeoutHandler: ReturnType<typeof setTimeout>;
 
   const rejectHandler = (error: unknown, force?: boolean): void => {
     // Resolve before wait called.
@@ -46,7 +45,6 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
     // Changed only after all chain will resolved.
     pending = false;
     settled = true;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     clearTimeout(waitTimeoutHandler);
   };
 
@@ -59,8 +57,7 @@ export function getAwaiter<T = void>({ lazy }: AwaiterOptions = Object.create(nu
       if (resolved) resolveRef(resolveValue);
       if (rejected) rejectRef(rejectValue);
     }
-    if (timeout && timeout > 0 && !settled) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    if (timeout != null && timeout > 0 && !settled) {
       clearTimeout(waitTimeoutHandler);
       waitTimeoutHandler = setTimeout(
         () => rejectHandler(new TimeoutError(`Timeout of ${timeout}ms exceeded.`)),

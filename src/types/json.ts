@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 import type { Option } from '../fp/Option';
 
 export type JSONPrimitive = string | number | boolean | null | undefined;

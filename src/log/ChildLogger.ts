@@ -4,13 +4,10 @@ import type log from './log';
 
 interface ChildLogger extends Pick<log.Logger, log.Level> {}
 
-class ChildLogger
-  implements
-    Pick<
-      log.Logger,
-      'name' | 'getLevels' | 'getLevel' | 'getLevelNumber' | 'isLevelEnabled' | 'getLogger' | 'log'
-    >
-{
+class ChildLogger implements Pick<
+  log.Logger,
+  'name' | 'getLevels' | 'getLevel' | 'getLevelNumber' | 'isLevelEnabled' | 'getLogger' | 'log'
+> {
   constructor(
     public readonly name: string,
     private readonly parent: log.Logger
@@ -33,6 +30,7 @@ class ChildLogger
   }
 
   log(...message: unknown[]): void {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (this.info) this.info(...message);
   }
 

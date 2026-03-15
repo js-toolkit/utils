@@ -44,7 +44,7 @@ export function getTimer({
   autostart = true,
   waitCallback,
 }: Options): Timer {
-  let timerId: number | NodeJS.Timeout | undefined;
+  let timerId: ReturnType<typeof setTimeout> | undefined;
   let sessionId = 0;
   let timeoutStartedAt = 0;
   let remainingTime = 0;
@@ -67,7 +67,7 @@ export function getTimer({
       remainingTime = 0;
       lastInterval = 0;
       clearTimers();
-      onStop && onStop();
+      onStop?.();
     }
   };
 
@@ -76,7 +76,7 @@ export function getTimer({
       remainingTime = Math.max(0, lastInterval - (Date.now() - timeoutStartedAt));
     }
     clearTimers();
-    onPause && onPause();
+    onPause?.();
   };
 
   const start = ({ immediately, once }: TimerStartOptions = Object.create(null)): void => {
@@ -174,7 +174,7 @@ export function getTimer({
         }
       }
     } finally {
-      onStart && onStart();
+      onStart?.();
     }
   };
 

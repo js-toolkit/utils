@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { noop } from '../noop';
@@ -6,7 +7,7 @@ import { Plugin as PluginBase } from './Plugin';
 import { ConsolePlugin } from './ConsolePlugin';
 import { ChildLogger } from './ChildLogger';
 
-type PluginConfigMap = Record<
+type PluginConfigMap = PartialRecord<
   string,
   [plugin: log.Plugin, defaultConfig: AnyObject, configs: Record<log.Logger['name'], AnyObject>]
 >;
@@ -24,7 +25,7 @@ const state = (() => {
   return {
     rootLoggerName: '',
     defaultLevel: 'debug' satisfies log.Level as log.Level,
-    loggers: Object.create(null) as Record<string, log.Logger>,
+    loggers: Object.create(null) as PartialRecord<string, log.Logger>,
     plugins: Object.create(null) as PluginConfigMap,
     levels,
     levelsMap: levelsToMap(levels),
@@ -50,16 +51,18 @@ function defaultMethodFactory(
   const chain: log.LoggingMethod[] = [];
   const level = log.normalizeLevel(method);
 
-  Object.values(plugins).forEach(([plugin, defaultConfig, configs]) => {
-    const rootConfig = configs[state.rootLoggerName];
-    const loggerConfig = configs[logger.name];
-    const newMethod = plugin.factory(logger, level, {
-      ...defaultConfig,
-      ...rootConfig,
-      ...loggerConfig,
-    });
-    if (newMethod) chain.push(newMethod);
-  });
+  Object.values(plugins as RequiredStrict<typeof plugins>).forEach(
+    ([plugin, defaultConfig, configs]) => {
+      const rootConfig = configs[state.rootLoggerName];
+      const loggerConfig = configs[logger.name];
+      const newMethod = plugin.factory(logger, level, {
+        ...defaultConfig,
+        ...rootConfig,
+        ...loggerConfig,
+      });
+      if (newMethod) chain.push(newMethod);
+    }
+  );
 
   if (chain.length === 0) return noop;
 
@@ -72,11 +75,11 @@ function defaultMethodFactory(
 }
 
 function getLoggersList(): log.Logger[] {
-  return Object.values(state.loggers);
+  return Object.values(state.loggers as RequiredStrict<typeof state.loggers>);
 }
 
 function getPluginsList(): log.Plugin[] {
-  return Object.values(state.plugins).map(([p]) => p);
+  return Object.values(state.plugins as RequiredStrict<typeof state.plugins>).map(([p]) => p);
 }
 
 function buildMethods(logger: log.Logger | ChildLogger): void {
@@ -103,11 +106,13 @@ type LoggerMethods = Record<log.Level, (...args: unknown[]) => void>;
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Logger extends LoggerMethods {}
 
+type Children = PartialRecord<string, ChildLogger>;
+
 class Logger {
   readonly name: string;
   readonly #defaultLevel: log.Level;
   #level: log.Level | undefined;
-  #children: Record<string, ChildLogger> = Object.create(null);
+  #children: Children = Object.create(null);
 
   constructor(name: string, defaultLevel: log.Level) {
     this.name = name;
@@ -137,7 +142,7 @@ class Logger {
     // If really changed
     if (prevLevel !== this.#level) {
       buildMethods(this);
-      Object.values(this.#children).forEach(buildMethods);
+      Object.values(this.#children as RequiredStrict<Children>).forEach(buildMethods);
       // If not initial setup
       if (prevLevel != null) getPluginsList().forEach((plugin) => plugin.notifyOfChange(this));
     }
@@ -149,6 +154,7 @@ class Logger {
   }
 
   log(...message: unknown[]): void {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (this.info) this.info(...message);
   }
 
@@ -161,7 +167,7 @@ class Logger {
     if (!usePlugin) throw new Error(`Invalid plugin: ${pluginName}`);
     usePlugin[2][this.name] = config ?? Object.create(null);
     buildMethods(this);
-    Object.values(this.#children).forEach(buildMethods);
+    Object.values(this.#children as RequiredStrict<Children>).forEach(buildMethods);
     return this;
   }
 
@@ -177,7 +183,6 @@ class Logger {
 
 type LoggerType = Logger;
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace log {
   // Use this remap for vscode quick fix's 'Implement inherited abstract class' in custom plugin impl
   export type Logger = { [P in keyof LoggerType]: LoggerType[P] };
@@ -235,17 +240,20 @@ namespace log {
     return state.loggers[name];
   }
 
-  export function getLoggers(): Record<string, Logger> {
+  export function getLoggers(): PartialRecord<string, Logger> {
     return { ...state.loggers };
   }
 
-  export function getPlugins(): Record<string, Plugin> {
-    return Object.entries(state.plugins).reduce(
-      (acc, [name, [pl]]) => {
-        acc[name] = pl;
+  export function getPlugins(): PartialRecord<string, Plugin> {
+    return Object.entries(state.plugins).reduce<PartialRecord<string, Plugin>>(
+      (acc, [name, cfg]) => {
+        if (cfg) {
+          const [pl] = cfg;
+          acc[name] = pl;
+        }
         return acc;
       },
-      Object.create(null) as Record<string, Plugin>
+      Object.create(null)
     );
   }
 
@@ -269,13 +277,11 @@ namespace log {
 
   export function register(plugin: log.Plugin, defaultConfig?: AnyObject): void {
     const pluginName = plugin.name;
-    if (!state.plugins[pluginName]) {
-      state.plugins[pluginName] = [
-        plugin,
-        defaultConfig ?? Object.create(null),
-        Object.create(null),
-      ];
-    }
+    state.plugins[pluginName] ??= [
+      plugin,
+      defaultConfig ?? Object.create(null),
+      Object.create(null),
+    ];
   }
 
   export function use(plugin: log.Plugin | string, defaultConfig?: AnyObject): void {
