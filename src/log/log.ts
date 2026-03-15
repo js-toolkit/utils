@@ -210,7 +210,7 @@ namespace log {
     const normLevel =
       typeof level === 'number'
         ? state.levels[level]
-        : (state.levelsMap[level] == null && undefined) || level;
+        : (state.levelsMap[level] != null && level) || undefined;
     if (normLevel == null) throw new Error(`Invalid level: ${level}`);
     return normLevel;
   }
