@@ -2,7 +2,7 @@
 import { TimeoutError } from '../TimeoutError';
 
 export namespace Sink {
-  export type Finalizator = () => void | Promise<any>;
+  export type Finalizator = () => void | Promise<void>;
 
   export interface Options {
     readonly cancelOnPipeError?: boolean | undefined;
@@ -14,24 +14,26 @@ export namespace Sink {
   }
 }
 
-function createTimer(callback: VoidFunction, timeout: number): unknown {
+type Timer = ReturnType<typeof setTimeout>;
+
+function createTimer(callback: VoidFunction, timeout: number): Timer {
   return setTimeout(callback, timeout);
 }
 
-function stopTimer(timer: unknown): void {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  clearTimeout(timer as any);
+function stopTimer(timer: Timer | undefined): void {
+  clearTimeout(timer);
 }
 
 export class Sink<A> {
   private readonly promise: Promise<void>;
   private readonly cancelOnError: boolean;
   private pending;
-  private waitTimeoutHandler: unknown;
+  private waitTimeoutHandler: Timer | undefined;
   private cancelling: Promise<void> | undefined;
   private resolve: VoidFunction | undefined;
   private reject: ((reason?: unknown) => void) | undefined;
   private finalizator: Sink.Finalizator | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private pipeHandler: ((value: A) => Promise<any>) | undefined;
 
   constructor(
@@ -70,6 +72,7 @@ export class Sink<A> {
     if (this.isPending && timeout != null && timeout > 0) {
       stopTimer(this.waitTimeoutHandler);
       this.waitTimeoutHandler = createTimer(() => {
+        this.waitTimeoutHandler = undefined;
         void this.cancel(
           errorOnTimeout ? new TimeoutError(`Timeout of ${timeout}ms exceeded.`) : undefined
         );
@@ -139,7 +142,7 @@ export class Sink<A> {
     return this as unknown as Sink<B>;
   }
 
-  catch<B = never>(action: (reason: any) => PromiseLike<B> | B): Sink<B> {
+  catch<B = never>(action: (reason: unknown) => PromiseLike<B> | B): Sink<B> {
     if (this.isPending) {
       const prevHandler = this.pipeHandler;
       this.pipeHandler = (value) =>

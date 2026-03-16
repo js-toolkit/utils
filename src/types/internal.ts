@@ -14,10 +14,10 @@ export type UndefinedToNever<T> = T extends undefined ? never : T;
 export type Invalid<T> = Error & { __errorMessage: T };
 
 /** Used in `AsUniqueArray`. */
-export type LiftInvalid<A extends readonly any[]> = IfExtends<
+export type LiftInvalid<A extends readonly unknown[]> = IfExtends<
   A[number],
-  Invalid<any>,
-  Extract<A[number], Invalid<any>>,
+  Invalid<unknown>,
+  Extract<A[number], Invalid<unknown>>,
   A
 >;
 

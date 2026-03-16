@@ -14,7 +14,7 @@ export interface ListLike<T> extends Iterable<T> {
   some(f: (value: T) => boolean): boolean;
   filter(f: (value: T) => boolean): ListLike<T>;
   sort(compareFn?: (a: T, b: T) => number): ListLike<T>;
-  forEach(f: (value: T) => any): void;
+  forEach(f: (value: T) => void): void;
   map<U>(f: (value: T) => U): ListLike<U>;
   reduce<U>(f: (previousValue: U, currentValue: T) => U, initialValue: U): U;
   reduceRight<U>(f: (previousValue: U, currentValue: T) => U, initialValue: U): U;
@@ -175,8 +175,8 @@ export class List<T> implements ListLike<T> {
     return this.reverse().reduce(f, initialValue);
   }
 
-  forEach(f: (value: T) => any): void {
-    this.reduce((_, h) => f(h), undefined);
+  forEach(f: (value: T) => void): void {
+    this.reduce<unknown>((_, h) => f(h), undefined);
   }
 
   map<U>(f: (value: T) => U): List<U> {
@@ -309,6 +309,7 @@ class ListInternal<T> extends List<T> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Nil = List<any>;
 
 export const Nil: Nil = List.empty;

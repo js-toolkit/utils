@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 /* eslint-disable guard-for-in */
 import { clear } from './clear';
@@ -209,7 +210,7 @@ export namespace EventEmitter {
     [P in keyof Map]: GetEventObjectTuple<Map, P, Target>[0];
   };
 
-  type Listener<Args extends any[]> = (...args: Args) => void;
+  type Listener<Args extends unknown[]> = (...args: Args) => void;
 
   export type EventListener<
     EventTypes extends string | symbol | EventObjects,

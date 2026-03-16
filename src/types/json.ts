@@ -15,7 +15,7 @@ export interface ValueContainer<A extends JSONPrimitive> {
 
 type ExcludeFunctions<A extends AnyObject> = ExcludeKeysOfType<A, AnyFunction>;
 
-type ValidProps<A extends AnyObject, OmitKeys extends keyof any> = ExcludeFunctions<
+type ValidProps<A extends AnyObject, OmitKeys extends keyof never> = ExcludeFunctions<
   Omit<A, OmitKeys | keyof JSONSerializable<any, any>>
 >;
 
@@ -59,7 +59,7 @@ export type Jsonify<A, OmitKeys extends ExtractKeys<A> = never> =
     : A extends JSONSerializable<infer T, any>
       ? Jsonify<T, Extract<OmitKeys, ExtractKeys<T>>>
       : A extends readonly (infer T)[]
-        ? JSONArrayOf<T, A extends any[] ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
+        ? JSONArrayOf<T, A extends unknown[] ? false : true, Extract<OmitKeys, ExtractKeys<T>>>
         : A extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
           ? number[]
           : A extends AnyObject

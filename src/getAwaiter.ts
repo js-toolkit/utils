@@ -7,7 +7,7 @@ export interface Awaiter<T> {
   resolve: IsAny<T> extends true
     ? (value?: T | PromiseLike<T>, force?: boolean) => void
     : (value: T | PromiseLike<T>, force?: boolean) => void;
-  reject: (reason?: any, force?: boolean) => void;
+  reject: (reason?: unknown, force?: boolean) => void;
 }
 
 export interface AwaiterOptions {

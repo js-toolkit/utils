@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/only-throw-error */
 /* eslint-disable @typescript-eslint/unified-signatures */
 // eslint-disable-next-line max-classes-per-file
 import { es5ErrorCompat } from './es5ErrorCompat';
@@ -9,7 +10,7 @@ export class PromiseCancelledError extends Error {
   }
 }
 
-function catchCancel(handler?: ((value: any) => unknown) | null, value?: any): unknown {
+function catchCancel<T>(value: T, handler?: ((value: T) => unknown) | null): unknown {
   // console.log('catchCancel', value, onrejected);
   if (value instanceof PromiseCancelledError || !handler) {
     throw value;
@@ -24,7 +25,7 @@ export class CancellablePromise<T> extends Promise<T> {
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any) => void,
+          reject: (reason?: unknown) => void,
           cancel: VoidFunction
         ) => void)
       | CancellablePromise<T>
@@ -40,6 +41,7 @@ export class CancellablePromise<T> extends Promise<T> {
         currentCanceller;
 
       if (executorOrPromise instanceof CancellablePromise) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         executorOrPromise.cancelled<any>(currentCanceller).then(resolve).catch(reject);
       } else if (executorOrPromise instanceof Promise) {
         // Use chain to avoid dynamically inserting into the chain a regular Promise which hasn't cancel handler.
@@ -86,21 +88,21 @@ export class CancellablePromise<T> extends Promise<T> {
 
   override then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
   ): CancellablePromise<TResult1 | TResult2> {
     const next = super.then(
-      (value) => catchCancel(onfulfilled, value),
-      (reason: unknown) => catchCancel(onrejected, reason)
+      (value) => catchCancel(value, onfulfilled),
+      (reason: unknown) => catchCancel(reason, onrejected)
     ) as CancellablePromise<TResult1 | TResult2>;
     next.canceller = this.canceller;
     return next;
   }
 
   override catch<TResult = never>(
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
+    onrejected?: ((reason: unknown) => TResult | PromiseLike<TResult>) | null
   ): CancellablePromise<T | TResult> {
     const next = super.then(undefined, (reason: unknown) =>
-      catchCancel(onrejected, reason)
+      catchCancel(reason, onrejected)
     ) as CancellablePromise<T | TResult>;
     next.canceller = this.canceller;
     return next;
@@ -120,11 +122,11 @@ interface CancellablePromiseWithResolvers<T> extends PromiseWithResolvers<T> {
 export interface CancellablePromiseConstructor extends DefineAll<
   keyof PromiseConstructor,
   {
-    readonly prototype: CancellablePromise<any>;
+    readonly prototype: CancellablePromise<unknown>;
 
     readonly [Symbol.species]: CancellablePromiseConstructor;
 
-    reject<T = never>(reason?: any): CancellablePromise<T>;
+    reject<T = never>(reason?: unknown): CancellablePromise<T>;
 
     resolve(): CancellablePromise<void>;
 
@@ -256,7 +258,7 @@ export interface CancellablePromiseConstructor extends DefineAll<
     executorOrPromise:
       | ((
           resolve: (value: T | PromiseLike<T>) => void,
-          reject: (reason?: any) => void,
+          reject: (reason?: unknown) => void,
           cancel: VoidFunction
         ) => void)
       | Promise<T>

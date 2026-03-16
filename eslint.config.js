@@ -17,7 +17,6 @@ module.exports = [
     },
 
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       '@typescript-eslint/no-namespace': 'off',
       'no-restricted-syntax': [
@@ -33,6 +32,7 @@ module.exports = [
   {
     files: [getFilesGlob(getTSExtensions(), 'src/types')],
     rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',

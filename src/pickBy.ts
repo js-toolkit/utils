@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import type { SelectByPredicate } from './omitBy';
 
 type MapCallback<O extends AnyObject> = (value: O[keyof O], key: keyof O) => typeof value;
@@ -28,7 +26,7 @@ export function pickBy<
   for (const key in obj) {
     if (predicate(obj[key], key)) {
       const val = obj[key];
-      result[key] = map ? map(val as any, key as any) : val;
+      result[key] = map ? map(val as never, key as never) : val;
     }
   }
   return result as PickByResult<O, T, K>;

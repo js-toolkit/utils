@@ -4,6 +4,6 @@
 //   return array;
 // }
 
-export function asUniqueArray<A extends readonly any[]>(array: AsUniqueArray<A>): A {
+export function asUniqueArray<A extends readonly unknown[]>(array: AsUniqueArray<A>): A {
   return array as A;
 }

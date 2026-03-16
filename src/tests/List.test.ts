@@ -1,4 +1,3 @@
-/* eslint-disable */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { List, Nil } from '../collections/immutable';
 

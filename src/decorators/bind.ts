@@ -1,14 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 export type DefaultOrBabelDescriptor<T> = TypedPropertyDescriptor<T> & {
-  initializer?: (() => any) | undefined;
+  initializer?: (() => AnyFunction) | undefined;
 };
 
 /** Bind method to instance. */
-export function bind<T extends (...args: any[]) => any>(
+export function bind<T extends AnyFunction>(
   target: object,
   propertyKey: string | symbol,
   descriptor: DefaultOrBabelDescriptor<T>
@@ -20,7 +15,7 @@ export function bind<T extends (...args: any[]) => any>(
       ...rest,
       initializer() {
         // N.B: we can't immediately invoke initializer; this would be wrong
-        const fn: Function = initializer.call(this);
+        const fn = initializer.call(this);
         return fn.bind(this);
       },
     };
@@ -29,13 +24,14 @@ export function bind<T extends (...args: any[]) => any>(
   return {
     configurable: true,
     enumerable: false,
-    get(this: typeof target) {
+    get(this: typeof target & AnyObject) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { value, get, set, ...rest } = descriptor;
       Object.defineProperty(this, propertyKey, {
         ...rest,
         value: value?.bind(this),
       });
-      return (this as AnyObject)[propertyKey as string];
+      return this[propertyKey] as T;
     },
   };
 }

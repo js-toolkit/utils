@@ -26,5 +26,5 @@ export function delay<T extends AnyFunction>(
 }
 
 export namespace delay {
-  export type Delay = Pick<delayed.Func<any>, 'isPending' | 'cancel'>;
+  export type Delay = Pick<delayed.Func<AnyFunction>, 'isPending' | 'cancel'>;
 }

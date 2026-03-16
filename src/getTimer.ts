@@ -120,7 +120,7 @@ export function getTimer({
         };
 
         if (immediately) {
-          timerId = -1;
+          timerId = -1 as unknown as typeof timerId;
           timerCallback(/* true */);
         } else {
           loop();
@@ -166,7 +166,7 @@ export function getTimer({
 
         try {
           if (immediately) {
-            timerId = -1;
+            timerId = -1 as unknown as typeof timerId;
             void callback(timer);
           }
         } finally {
