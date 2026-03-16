@@ -929,10 +929,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@js-toolkit/configs@npm:3.105.1":
-  version: 3.105.1
-  resolution: "@js-toolkit/configs@npm:3.105.1"
-  checksum: 10c0/4d5ce94a877f67ad0824df5ac80220a659cb17d38e0494b77f4566adad3788cc3938164c4b908a267d5ee808df420e160fc0f82a3a4f91a7d2f250ed4a11dbb4
+"@js-toolkit/configs@npm:3.106.0":
+  version: 3.106.0
+  resolution: "@js-toolkit/configs@npm:3.106.0"
+  checksum: 10c0/d11777243ec6a0c99e376d6f7da0c184c5d4df3dfd0a43b725294cd46746dcb1f845f4c57bfdaffcc7cfa4db326ef6c0df6c8ef0cd8f379cfd7fa34df85f8ddd
   languageName: node
   linkType: hard
 
@@ -951,7 +951,7 @@ __metadata:
   dependencies:
     "@eslint/compat": "npm:2.0.3"
     "@eslint/js": "npm:10.0.1"
-    "@js-toolkit/configs": "npm:3.105.1"
+    "@js-toolkit/configs": "npm:3.106.0"
     "@js-toolkit/node-utils": "npm:1.2.6"
     "@types/eslint": "npm:9.6.1"
     "@types/jest": "npm:30.0.0"
