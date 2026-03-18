@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-invalid-void-type */
 import { TimeoutError } from '../TimeoutError';
 
 export namespace Sink {
@@ -37,6 +36,7 @@ export class Sink<A> {
   private pipeHandler: ((value: A) => Promise<any>) | undefined;
 
   constructor(
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     executor: (pipe: (value: A) => void, cancel: Sink<A>['cancel']) => Sink.Finalizator | void,
     { cancelOnPipeError = true }: Sink.Options = Object.create(null)
   ) {
