@@ -154,7 +154,7 @@ class Logger {
   }
 
   log(...message: unknown[]): void {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    // eslint-disable-next-line @js-toolkit/strict-boolean-expressions
     if (this.info) this.info(...message);
   }
 
@@ -183,6 +183,7 @@ class Logger {
 
 type LoggerType = Logger;
 
+// eslint-disable-next-line @js-toolkit/no-namespace-except-declaration-merge
 namespace log {
   // Use this remap for vscode quick fix's 'Implement inherited abstract class' in custom plugin impl
   export type Logger = { [P in keyof LoggerType]: LoggerType[P] };

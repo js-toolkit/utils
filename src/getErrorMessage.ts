@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-base-to-string */
 
 export interface GetErrorMessageOptions {
@@ -10,12 +8,14 @@ export interface GetErrorMessageOptions {
 function objectToString(error: AnyObject, options: GetErrorMessageOptions): string {
   const { message, cause } = error as Error;
   if (message) {
-    return cause ? `${message} => cause: ${getErrorMessage(cause, options)}` : message;
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return cause != null ? `${message} => cause: ${getErrorMessage(cause, options)}` : message;
   }
 
   const errStr = error.toString?.() ?? 'Unknown';
 
   if (
+    // eslint-disable-next-line @js-toolkit/strict-boolean-expressions
     !error.toString ||
     // If error is just a simple object ("[object Object]").
     (error.constructor?.name && errStr === `[object ${error.constructor.name}]`)
@@ -39,7 +39,7 @@ export function getErrorMessage(
   if (typeof error !== 'object' || error == null) {
     return String(error);
   }
-  const proto = Object.getPrototypeOf(error) as object;
+  const proto = Object.getPrototypeOf(error) as object | null;
   // If error is instance of Error with cause.
   if (error instanceof Error && proto === Error.prototype && error.cause != null) {
     const prefix = options.simple ? '' : `${error.name || error.constructor.name}: `;

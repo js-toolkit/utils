@@ -30,7 +30,7 @@ class ChildLogger implements Pick<
   }
 
   log(...message: unknown[]): void {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    // eslint-disable-next-line @js-toolkit/strict-boolean-expressions
     if (this.info) this.info(...message);
   }
 
