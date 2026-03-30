@@ -16,17 +16,7 @@ module.exports = [
       },
     },
 
-    rules: {
-      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
-      '@typescript-eslint/no-namespace': 'off',
-      'no-restricted-syntax': [
-        'error',
-        'LabeledStatement',
-        'WithStatement',
-        "CallExpression[callee.name='setTimeout'][arguments.length!=2]",
-        "CallExpression[arguments.length!=2] > MemberExpression[object.name='window'][property.name='setTimeout']",
-      ],
-    },
+    rules: {},
   },
 
   {

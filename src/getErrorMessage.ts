@@ -1,3 +1,4 @@
+/* eslint-disable @js-toolkit/no-unnecessary-optional-chain */
 /* eslint-disable @typescript-eslint/no-base-to-string */
 
 export interface GetErrorMessageOptions {

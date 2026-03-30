@@ -1,5 +1,6 @@
-/* eslint-disable no-proto */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-parameters */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable no-proto */
 
 export function es5ErrorCompat<S extends Error, C extends AnyConstructor>(
   target: S,

@@ -94,6 +94,7 @@ export class EventEmitter<
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   getListenerCount<T extends EventNames<EventTypes>>(event?: T): number {
     if (event != null) return this[eventsKey][event]?.size ?? 0;
     let count = 0;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-parameters */
 /* eslint-disable @typescript-eslint/no-for-in-array */
 /* eslint-disable no-unreachable-loop */
 /* eslint-disable guard-for-in */

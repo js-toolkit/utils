@@ -7,13 +7,14 @@ export interface TreeIteratorOptions {
 }
 
 export type NextOptions = Pick<TreeIteratorOptions, 'delay' | 'loop'>;
+
 type GetNextOptions = Pick<NextOptions, 'loop'>;
 
-export interface TreeIterator<N extends AnyObject, SN extends N = N> {
+export interface TreeIterator<Node extends AnyObject, StopNode extends Node = Node> {
   readonly next: (options?: NextOptions) => void;
   readonly back: (options?: NextOptions) => void;
-  readonly getNext: (options?: GetNextOptions) => SN | undefined;
-  readonly getBack: (options?: GetNextOptions) => SN | undefined;
+  readonly getNext: (options?: GetNextOptions) => StopNode | undefined;
+  readonly getBack: (options?: GetNextOptions) => StopNode | undefined;
   readonly isCanNext: (options?: GetNextOptions) => boolean;
   readonly isCanBack: (options?: GetNextOptions) => boolean;
   readonly isPending: boolean;
@@ -21,29 +22,34 @@ export interface TreeIterator<N extends AnyObject, SN extends N = N> {
   readonly cancel: VoidFunction;
 }
 
-export interface TreeScope<N extends AnyObject, SN extends N> {
-  readonly getCurrentNode: () => N | undefined;
-  readonly childrenProp: keyof N;
-  readonly parentProp: keyof N;
-  readonly stop: ((node: N) => node is SN) | ((node: N) => boolean);
+export interface TreeScope<Node extends AnyObject, StopNode extends Node> {
+  readonly getCurrentNode: () => Node | undefined;
+  readonly childrenProp: keyof Node;
+  readonly parentProp: keyof Node;
+  readonly stop: ((node: Node) => node is StopNode) | ((node: Node) => boolean);
 }
 
-export function getTreeIterator<N extends AnyObject, SN extends N = N>(
-  scope: TreeScope<N, SN>,
-  onSwitch: (nextNode: SN) => unknown,
+export function getTreeIterator<Node extends AnyObject, StopNode extends Node = Node>(
+  scope: TreeScope<Node, StopNode>,
+  onSwitch: (nextNode: StopNode) => unknown,
   options?: TreeIteratorOptions
-): TreeIterator<N, SN> {
-  let nextTreeNode: SN | undefined;
+): TreeIterator<Node> {
+  let nextTreeNode: StopNode | undefined;
 
-  const getParent = (node: N): N | undefined => {
-    return node[scope.parentProp] as N | undefined;
+  const getParent = (node: Node): Node | undefined => {
+    return node[scope.parentProp] as Node | undefined;
   };
 
-  const getChildren = (node: N): readonly N[] | undefined => {
-    return node[scope.childrenProp] as readonly N[];
+  const getChildren = (node: Node): readonly Node[] | undefined => {
+    return node[scope.childrenProp] as readonly Node[];
   };
 
-  const selectNext = (node: N, step: -1 | 1, loop: boolean, visited: Set<N>): SN | undefined => {
+  const selectNext = (
+    node: Node,
+    step: -1 | 1,
+    loop: boolean,
+    visited: Set<Node>
+  ): StopNode | undefined => {
     // Down to children
     if (!visited.has(node)) {
       const children = getChildren(node);
@@ -52,7 +58,7 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
         const nextIdx = step + (step > 0 ? -1 : length);
         if (nextIdx >= 0 && nextIdx <= length - 1) {
           const nextNode = children[nextIdx];
-          if (scope.stop(nextNode)) return nextNode as SN;
+          if (scope.stop(nextNode)) return nextNode as StopNode;
           return selectNext(nextNode, step, loop, visited);
         }
       }
@@ -74,38 +80,38 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
       const nextIdx = idx + step;
       if (nextIdx >= 0 && nextIdx <= siblings.length - 1) {
         const nextNode = siblings[nextIdx];
-        if (scope.stop(nextNode)) return nextNode as SN;
+        if (scope.stop(nextNode)) return nextNode as StopNode;
         return selectNext(nextNode, step, loop, visited);
       }
     }
 
     // Up to parent
-    if (scope.stop(parent)) return parent as SN;
+    if (scope.stop(parent)) return parent as StopNode;
     visited.add(parent);
     return selectNext(parent, step, loop, visited);
   };
 
-  const getNextNode = (loop?: boolean): SN | undefined => {
+  const getNextNode = (loop?: boolean): StopNode | undefined => {
     const currentNode = scope.getCurrentNode();
     if (!currentNode) return undefined;
-    const visited = new Set<N>();
+    const visited = new Set<Node>();
     // visited.add(currentNode);
     return selectNext(currentNode, 1, loop ?? false, visited);
   };
 
-  const getPrevNode = (loop?: boolean): SN | undefined => {
+  const getPrevNode = (loop?: boolean): StopNode | undefined => {
     const currentNode = scope.getCurrentNode();
     if (!currentNode) return undefined;
-    const visited = new Set<N>();
+    const visited = new Set<Node>();
     // visited.add(currentNode);
     return selectNext(currentNode, -1, loop ?? false, visited);
   };
 
-  const getNext = (opts?: GetNextOptions): SN | undefined => {
+  const getNext = (opts?: GetNextOptions): StopNode | undefined => {
     return getNextNode(opts?.loop);
   };
 
-  const getBack = (opts?: GetNextOptions): SN | undefined => {
+  const getBack = (opts?: GetNextOptions): StopNode | undefined => {
     return getPrevNode(opts?.loop);
   };
 
@@ -123,7 +129,7 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
 
   const cancel = (): void => delayedSwitch.cancel();
 
-  const next: TreeIterator<N, SN>['next'] = beforeCall(
+  const next: TreeIterator<Node>['next'] = beforeCall(
     ({ delay = options?.delay } = Object.create(null)) => {
       nextTreeNode != null && delayedSwitch.delay(delay ?? 0);
     },
@@ -133,7 +139,7 @@ export function getTreeIterator<N extends AnyObject, SN extends N = N>(
     }
   );
 
-  const back: TreeIterator<N, SN>['back'] = beforeCall(
+  const back: TreeIterator<Node>['back'] = beforeCall(
     ({ delay = options?.delay } = Object.create(null)) => {
       nextTreeNode != null && delayedSwitch.delay(delay ?? 0);
     },

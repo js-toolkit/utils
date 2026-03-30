@@ -246,16 +246,13 @@ namespace log {
   }
 
   export function getPlugins(): PartialRecord<string, Plugin> {
-    return Object.entries(state.plugins).reduce<PartialRecord<string, Plugin>>(
-      (acc, [name, cfg]) => {
-        if (cfg) {
-          const [pl] = cfg;
-          acc[name] = pl;
-        }
-        return acc;
-      },
-      Object.create(null)
-    );
+    return Object.entries(state.plugins).reduce((acc, [name, cfg]) => {
+      if (cfg) {
+        const [pl] = cfg;
+        acc[name] = pl;
+      }
+      return acc;
+    }, Object.create(null));
   }
 
   export function configure({
