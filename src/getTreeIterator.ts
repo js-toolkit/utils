@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-arguments */
 import { beforeCall } from './beforeCall';
 import { delayed } from './delayed';
 
@@ -33,7 +34,7 @@ export function getTreeIterator<Node extends AnyObject, StopNode extends Node = 
   scope: TreeScope<Node, StopNode>,
   onSwitch: (nextNode: StopNode) => unknown,
   options?: TreeIteratorOptions
-): TreeIterator<Node> {
+): TreeIterator<Node, StopNode> {
   let nextTreeNode: StopNode | undefined;
 
   const getParent = (node: Node): Node | undefined => {
